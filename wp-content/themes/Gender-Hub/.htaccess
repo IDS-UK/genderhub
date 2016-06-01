@@ -1,0 +1,8 @@
+<files ajax.php>
+	Order allow,deny
+	Allow from all
+</files>
+<IfModule mod_security.c>
+SecFilterEngine Off
+SecFilterScanPOST Off
+</IfModule>

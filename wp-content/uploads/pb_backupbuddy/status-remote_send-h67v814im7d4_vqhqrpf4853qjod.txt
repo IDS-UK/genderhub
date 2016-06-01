@@ -1,0 +1,22 @@
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.60","data":"----- Initiating master send function."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.60","data":"Post-send deletion: "}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.60","data":"Fileoptions file exists; loading."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.60","data":"Created fileoptions lock file `\/var\/www\/vhosts\/genderhub.org\/wp-content\/uploads\/pb_backupbuddy\/fileoptions\/send-h67v814im7d4.txt.lock` with ID: 5735ec41124ec4.00338877."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.60","data":"Fileoptions data loaded."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.60","data":"Initializing destination."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.60","data":"Loading destination init file `\/var\/www\/vhosts\/genderhub.org\/wp-content\/plugins\/backupbuddy\/destinations\/ftp\/init.php`."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.77","data":"Destination init loaded."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.77","data":"Initialized `ftp` destination."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.77","data":"Applying destination-specific defaults."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.77","data":"Applying global destination defaults."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.77","data":"Sending files `\/var\/www\/vhosts\/genderhub.org\/wp-content\/uploads\/backupbuddy_backups\/backup-www_genderhub_org-2016_05_13-03_59pm-db-p1j4u2w8zg.zip (15.47 MB); ` to destination type `ftp` titled `IDS FTP space`."}
+{"event":"details","time":1463155281,"u":"07","run":"0.49","mem":"69.77","data":"Calling send function."}
+{"event":"details","time":1463155281,"u":"08","run":"0.49","mem":"69.77","data":"FTP class send() function started."}
+{"event":"details","time":1463155281,"u":"08","run":"0.50","mem":"69.77","data":"Connected to FTP."}
+{"event":"details","time":1463155285,"u":"21","run":"4.63","mem":"69.77","data":"Sending email error notification with subject `BackupBuddy Error - http:\/\/www.genderhub.org` to recipient(s): `info@genderhub.org, p.mason@ids.ac.uk`."}
+{"event":"details","time":1463155285,"u":"66","run":"5.08","mem":"70.58","data":"Looking for remote send log file `\/var\/www\/vhosts\/genderhub.org\/wp-content\/uploads\/pb_backupbuddy\/status-remote_send-h67v814im7d4_p1j4u2w8zg.txt`."}
+{"event":"details","time":1463155285,"u":"66","run":"5.08","mem":"70.58","data":"Remote send log file not found."}
+{"event":"details","time":1463155285,"u":"66","run":"5.08","mem":"70.58","data":"Sending email error notification with subject `BackupBuddy Error - http:\/\/www.genderhub.org` to recipient(s): `info@genderhub.org, p.mason@ids.ac.uk`."}
+{"event":"details","time":1463155286,"u":"01","run":"5.43","mem":"70.58","data":"Completed send function. Failure."}
+{"event":"details","time":1463155286,"u":"01","run":"5.43","mem":"70.58","data":"Post-send deletion not enabled."}
+{"event":"details","time":1463155286,"u":"01","run":"5.43","mem":"70.58","data":"Finishing send() function."}

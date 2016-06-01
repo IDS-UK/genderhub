@@ -1,0 +1,447 @@
+/* 
+ * Custom Skin Sample
+ *
+ * These styles apply when the skin is set to "None".  To apply to do different skin, replace the .ubermenu-skin-none prefix with the appropriate skin.
+ * To apply to all menus, replace .ubermenu-skin-none with just .ubermenu
+ */
+/* UberMenu - Copyright 2011-2014, SevenSpark */
+
+
+
+
+
+
+
+
+.ubermenu .ubermenu-colgroup .ubermenu-column, .ubermenu .ubermenu-custom-content-padded, .ubermenu .ubermenu-nonlink, .ubermenu .ubermenu-retractor, .ubermenu .ubermenu-submenu-padded, .ubermenu .ubermenu-submenu-type-stack > .ubermenu-item-normal > .ubermenu-target, .ubermenu .ubermenu-target, .ubermenu .ubermenu-widget, .ubermenu-responsive-toggle
+{
+  padding: 0!important;
+}
+
+
+
+
+/* Menu Bar */
+
+
+.ubermenu-skin-none {
+  border: none;
+  background: transparent;
+  margin-bottom:0!important;
+  margin-top:0px
+
+}
+.ubermenu {background:transparent!important;}
+
+
+
+
+
+
+
+
+
+/* Menu Item Links in general */
+
+.ubermenu-target-text {padding:4px 10px!important;font-family: 'Asap', Arial, Helvetica, sans-serif;font-weight:700;font-size:16px;}
+.ubermenu-target-text:hover {color:#fff}
+
+.ubermenu .ubermenu-target {color:#636d78}
+.ubermenu .ubermenu-target:hover {color:#fff}
+
+
+
+.ubermenu-skin-none .ubermenu-target {
+width:auto;
+	box-shadow: none!important;
+	background:#dce6ef;
+	color:#636d78!important;
+	 /* Safari 3-4, iOS 1-3.2, Android 1.6- */
+  -webkit-border-radius: 4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+/* Firefox 1-3.6 */
+  -moz-border-radius:4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+/* Opera 10.5, IE 9, Safari 5, Chrome, Firefox 4, iOS 4, Android 2.1+ */
+  border-radius:4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+}
+
+
+
+
+
+
+/* Top Level Items
+ */
+
+
+
+#ubermenu-nav-main-2-primary li {margin-left:4px!important;}
+
+
+.ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-item > .ubermenu-target,
+.ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-parent > .ubermenu-target,
+.ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-ancestor > .ubermenu-target {
+  width:auto;
+  box-shadow: none!important;
+  background:#4f8731!important;
+  color:#fff!important;
+   /* Safari 3-4, iOS 1-3.2, Android 1.6- */
+  -webkit-border-radius: 4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+/* Firefox 1-3.6 */
+  -moz-border-radius:4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+/* Opera 10.5, IE 9, Safari 5, Chrome, Firefox 4, iOS 4, Android 2.1+ */
+  border-radius:4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+}
+
+
+
+
+/* Top Level Items - Hover ////////////////////////////////////////////////////////////////*/
+.ubermenu-skin-none .ubermenu-item-level-0:hover > .ubermenu-target,
+.ubermenu-skin-none .ubermenu-item-level-0.ubermenu-active > .ubermenu-target {
+width:auto;
+  box-shadow: none!important;
+  background:#4f8731!important;
+  color:#fff!important;
+   /* Safari 3-4, iOS 1-3.2, Android 1.6- */
+  -webkit-border-radius: 4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+/* Firefox 1-3.6 */
+  -moz-border-radius:4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+/* Opera 10.5, IE 9, Safari 5, Chrome, Firefox 4, iOS 4, Android 2.1+ */
+  border-radius:4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+
+}
+
+
+
+
+
+
+
+/* Submenu Indicators (Arrows)
+ */
+
+
+
+
+
+.ubermenu-sub-indicators .ubermenu-has-submenu-drop > .ubermenu-target:after {
+  display:none!important
+}
+
+.ubermenu .ubermenu-item .ubermenu-submenu-drop
+{
+  box-shadow: none!important;
+}
+
+
+
+
+/* Top Level Submenu Stack Links */
+
+
+
+.ubermenu-skin-none .ubermenu-item-level-0 > .ubermenu-submenu-type-stack > .ubermenu-item > .ubermenu-target {
+  color: #636d78;
+  background: transparent!important;
+}
+.ubermenu-skin-none .ubermenu-item-level-0 > .ubermenu-submenu-type-stack > .ubermenu-item > .ubermenu-target:hover {
+  color: #28313b;
+  background: transparent!important;
+}
+
+
+
+
+/* Submenus */
+
+
+
+.ubermenu-submenu .ubermenu-target-text {padding:4px 10px!important;font-family: 'Asap', Arial, Helvetica, sans-serif;font-weight:700;font-size:16px;}
+.ubermenu-submenu .ubermenu-target-text:hover {color:#000}
+
+.ubermenu-submenu .ubermenu .ubermenu-target {color:#636d78}
+.ubermenu-submenu .ubermenu .ubermenu-target:hover {color:#000}
+
+
+
+
+
+
+.ubermenu .ubermenu-current-menu-item > .ubermenu-submenu,
+.ubermenu .ubermenu-current-menu-ancestor > .ubermenu-submenu{
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  margin: 0 !important;
+  top: auto !important;
+  max-height: none !important;
+  height: auto !important;
+  background:#dce6ef !important;
+  border-bottom: 2px solid #dce6ef ;
+  z-index:50;
+}
+
+
+/* Submenu BACKGROUND PANEL */
+.ubermenu-skin-none.ubermenu-horizontal .ubermenu-item-level-0 > .ubermenu-submenu-drop {
+  width:100%!important;
+  height:auto!important;
+  overflow:hidden!important;
+  border-top: none  !important;
+  background:#dce6ef !important;
+  margin-top:0!important;
+  padding-top:0px!important;
+  z-index:1000!important;
+}
+
+
+
+
+
+/* Current Submenu Item  ////////////////////////////////////////////////////////////////*/
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-current-menu-item > .ubermenu-target,
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-current-page-item > .ubermenu-target {
+  color: #000!important;
+  background:transparent;
+  margin-top:0!important;
+  z-index:50!important;
+}
+
+
+
+/* Submenu general text color */
+.ubermenu-skin-none .ubermenu-submenu,
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-target {
+  color: #636d78;
+}
+
+/* Submenu highlight color */
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-highlight {
+  color: #28313b;
+}
+
+/* Submenu Links */
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-target:hover,
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-active > .ubermenu-target {
+  color:#28313b;
+  background: transparent!important;
+}
+/* Submenu Descriptions */
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-target > .ubermenu-target-description {
+  color: #636d78;
+}
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-active > .ubermenu-target > .ubermenu-target-description {
+  color:#636d78;
+}
+
+/* Submenu Headers */
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-item-header > .ubermenu-target {
+  font-weight: 700;
+  color:#636d78;
+  background: transparent!important;
+}
+/* Submenu items in a stack */
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-item-header.ubermenu-has-submenu-stack > .ubermenu-target {
+  border-bottom: none;
+  background: transparent!important;
+}
+/* Submenu Headers - Hover */
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-item-header > .ubermenu-target:hover {
+  color: #28313b;
+ background: transparent!important;
+}
+
+
+
+.ubermenu .ubermenu-autocolumn, .ubermenu .ubermenu-submenu-type-stack {display:none}
+
+
+
+
+
+
+
+
+/* NEW EXTRA STYLES to FIX SUB NAV HOVER */
+.ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-item > ul.ubermenu-submenu.ubermenu-submenu, .ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-parent > ul.ubermenu-submenu.ubermenu-submenu, 
+.ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-ancestor > ul.ubermenu-submenu.ubermenu-submenu{
+  z-index:11 !important;
+  margin-top:1px;
+}
+
+.ubermenu-skin-none.ubermenu-horizontal .ubermenu-item-level-0 > .ubermenu-submenu-drop.ubermenu-submenu-drop.ubermenu-submenu-drop{
+  background:none !important;
+  border-top:none !important;
+  margin-top:-1px;
+  }
+.ubermenu-skin-none.ubermenu-horizontal .ubermenu-item-level-0 > .ubermenu-submenu-drop.ubermenu-submenu-drop.ubermenu-submenu-drop li{
+  background-color: #DCE6EF;
+  }
+  
+  
+.ubermenu-skin-none.ubermenu-horizontal .ubermenu-item-level-0 > .ubermenu-submenu-drop:before{
+  content: " ";
+  display:block;
+  width:100%;
+  background:none!important;
+  height:5px;
+  }
+  
+
+
+  
+.ubermenu-skin-none.ubermenu-horizontal .ubermenu-item-level-0 > .ubermenu-submenu-drop:after{
+  content:" ";
+  display:block;
+  position:absolute;
+  background-color:#DCE6EF;
+  width:100%;
+  height:25px;
+  left:0;
+  bottom:0;
+  }
+#ubermenu-nav-main-2-primary li.ubermenu-item.ubermenu-item.ubermenu-item.ubermenu-item{
+  margin-left:0 !important;
+  padding-left:4px;
+  }
+
+#ubermenu-nav-main-2-primary li.ubermenu-active{
+  }
+  
+  
+  
+
+
+
+  /*  Make mobile version work properly - expand panel */
+
+
+@media only screen and (max-width: 890px) {
+.ubermenu .ubermenu-item .ubermenu-submenu-drop{
+  position:static !important;
+  }
+#ubermenu-nav-main-2-primary li.ubermenu-item{
+  width: 100%;
+  display: block;
+  }  
+}
+  
+  
+  
+  
+ 
+
+/* Responsive menu */
+
+
+.ubermenu-responsive-toggle, .ubermenu-sticky-toggle-wrapper
+{
+  float:right;display: block;color:#dce6ef
+}
+
+
+.ubermenu-responsive-toggle:hover
+{
+}
+
+
+
+
+ /*  GO FULL WIDTH AT LESS THAN 890 PIXELS */
+
+@media only screen and (max-width: 890px) {
+
+/* Submenu Indicators */
+.ubermenu-sub-indicators .ubermenu-has-submenu-drop > .ubermenu-target:after {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  margin-top: -6px;
+  content: "\f107";
+  display: inline-block!important;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+
+
+
+.ubermenu-responsive-toggle, .ubermenu-sticky-toggle-wrapper
+{
+  float:right;display: block;color:#dce6ef;margin-top:-30px
+}
+
+.ubermenu .ubermenu-autocolumn, .ubermenu .ubermenu-submenu-type-stack {display:block}
+
+#ubermenu-main-2-primary {height:auto!important;overflow:auto!important;display:block;position:relative;z-index:2000;
+margin:0!important;padding:10px!important;
+	 width:100%;
+  box-shadow: none!important;
+  background:#dce6ef!important;
+  color:#fff!important;
+   /* Safari 3-4, iOS 1-3.2, Android 1.6- */
+  -webkit-border-radius: 4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+/* Firefox 1-3.6 */
+  -moz-border-radius:4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+/* Opera 10.5, IE 9, Safari 5, Chrome, Firefox 4, iOS 4, Android 2.1+ */
+  border-radius:4px 4px 4px 4px!important; /* top left, top right, bottom right, bottom left */
+}
+
+
+
+.ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-item > ul.ubermenu-submenu.ubermenu-submenu, .ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-parent > ul.ubermenu-submenu.ubermenu-submenu, 
+.ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-ancestor > ul.ubermenu-submenu.ubermenu-submenu{
+  z-index:1 !important;
+  margin-top:1px;
+}
+
+
+
+
+
+#ubermenu-nav-main-2-primary li.ubermenu-item.ubermenu-item.ubermenu-item.ubermenu-item{
+  padding-left:0px;
+  }
+
+
+#ubermenu-nav-main-2-primary li.ubermenu-item {margin-bottom:5px!important;display:inline-block!important;
+ }
+ 
+.ubermenu-submenu .ubermenu-target-text:before {
+	 content: "- ";
+	 
+}
+
+.ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-item > ul.ubermenu-submenu.ubermenu-submenu, .ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-parent > ul.ubermenu-submenu.ubermenu-submenu, 
+.ubermenu-skin-none .ubermenu-item-level-0.ubermenu-current-menu-ancestor > ul.ubermenu-submenu.ubermenu-submenu{
+  display:inline!important
+}
+
+
+
+
+
+/* Current Submenu Item  ////////////////////////////////////////////////////////////////*/
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-current-menu-item > .ubermenu-target,
+.ubermenu-skin-none .ubermenu-submenu .ubermenu-current-page-item > .ubermenu-target {
+  color: #28313b!important;
+  background:#dce6ef!important;
+  margin-top:0!important;
+  z-index:50!important;
+}
+
+
+
+
+
+
+}
+
+
+

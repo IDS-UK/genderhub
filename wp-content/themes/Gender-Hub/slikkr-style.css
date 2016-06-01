@@ -1,0 +1,246 @@
+.sidebar-section.nbm {
+	margin-bottom: 0;
+}
+
+.single-collections h1 span {
+	background: #53a669;
+	color: #fff;
+	padding: 5px;
+}
+
+.single-collections h1 {
+	border-top: solid 5px #53a669
+}
+
+.filter {
+	width:auto;
+	color:#000;
+	font-size:18px;
+	border-bottom: 2px solid #53a669;
+}
+
+.filter a {
+	color: #fff;
+	font-size: 1em;
+	background: #99ce94;
+	padding: 8px;
+	border-radius:5px 5px 0 0;
+	display:inline-block;
+	cursor:pointer;
+}
+
+.filter a.active {
+	background: #4aa65f;
+}
+
+.col1_3 h3, .col2_3 h3 {
+	color: #4aa65f;
+	padding-bottom: .8em;
+	font-size: 1.3em;
+}
+
+#documents {
+	padding-bottom: 1em;
+	border-bottom: 2px solid #53a669;
+}
+
+#documents + h3 {
+	margin-top: 1em;
+}
+
+#doc-container {
+	position: relative;
+}
+
+#doc-container:after {
+	content: "";
+	clear: both;
+	display: block;
+}
+
+.doclist {
+	clear: both;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+.doclist.single {
+	clear: both;
+	width: 100%;
+	position: relative;
+	top: 0;
+	right: 0;
+}
+.doc-topic-desc {
+	padding: .5em;
+}
+
+#main .doclist p.topiclist {
+	margin: .8em 0 0;
+	font-size: 1em;
+}
+
+#main .doclist p.topiclist a {
+	cursor:pointer; color: #99ce94; font-weight: bold; font-size: 1.1em;  
+}
+
+#main .doclist p.doctitle {
+	margin: .8em .5em 0 .2em;
+	font-size: 1em;
+}
+
+#main .doclist p.doctitle a:hover {
+	text-decoration: underline;
+}
+
+#main .doclist p:not(doctitle) {
+	margin: 0 .5em 0 .2em;
+	font-size: .9em;
+	padding-left: .3em;
+}
+
+#main .doclist p.doctitle span.dtitle a {
+	font-weight: bold;
+}
+
+#main .doclist p.doctitle span.dpublisher {
+	font-size: .9em;
+	color: #666666;
+}
+.single-collections #main a.collection-image { display: block;position: relative; text-decoration: none; }
+.single-collections #main a.collection-image:hover { text-decoration: none; }
+.single-collections #main a.collection-image .image-caption { position: absolute; bottom: 0; }
+.single-collections #main a.collection-image.processed .image-caption { display: none; opacity: 0.85;}
+
+.single-collections #main .image-text { padding: 10px; background-color: #eee; font-style: italic;font-size: 0.875em;}
+.single-collections #main .image-text p { margin: 2px 0 5px 0;  color: #000; font-style: italic;}
+.single-collections #main .image-credit { padding: 5px; text-align: right;}
+
+
+#featured_content article {
+	padding: 0;
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+#featured_content h6 {padding:3% 30px 3% 3%; position: relative; }
+#featured_content h6 span { position: absolute; right: 3%; top: 8% }
+
+
+#inspiring {
+	background: #e5f7f9;
+	padding-top: .8em;
+}
+
+.contact-point{
+	clear: both;
+}
+
+.cp-image {
+	float: left;
+	width: 20%;
+	margin-right: 5%;
+}
+
+.cp-details {
+	float: right;
+}
+
+#main .cp-image img {
+	width: 100%;
+}
+
+.next-prev-links {
+	border-bottom: 3px solid #4aa65f;
+}
+
+.next-prev-links:after {
+	content: "";
+	clear: both;
+	display: block;
+}
+
+.next-prev-links div {
+	padding: .5em 0;
+}
+
+.next-prev-links div a {
+	padding: .5em 0;
+}
+
+.collections-shortcode .collection {
+	margin-bottom: .5em;
+}
+
+.collections-shortcode .collection:after {
+	content: "";
+	clear: both;
+	display: block;
+}
+
+#main .collections-shortcode > .collection > p {
+	margin-bottom: .5em;
+}
+
+.collection .image {
+	width: 22%;
+	float: left;
+	margin-right: 3%;
+}
+
+.collection .details {
+	width: 75%;
+	float: right;
+}
+
+#main .collection .details p {
+	margin-bottom: .5em;
+}
+
+.collection .details h2 a {
+	color: #4aa65f;
+}
+.collection-date {
+	font-weight: bold;
+}
+.page-template-template-collections #main ul, .page-template-template-collections #main ul li {
+	list-style: none;
+	margin-left: 0;
+}
+
+.page-template-template-collections #main ul li a {
+	color: #4aa65f;
+}
+
+.sidebar-section {
+	margin-bottom: 2em;
+	clear: both;
+	padding: 0 .8em .8em;
+}
+
+#main .sidebar-section p:last-of-type {
+	margin-bottom: 0;
+}
+
+.sidebar-section .wpcf7-form input {
+	display: block;
+}
+
+.sidebar-section.section-highlight {
+	padding-top: .8em;
+}
+
+.sidebar-section.section-highlight h3 {
+	color: #fff;
+}
+
+.section-highlight {
+	color: #000;
+	background-color: rgba(153, 206, 148, 0.68);
+}
+
+.entry-featured-image img {
+	object-fit: cover;
+	display: block;
+	width: 100%;
+}

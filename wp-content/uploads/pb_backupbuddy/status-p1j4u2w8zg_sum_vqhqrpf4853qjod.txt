@@ -1,0 +1,1 @@
+{"event":"error","time":1463155286,"u":"02","run":"5.44","mem":"70.62","data":"Failure sending to remote destination. Details: BackupBuddy failed sending a backup to the remote destination \"IDS FTP space\" (id: 1). Please verify and test destination settings and permissions. Check the error log for further details."}
