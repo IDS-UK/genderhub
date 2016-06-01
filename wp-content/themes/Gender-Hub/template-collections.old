@@ -1,0 +1,91 @@
+
+			<div id="documents">
+
+				<aside class="filter">
+					<?php
+
+					foreach($topic_list as $topic) : ?>
+
+						<a rel="<?php echo $topic->term_id;?>" class="docfilter<?php echo $topic->parent === 0 ? ' active' : '' ;?>"><?php echo $topic->parent === 0 ? 'Topics' : $topic->name; ?></a>
+
+					<?php endforeach;
+					?>
+				</aside>
+
+				<div id="doc-container">
+
+					<?php
+
+					$docsetcount = 1;
+
+					foreach($topic_list as $topic) : ?>
+
+						<div id="<?php echo $topic->term_id;?>" class="doclist"<?php echo $docsetcount > 1 ? ' style="display:none;"' : ''; ?>>
+
+						<?php
+
+						if ($docsetcount ===1) :
+
+							foreach($topic_list as $t) :
+
+								echo $t->parent > 0 ? '<p class="topiclist"><a rel="'.$t->term_id.'" class="topicfilter">'.$t->name.'</a><br/>'.$t->description.'</p>' : '';
+
+								endforeach;
+
+							$docsetcount++;
+
+						else: ?>
+
+							<div class="doc-topic-desc section-highlight">
+
+								<?php echo $topic->description; ?>
+
+							</div>
+
+							<?php
+
+							$args = array(
+								'numberposts' => 100,
+								'post_type' => $docs_post_types,
+								'orderby' => 'post_date',
+								'order' => 'DESC' ,
+								'tax_query' => array(
+
+									array(
+										'taxonomy' => 'topics',
+										'field'    => 'term_id',
+										'operator' => 'IN',
+										'terms'    => $topic->term_id,
+									))
+							);
+
+							$doc_posts = get_posts( $args );
+
+							foreach ( $doc_posts as $post ) :
+								$c = get_post_custom($post->ID);
+								$publisher = get_field('publisher');
+								$publication_year = get_field('publication_year');
+
+								?>
+								<p class="doctitle"><span class="dtitle"><a href="<?php echo get_the_permalink($post->ID);?>"><?php echo get_the_title($post->ID);?></a></span>
+								<?php echo !empty($publisher) ? '<span class="dpublisher">('.$publisher : ''; ?>
+
+								<?php echo !empty($publication_year) ? ' - '.$publication_year.')</span></p>' : '</p>';?>
+
+								<?php
+							endforeach;
+
+								$docsetcount++;
+							wp_reset_postdata();?>
+
+							<?php endif; ?>
+
+						</div>
+
+					<?php endforeach; ?>
+
+				</div> <!-- slkr - /doc-container -->
+
+
+			</div> <!-- slkr - /documents -->
+

@@ -1,0 +1,40 @@
+<?php
+/**
+ * Template Name: IDS View Documents Template
+*/
+get_header(); ?>
+
+<div class="section group main_content">
+<div class="col span_3_of_4 padding10">
+<!-- Call the API and populate the loop with IDS documents -->
+<?php idsview_assets('eldis', 'documents'); ?>
+<?php if ( have_posts() ) : ?>
+  <?php if ( !idsview_is_single() ) { ?>
+    <header class="archive-header">
+     <h1 class="archive-title"><span>
+        <?php if ( $category_title = idsview_category_title('eldis') ) { ?>
+          <?php printf(__('Results for: %s'), $category_title ); 	?>
+        <?php } else { ?>
+          Resource library
+        <?php } ?>
+      </span></h1>
+    </header><!-- .archive-header -->
+  <?php } ?>
+  <div class="article">
+  
+
+<?php /* The loop */ ?>
+	<?php while ( have_posts() ) : the_post(); ?>
+		<?php get_template_part( 'content-ids_documents', get_post_format() ); ?>
+	<?php endwhile; ?>
+<?php genderhub_pagination(); ?>
+  </div><!--/article-->
+<?php else : ?>
+	<?php get_template_part( 'content', 'none' ); ?>
+<?php endif; ?>
+</div><!--/col span_3_of_4-->
+<div class="col span_1_of_4 sidebar padding10">
+<?php if ( function_exists( 'dynamic_sidebar' ) ) dynamic_sidebar( "knowledge-sidebar" ); ?> 
+</div><!--/col span_1_of_4-->
+</div><!--/section group-->
+<?php get_footer(); ?>
