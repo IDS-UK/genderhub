@@ -9,18 +9,13 @@
 <div class="col span_3_of_4 archive_content padding10">
 
 
-
-
-
-
 		<?php /* The loop */ ?>
 			<?php while ( have_posts() ) : the_post(); ?>
 
-				<?php get_template_part( 'content', get_post_format() ); ?>
+				<?php get_template_part( 'content', get_post_type() ); ?>
 									
 		<?php edit_post_link(); ?>	
-		
-									<?php comments_template(); ?>
+				<?php comments_template(); ?>
 									
 	
 

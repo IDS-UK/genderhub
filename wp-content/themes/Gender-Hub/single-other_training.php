@@ -16,7 +16,7 @@
 		<?php /* The loop */ ?>
 			<?php while ( have_posts() ) : the_post(); ?>
 
-				<?php get_template_part( 'content', 'training' ); ?>
+				<?php get_template_part( 'content', 'other_training' ); ?>
 									
 		<?php edit_post_link(); ?>	
 		

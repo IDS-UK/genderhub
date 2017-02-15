@@ -30,13 +30,17 @@ get_header(); ?>
 <?php if ( have_posts() ) : ?>
 
 	<header class="archive-header">
+
     <h1 class="archive-title">
+
+	
+
     <!--<div class="rss_socials">
       <ul>
         <li class="rssNav"><a title="RSS Feed" href="<?php echo current_page_url(); ?>/feed"><span>RSS Feed</span></a></li>
       </ul>
     </div>-->
-    <span>
+    <span class="type">
     <?php
       if ( is_day() ) :
         printf( __( 'Daily Archives: %s', 'twentythirteen' ), get_the_date() );
@@ -56,31 +60,45 @@ get_header(); ?>
       endif;
     ?>
     </span>
-    </h1>
-	</header><!-- .archive-header -->
-<span class="count-items"><?php global $wp_query; echo $wp_query->found_posts; ?> resources(s) </span>
- 
-		<?php if(get_option($wp_query->query['post_type'].'-description') != ''): echo '<p class="introtext">'.get_option($wp_query->query['post_type'].'-description').'</p>'; endif;?>
-  <?php
-  genderhub_pagination();	
-  wp_reset_query(); 
-	
-	/* The loop */
-    while ( have_posts() ) : the_post();
-      
-	//if (is_post_type_archive( 'ids_documents' )) { // IDS DOCUMENT
-       if (get_post_type() == 'ids_documents') {
-	 get_template_part( 'content-ids_documents' );
-        //echo 'ppp'.get_post_type();
-	} else { // REGULAR POST
-        get_template_part( 'content', get_post_format() );
-        //echo 'qqq'.get_post_type();
-      }
-		endwhile;
-  genderhub_pagination();
+	<?php echo category_description( $category_id ) ? '<span class="category-description">'.category_description( $category_id ).'</span>' : ''; ?>
 
-else : 
-  get_template_part( 'content', 'none' );
+	
+
+    </h1>
+<span class="count-items"><?php global $wp_query; echo $wp_query->found_posts; ?> resources(s) </span>
+	</header><!-- .archive-header -->
+ 
+<?php 
+    if (isset($wp_query->query['post_type'])) {
+        if (get_option($wp_query->query['post_type'].'-description') != '') {
+            echo '<p class="introtext">'.get_option($wp_query->query['post_type'].'-description').'</p>'; 
+        }
+    }
+?>
+<?php
+
+    genderhub_pagination();
+
+    while ( have_posts() ) : the_post();
+
+        if (get_post_type() == 'ids_documents') {
+
+            get_template_part( 'content', 'ids_documents');
+
+        } else {
+
+            get_template_part( 'content', get_post_format() );
+
+        }
+
+    endwhile;
+
+    genderhub_pagination();
+
+else :
+
+    get_template_part( 'content', 'none' );
+
 endif;
 
 ?>

@@ -1,22 +1,7 @@
 <?php
 /**
- * /* Template Name: Practical Tools Archive page 
-
-The template for displaying Practical Tools Archive pages
- *
- * Used to display archive-type pages if nothing more specific matches a query.
- * For example, puts together date-based pages if no date.php file exists.
- *
- * If you'd like to further customize these archive views, you may create a
- * new template file for each specific one. For example, Twenty Thirteen
- * already has tag.php for Tag archives, category.php for Category archives,
- * and author.php for Author archives.
- *
- * @link http://codex.wordpress.org/Template_Hierarchy
- *
- * @package WordPress
- * @subpackage Twenty_Thirteen
- * @since Twenty Thirteen 1.0
+ * Template Name: Practical Tools Archive page
+ * The template for displaying Practical Tools Archive pages
  */
 
 get_header(); ?>
@@ -36,7 +21,7 @@ get_header(); ?>
     <?php if(get_option($wp_query->query['post_type'].'-description') != ''): echo '<p class="introtext">'.get_option($wp_query->query['post_type'].'-description').'</p>'; endif;?>
     <!-- the loop -->
     <?php while ( have_posts() ) : the_post(); ?>
-      <?php get_template_part( 'content', get_post_format() ); ?>
+      <?php get_template_part( 'content', get_post_type() ); ?>
     <?php endwhile; ?>
     <!-- end of the loop -->
     <br /><br />

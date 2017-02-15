@@ -1,7 +1,8 @@
 <?php
 /**
- * The default template for displaying content
+ * Template for displaying IDS Documents content parts
  */
+//require_once("Tax-meta-class/Tax-meta-class.php");
 
 ?>
 
@@ -12,29 +13,30 @@
 	$terms = wp_get_post_terms(get_the_ID(), 'attribution');
 
 	foreach ($terms as $term){
-		//echo print_r($term,true);
-		$attribution .= '<div class="attribution-group">';
-
-		$attribution .= '<a class="attribution-link" href="'.get_tax_meta($term->term_id,'ba_website_link_field_id').'">';
-	
-		$attribution .= '<span class="attribution-text">';
-		$attribution .= get_tax_meta($term->term_id,'ba_attribution_text_field_id');
-		$attribution .= '&nbsp;'.get_tax_meta($term->term_id,'ba_display_name_field_id');
-		$attribution .= '</span>';
-		$img = get_tax_meta($term->term_id,'ba_attribution_image_field_id');
-		$img = vt_resize($img['id'], '', 140, 110, true);
+		//$attribution .= '<pre>'.print_r($term,true).'</pre>';
+		$title = get_term_meta($term->term_id,'ba_attribution_text_field_id', true);
+		
+                $attribution .= '<div class="attribution-group">';
+                $attribution .= '<a class="attribution-link" title="'.$title.'" href="'.get_term_meta($term->term_id,'ba_website_link_field_id',true).'">';
+		//$attribution .= '<span class="attribution-text">';
+		//$attribution .= '&nbsp;'.get_term_meta($term->term_id,'ba_display_name_field_id', true);
+		//$attribution .= '</span>';
+                //$attribution .= print_r(get_term_meta($term->term_id,'ba_attribution_image_field_id'),true);
+		$img = get_term_meta($term->term_id,'ba_attribution_image_field_id',true);  
+            	$img = vt_resize($img['id'], '', 140, 110, true);
 		$attribution .= '<img class="attribution-image" src="'.$img['url'].'" />';
-		//$attribution .= print_r(get_tax_meta($term->term_id,'ba_attribution_image_field_id'),true);
+		
 		$attribution .= '</a></div>';
+                 
 	}
   //}
 
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+
 	<header class="entry-header">
-	
-	
+
 		<?php if ( has_post_thumbnail() && ! post_password_required() && ! is_attachment() ) : ?>
 		<div class="entry-thumbnail">
 			<?php the_post_thumbnail(); ?>
@@ -52,11 +54,15 @@
 				
 			
 			<h1 class="entry-title">
-				<a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?></a>
+				<a href="<?php the_permalink(); ?>" rel="bookmark">
+                                    <?php if ( is_search() ) :  ?><span class="search-content-type">DOCUMENT: </span><?php endif; ?>
+                                    <?php the_title(); ?>
+                                </a>
 			</h1>
 		<?php endif; // is_single() ?>
 
 	<h6>
+		<span class="floatright"><img src="/wp-content/uploads/2015/05/document-icon.png" /></span>
 
 		<?php 
 		if (ids_get_field('publisher') != '') { echo '<span>Publisher: </span><strong>'.ids_get_field('publisher').'</strong>'; } 
@@ -75,33 +81,7 @@
 		<?php
 		// if ($terms_as_text = strip_tags( get_the_term_list( $wp_query->post->ID, 'content_type', '', ' , ' ) )) { echo '<!--span>Content type(s): </span><strong>'.$terms_as_text.'</strong-->'; }
 		?>
-
-
-
-
-
-<?php
-
-if( has_term( 'Event', 'content_type', $wp_query->post->ID ) ):
-	echo '<span class="floatright"><img src="/wp-content/uploads/2015/05/event-icon.png" /></span>';
-elseif( has_term( 'Blog', 'content_type',$wp_query->post->ID ) ):
-	echo '<span class="floatright"><img src="/wp-content/uploads/2015/05/blog-icon.png" /></span>';
-elseif( has_term( 'News', 'content_type',$wp_query->post->ID ) ):
-	echo '<span class="floatright"><img src="/wp-content/uploads/2015/05/news-icon.png" /></span>';
-elseif( has_term( 'Training', 'content_type',$wp_query->post->ID ) ):
-	echo '<span class="floatright"><img src="/wp-content/uploads/2015/05/training-icon.png" /></span>';
-elseif( has_term( 'Alert', 'content_type',$wp_query->post->ID ) ):
-	echo '<span class="floatright"><img src="/wp-content/uploads/2015/06/bell-icon.png" /></span>';
-elseif( has_term( 'Document', 'content_type',$wp_query->post->ID ) ):
-	echo '<span class="floatright"><img src="/wp-content/uploads/2015/06/document-icon.png" /></span>';
-elseif( has_term( 'Story', 'content_type',$wp_query->post->ID ) ):
-	echo '<span class="floatright"><img src="/wp-content/uploads/2015/06/speech-bubbles-icon.png" /></span>';
-elseif( has_term( 'Tool', 'content_type',$wp_query->post->ID ) ):
-	echo '<span class="floatright"><img src="/wp-content/uploads/2015/06/presentation-icon.png" /></span>';
-endif;
-?>
-
-</h6>
+            </h6>
 	
 	
 	 </header><!-- .entry-header -->
@@ -172,18 +152,55 @@ if( !empty($image) ): ?>
 
       <div class="ids-fields">
       
-      <h3>Document details</h4>
+      <h3>Document details</h3>
       
    
   
       
        <?php ids_field('urls', '<div class="list-of-buttons">', '</div>', array('link', 'Read document')); ?>
              
-       <ul>
-       
+        
    
+<?php 
+    /* Get the collections this is part of */
 
+        $topics = wp_get_post_terms(get_the_ID(), 'topics', array('fields' => 'all','orderby' => 't.term_id'));
+        foreach($topics as $topic) {
+            $topic_list[] = $topic->term_id;
+        }
+        //print 'xxx'.print_r($topic_list,true);
+        
+        $posts_array = get_posts(
+            array( 'showposts' => -1,
+            'post_type' => 'collections',
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'topics',
+                    'field' => 'term_id',
+                    'terms' => $topic_list,
+                    )
+                )
+            )
+        );
+        //print 'xxx'.print_r($posts_array,true);
+        if (count($posts_array) > 0) {
+            print '<div class="document-collections-wrapper">';
+            print '<h3>'.'<span>Collections</span>'.'</h3>';
+            print '<p>'.'Find more like this in our collections'.'</p><ul>';
+            foreach ($posts_array as $collection) {
+                //print get_field('date', $collection->ID);
+                $collection_date = new DateTime(get_field('date', $collection->ID));
+                //print 'xxx'.print_r($collection,true);
+                print '<li>';
+                print '<a href="'.$collection->guid.'">'.$collection->post_title.' ('.$collection_date->format('F Y').')</a><br/>'.  get_the_excerpt($collection->ID);
+                print '</li>';
+            }
+            print '</ul>';
+            print '</div>';
+        }
 
+?>
+      <ul>
         <?php ids_field('publisher', '<li class="ids-field">' . __('<strong>Publisher:</strong> '), '</li>'); ?>      
         <?php ids_field('authors', '<li class="ids-field">' . __('<strong>Author:</strong> '), '</li>'); ?> 
 
@@ -199,7 +216,7 @@ if( !empty($image) ): ?>
         <li class="ids-field"><strong>Themes:</strong> <?php
 $sep = '';
 foreach((get_the_category()) as $category) {
-echo $sep . '<a href="/?unonce=34668a7887&uformid=1930&s=uwpsfsearchtrg&taxo%5B0%5D%5Bname%5D=category&taxo%5B0%5D%5Bopt%5D=&taxo%5B0%5D%5Bterm%5D='.$category->slug.'&taxo%5B1%5D%5Bname%5D=bridge_countries&taxo%5B1%5D%5Bopt%5D=&taxo%5B1%5D%5Bterm%5D=uwpqsftaxoall&skeyword=">'.$category->cat_name.'</a>'; $sep = ', ';
+    echo $sep . '<a href="/?unonce=34668a7887&uformid=1930&s=uwpsfsearchtrg&taxo%5B0%5D%5Bname%5D=category&taxo%5B0%5D%5Bopt%5D=&taxo%5B0%5D%5Bterm%5D='.$category->slug.'&taxo%5B1%5D%5Bname%5D=bridge_countries&taxo%5B1%5D%5Bopt%5D=&taxo%5B1%5D%5Bterm%5D=uwpqsftaxoall&skeyword=">'.$category->cat_name.'</a>'; $sep = ', ';
 }
 ?></li>
 

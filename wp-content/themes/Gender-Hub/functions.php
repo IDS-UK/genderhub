@@ -1,22 +1,7 @@
 <?php
-//Twitter Fuctions
-function buildBaseString($baseURI, $method, $params) {
-    $r = array();
-    ksort($params);
-    foreach($params as $key=>$value){
-$r[] = "$key=" . rawurlencode($value);
-    }
-    return $method."&" . rawurlencode($baseURI) . '&' . rawurlencode(implode('&', $r));
-}
-function buildAuthorizationHeader($oauth) {
-    $r = 'Authorization: OAuth ';
-    $values = array();
-    foreach($oauth as $key=>$value)
-$values[] = "$key=\"" . rawurlencode($value) . "\"";
-    $r .= implode(', ', $values);
-    return $r;
-}
-//Twitter Fuctions End
+include(get_template_directory() . '/inc/gh-page-meta.php');
+include(get_template_directory() . '/inc/gh-social-media-posts.php');
+
 
 // Generic functiona and theme options
 function get_words($sentence, $count = 30) {
@@ -74,6 +59,7 @@ function genderhub_scripts() {
 	wp_enqueue_script( 'scripts', get_stylesheet_directory_uri() . '/js/genderhub.js', array(), '1.0.0', true );
 }
 add_action( 'wp_enqueue_scripts', 'genderhub_scripts' );
+
 
 // change comments template title
 function comment_reform ($arg) {
@@ -575,9 +561,9 @@ function blocks_register() {
 	register_post_type( 'blocks' , $args );
 }
 
-//add_action('init', 'collection_register');
-// slkr - collection post type moved to plugin (as it should be!)
-// slkr - todo: move all other CPTs to plugin!
+
+
+// todo: slikkr - move all other CPTs to plugin!
 
 add_action('init', 'facebook_register');
  
@@ -626,52 +612,6 @@ function facebook_register() {
  
 	register_post_type( 'facebook' , $args );
 }
-
-/// Register Custom Post Type
-function contact_point_post_type() {
-
-  $labels = array(
-  'name'=> _x( 'Contact Points', 'Post Type General Name', 'text_domain' ),
-  'singular_name'       => _x( 'Contact Point', 'Post Type Singular Name', 'text_domain' ),
-  'menu_name'   => __( 'Contact Point', 'text_domain' ),
-  'parent_item_colon'   => __( 'Parent Item:', 'text_domain' ),
-  'all_items'   => __( 'All Items', 'text_domain' ),
-  'view_item'   => __( 'View Item', 'text_domain' ),
-  'add_new_item'=> __( 'Add New Item', 'text_domain' ),
-  'add_new'     => __( 'Add New', 'text_domain' ),
-  'edit_item'   => __( 'Edit Item', 'text_domain' ),
-  'update_item' => __( 'Update Item', 'text_domain' ),
-  'search_items'=> __( 'Search Item', 'text_domain' ),
-  'not_found'   => __( 'Not found', 'text_domain' ),
-  'not_found_in_trash'  => __( 'Not found in Trash', 'text_domain' ),
-  );
-  $args = array(
-  'label'       => __( 'contact_point', 'text_domain' ),
-  'description' => __( 'Contact Point Description', 'text_domain' ),
-  'labels'      => $labels,
-  'supports'    => array( 'title', 'editor', 'excerpt', 'custom-fields', 'post-formats', ),
-  'taxonomies'  => array( 'category', 'post_tag', 'bridge_themes', 'gender_hub_themes' ),
-  'hierarchical'=> true,
-  //'rewrite' => array( 'slug'  => 'connect-and-discuss/join-the-conversation' ),
-  'public'      => true,
-  'show_ui'     => true,
-  'show_in_menu'=> true,
-  'show_in_nav_menus'   => true,
-  'show_in_admin_bar'   => true,
-  'menu_position'       => 5,
-  'menu_icon'   => 'http://genderhub.org/wp-content/themes/genderhub/images/contactpoint_icons16.png',
-  'can_export'  => true,
-  'has_archive' => true,
-  'exclude_from_search' => false,
-  'publicly_queryable'  => true,
-  'capability_type'     => 'page',
-  );
-  register_post_type( 'contact_point', $args );
-
-}
-
-// Hook into the 'init' action
-add_action( 'init', 'contact_point_post_type', 0 );
 
 function custom_rewrite_basic() {
   add_rewrite_rule('^csw60/?', 'index.php?page_id=30914', 'top');
@@ -904,7 +844,7 @@ function news_stories_post_type() {
   'show_in_nav_menus'   => true,
   'show_in_admin_bar'   => true,
   'menu_position'       => 10,
-  'menu_icon'   => '/wp-content/uploads/2015/05/news-icon.png',
+  'menu_icon'   => '/wp-content/uploads/2015/05/bell-icon.png',
   'can_export'  => true,
   'has_archive' => true,
   'exclude_from_search' => false,
@@ -1284,11 +1224,11 @@ if(isset($v['term'])){
 }
       }
       if(!empty($_GET['skeyword'])){
-$var[] = $_GET['skeyword'];
+		$var[] = $_GET['skeyword'];
       }
       $return = '';
       if(!empty($var)){
-$return = implode(' | ', $var);
+		$return = implode(' | ', $var);
       }
       return $return;
     }
@@ -1385,6 +1325,16 @@ function save_url_custom_field() {
 }
 /// This error appears in the plugin’s Error Log when an image was not imported due to WordPress’ security check for the image’s extension. Some sites will deliver images without extensions in the URL, but will still send the correct MIME type. The filter below will allow the plugin to bypass this security check, and import images correctly: ///
 add_filter( 'wprss_ftp_override_upload_security', '__return_true' );
+
+add_filter( 'wp_image_editors', 'change_graphic_lib' );
+function change_graphic_lib($array) {
+    return array( 'WP_Image_Editor_GD', 'WP_Image_Editor_Imagick' );
+}
+
+function format_link($url, $title = '', $scheme = 'http://') {
+  if ($title == '') { $title = $url; }
+  return '<a href="'. (parse_url($url, PHP_URL_SCHEME) === null ? $scheme . $url : $url) . '">'.sanitize_title($title).'</a>';
+}
 
 /*
 * http://wordpress.stackexchange.com/questions/35055/how-to-dynamically-resize-wordpress-image-on-the-fly-custom-field-theme-option
@@ -1637,141 +1587,6 @@ function prev_next( $post ) {
 	endif;
 }
 
-// slkr - new functions
-
-/* AUTOMATICALLY SELECT PARENT TERMS WHEN A POST IS ADDED TO A TOPIC */
-function slikkr_select_parent_terms($post_ID, $post) {
-    if(!wp_is_post_revision($post_ID)) {
-        $taxonomies = get_taxonomies(array('_builtin' => false));
-        foreach ($taxonomies as $taxonomy ) {
-            $terms = wp_get_object_terms($post->ID, $taxonomy);
-            foreach ($terms as $term) {
-                $parenttags = get_ancestors($term->term_id,$taxonomy);
-                wp_set_object_terms( $post->ID, $parenttags, $taxonomy, true );
-            }
-        }
-    }
-}
-add_action('publish_ids_documents', 'slikkr_select_parent_terms', 10, 2);
-add_action('publish_contact_point', 'slikkr_select_parent_terms', 10, 2);
-add_action('publish_events', 'slikkr_select_parent_terms', 10, 2);
-add_action('publish_blogs_opinions', 'slikkr_select_parent_terms', 10, 2);
-add_action('publish_other_training', 'slikkr_select_parent_terms', 10, 2);
-add_action('publish_programme_alerts', 'slikkr_select_parent_terms', 10, 2);
-add_action('publish_practical_tools', 'slikkr_select_parent_terms', 10, 2);
-add_action('publish_news_stories', 'slikkr_select_parent_terms', 10, 2);
-add_action('publish_collections', 'slikkr_select_parent_terms', 10, 2);
-
-function slikkr_footer_loadscripts() {
-
-    wp_register_script( 'slikkr_frontend_jquery', get_stylesheet_directory_uri() . '/js/slikkr-custom-front.js', array( 'jquery'), null, true);
-
-    wp_enqueue_script('slikkr_frontend_jquery');
-}
-add_action( 'wp_footer', 'slikkr_footer_loadscripts' );
-
-function slikkr_excerpt_label( $new, $original ) {
-    global $post_type;
-    if ( 'Excerpt' == $original && $post_type == 'collections') {
-        return 'Explain why this collection was created';
-    }else{
-        $pos = strpos($original, 'Excerpts are optional hand-crafted summaries of your');
-        if ($pos !== false) {
-            return  '';
-        }
-    }
-    return $new;
-}
-
-add_filter( 'gettext', 'slikkr_excerpt_label', 10, 2 );
-
-
-if(!function_exists('slikkr_collections_list')) {
-    function slikkr_collections_list($atts) {
-
-
-        if($atts == NULL) {
-            $atts =
-                shortcode_atts(
-                    array(
-                        'type'  => ''
-                    ), $atts, 'ghcollections'
-                );
-        }
-
-        $html = '';
-        $args = array(
-            'numberposts' => 100,
-            'post_type'=> 'collections',
-            'orderby' => 'meta_value',
-            'meta_key' => 'date',
-            'order' => 'DESC'
-        );
-        $colls = new WP_Query( $args );
-
-	if ( $colls->have_posts() ) :
-
-            $html .= '<div class="collections-shortcode">';
-
-            while ($colls->have_posts()) : $colls->the_post();
-
-                global $wp;
-                $current_url = add_query_arg( $wp->query_string, '', home_url( $wp->request ) );
-                $current_url = strtok($current_url, '?').'/';
-
-                $date = new DateTime(get_field('date'));
-
-                if(($atts['type'] == 'sidebar')) {
-
-                    if ($current_url != get_the_permalink()) {
-
-                        $html .= '<div class="collection">';
-                        $html .= '<p><a href="'.get_the_permalink().'">'.get_the_title();
-                        $html .= !empty($date) ? ' ('.$date->format('M Y').')</a></p>' : '</a></p>';
-                        $html .= '</div>';
-                    } else {
-                        $html .= '';
-                    }
-
-                } else {
-
-                    $html .= '<div class="collection">';
-                    $html .= '<div class="image"><a href="'.get_the_permalink().'">'.get_the_post_thumbnail($colls->id).'</a></div>';
-                    $html .= '<div class="details"><h2><a href="'.get_the_permalink().'">'.get_the_title().'</a></h2>';
-                    $html .= !empty($date) ? '<p>'.$date->format('M Y').'</p>' : '';
-                    $html .= '<p>'.wp_trim_words( get_the_excerpt(), 200 ).'</p></div>';
-                    $html .= '</div>';
-
-                }
-
-            endwhile;
-
-            $html .= '</div>';
-	endif; ?>
-
-<?php wp_reset_postdata();
-
-    return $html;
-    }
-    
-}
-
-add_shortcode('ghcollections', 'slikkr_collections_list');
-
-function slikkr_excerpt_meta_box($post) {
-    remove_meta_box( 'postexcerpt' , $post->post_type , 'normal' );  ?>
-    <div class="postbox" style="margin-bottom: 0;">
-        <h3 class="hndle"><span>Explain why this collection was created</span></h3>
-        <div class="inside">
-            <label class="screen-reader-text" for="excerpt"><?php _e('Excerpt') ?></label>
-             <textarea rows="1" cols="40" name="excerpt" id="excerpt">
-                  <?php echo $post->post_excerpt; ?>
-             </textarea>
-        </div>
-    </div>
-<?php }
-// IDS: Removed as it is affecting all forms 
-// add_action('edit_form_after_title', 'slikkr_excerpt_meta_box');
 
 /**
  * Takes one or two TIMESTAMPs, and an optional formatting array of the form ($year, $month, $day),
@@ -1783,36 +1598,36 @@ function slikkr_excerpt_meta_box($post) {
  */
 function ids_pretty_date( $start, $end = NULL, $fmt = NULL ) {
     if( ! isset( $start ) ) {
-	return false;
+        return false;
     }
-    
+
     if( ! isset( $fmt ) ) {
-	// default formatting
-	$fmt = array( 'Y', 'M', 'j' );
+        // default formatting
+        $fmt = array( 'Y', 'M', 'j' );
     }
     list( $yr, $mon, $day ) = $fmt;
-    
+
     if( ! isset( $end) || $start == $end ) {
-	return( date( "$mon $day, $yr", $start ) );
+        return( date( "$mon $day, $yr", $start ) );
     }
     if( date( 'M-j-Y', $start ) == date( 'M-j-Y', $end ) ) {
-	// close enough
-	return date( "$mon $day, $yr", $start );
+        // close enough
+        return date( "$mon $day, $yr", $start );
     }
-    
-    
+
+
     // ok, so $end != $start
-		    
+
     // let's look at the YMD individually, and make a pretty string
-    $dates = array( 
-	's_year' => date( $yr, $start ),
-	'e_year' => date( $yr, $end ),
+    $dates = array(
+        's_year' => date( $yr, $start ),
+        'e_year' => date( $yr, $end ),
 
-	's_month' => date( $mon, $start ),
-	'e_month' => date( $mon, $end ),
+        's_month' => date( $mon, $start ),
+        'e_month' => date( $mon, $end ),
 
-	's_day' => date( $day, $start ),
-	'e_day' => date( $day, $end ),
+        's_day' => date( $day, $start ),
+        'e_day' => date( $day, $end ),
 
     );
     // init dates
@@ -1821,29 +1636,263 @@ function ids_pretty_date( $start, $end = NULL, $fmt = NULL ) {
 
     $start_date .= $dates['s_month'];
     if( $dates['s_month'] != $dates['e_month'] ) {
-	$end_date .= $dates['e_month'];
+        $end_date .= $dates['e_month'];
     }
 
     $start_date .= ' '. $dates['s_day'];
     if( $dates['s_day'] != $dates['e_day'] || $dates['s_month'] != $dates['e_month'] ) {
-	$end_date .= ' ' . $dates['e_day'];
+        $end_date .= ' ' . $dates['e_day'];
     }
 
     if( $dates['s_year'] != $dates['e_year'] ) {
-	$start_date .= ', ' . $dates['s_year'];
-	if( $dates['s_month'] == $dates['e_month'] ) {
-	    if( $dates['s_day'] == $dates['e_day'] ) {
-		// same day, same month, different year
-		$end_date = ' ' . $dates['e_day'] . $end_date;
-	    }
-	    // same month, but a different year
-	    
-	    $end_date = $dates['e_month'] . $end_date;
-	}
+        $start_date .= ', ' . $dates['s_year'];
+        if( $dates['s_month'] == $dates['e_month'] ) {
+            if( $dates['s_day'] == $dates['e_day'] ) {
+                // same day, same month, different year
+                $end_date = ' ' . $dates['e_day'] . $end_date;
+            }
+            // same month, but a different year
+
+            $end_date = $dates['e_month'] . $end_date;
+        }
     }
     $end_date .= ', ' . $dates['e_year'];
 
     $complete_date = trim( $start_date ) . '&ndash;' . trim( $end_date );
-    
+
     return $complete_date;
 }
+
+/* AUTOMATICALLY SELECT PARENT TERMS WHEN A POST IS ADDED TO A TOPIC */
+function gh_select_parent_terms($post_ID, $post) {
+    if(!wp_is_post_revision($post_ID)) {
+        $taxonomies = get_taxonomies(array('_builtin' => false));
+        foreach ($taxonomies as $taxonomy ) {
+            $terms = wp_get_object_terms($post->ID, $taxonomy);
+            foreach ($terms as $term) {
+                $parenttags = get_ancestors($term->term_id,$taxonomy);
+                wp_set_object_terms( $post->ID, $parenttags, $taxonomy, true );
+            }
+        }
+    }
+}
+add_action('publish_ids_documents', 'gh_select_parent_terms', 10, 2);
+add_action('publish_contact_point', 'gh_select_parent_terms', 10, 2);
+add_action('publish_events', 'gh_select_parent_terms', 10, 2);
+add_action('publish_blogs_opinions', 'gh_select_parent_terms', 10, 2);
+add_action('publish_other_training', 'gh_select_parent_terms', 10, 2);
+add_action('publish_programme_alerts', 'gh_select_parent_terms', 10, 2);
+add_action('publish_practical_tools', 'gh_select_parent_terms', 10, 2);
+add_action('publish_news_stories', 'gh_select_parent_terms', 10, 2);
+add_action('publish_collections', 'gh_select_parent_terms', 10, 2);
+
+function gh_footer_loadscripts() {
+
+    wp_register_script( 'gh_frontend_jquery', get_stylesheet_directory_uri() . '/js/gh-custom-front.js', array( 'jquery'), null, true);
+
+    wp_enqueue_script('gh_frontend_jquery');
+}
+add_action( 'wp_footer', 'gh_footer_loadscripts' );
+
+function gh_excerpt_label( $new, $original ) {
+    global $post_type;
+    if ( 'Excerpt' == $original && $post_type == 'collections') {
+        return 'Explain why this collection was created';
+    }else{
+        $pos = strpos($original, 'Excerpts are optional hand-crafted summaries of your');
+        if ($pos !== false) {
+            return  '';
+        }
+    }
+    return $new;
+}
+add_filter( 'gettext', 'gh_excerpt_label', 10, 2 );
+
+function gh_archive_shortcode($atts, $content, $tag) {
+
+	$type = str_replace('gh', '', $tag);
+
+	ob_start();
+
+	if($atts == NULL) {
+		$atts =
+			shortcode_atts(
+				array(
+					'type'  => ''
+				), $atts, $tag
+			);
+	}
+
+	$args = array(
+		'numberposts' => 20,
+		'post_type' => $type,
+		'order'     => 'DESC'
+	);
+
+	$items = new WP_Query( $args );
+
+	if(($atts['type'] == 'sidebar')) {
+
+		$html = '';
+
+		$html .= '<div class="archive-summary-container">';
+		$html .= '<ul class="linklist '.$type.'">';
+
+		if ( $items->have_posts() ) : while ($items->have_posts()) : $items->the_post();
+
+			$html .= '<li><a href="'.get_the_permalink().'">'.$items->post->post_title;
+			$html .= !empty($date) ? ' ('.$date->format('M Y').')</a></p>' : '</a></li>';
+
+		endwhile;
+
+		endif;
+
+		$html .= '</ul>';
+
+		$html .= '</div>';
+
+		wp_reset_postdata();
+		wp_reset_query();
+
+		return $html;
+
+	} else {
+
+		if ( $items->have_posts() ) : while ($items->have_posts()) : $items->the_post();
+
+			get_template_part( 'content', $type );
+
+		endwhile;
+
+		endif;
+
+	}
+
+	return ob_get_clean();
+
+}
+add_shortcode('ghcollections', 'gh_archive_shortcode');
+add_shortcode('ghinterviews', 'gh_archive_shortcode');
+add_shortcode('ghcontact_point', 'gh_archive_shortcode');
+
+function genderhub_admin_scripts($hook) {
+
+    wp_enqueue_media();
+
+    wp_enqueue_style('jquery-ui-css','http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/base/jquery-ui.css',false,"1.9.0",false);
+
+    wp_register_script( 'genderhub-admin-js', get_stylesheet_directory_uri() . '/js/genderhub-custom-admin.js', array('jquery'), null, true );
+    wp_enqueue_script( 'genderhub-admin-js' );
+
+    $jquery_ui = array(
+        "jquery-ui-core",			//UI Core - do not remove this one
+        "jquery-ui-sortable",
+        "jquery-ui-draggable",
+        "jquery-ui-droppable",
+        "jquery-ui-selectable",
+        "jquery-ui-position",
+        "jquery-ui-datepicker"
+    );
+    foreach($jquery_ui as $script){
+        wp_enqueue_script($script);
+    }
+
+}
+add_action( 'admin_enqueue_scripts', 'genderhub_admin_scripts');
+
+function genderhub_body_classes( $classes ) {
+
+	global $post;
+
+	if ( isset( $post ) ) {
+		$classes[] = $post->post_name;
+
+		$this_template = get_post_meta($post->ID, '_wp_page_template', true);
+		$classes[] = $this_template;
+	}
+
+	foreach ( $classes as $k =>  $v ) {
+		if ( substr($v, 0, 21) == 'page-template-archive' ) {
+			$classes[ $k ] = substr( $v, 22 );
+		}
+	}
+
+	return $classes;
+}
+add_filter( 'body_class', 'genderhub_body_classes' );
+
+/**
+ * @param $id
+ * @param $terms
+ *
+ * @return string
+ *
+ * Can return a contact_point based on either
+ * an array of terms (e.g. via single-collections.php)
+ * or a specific contact_point id (e.g. via single-interviews.php)
+ */
+function gh_get_contact_point($id, $terms) {
+
+	if ($id) {
+
+		ob_start();
+
+		$args = array(
+			'numberposts' => 1,
+			'post_type' => array('contact_point'),
+			'p' => $id
+		);
+
+		$query = new WP_query( $args );
+
+		if($query->have_posts()) : while ($query->have_posts()) : $query->the_post();
+
+			get_template_part( 'content', 'contact_point' );
+
+		endwhile;
+
+		endif;
+
+		wp_reset_postdata();
+		wp_reset_query();
+
+		return ob_get_clean();
+
+	} else {
+
+		ob_start();
+
+		$args = array(
+			'numberposts' => 1,
+			'post_type' => array('contact_point'),
+			'tax_query' => array(
+
+				array(
+					'taxonomy' => 'topics',
+					'field'    => 'term_id',
+					'operator' => 'IN',
+					'terms'    => $terms,
+				))
+		);
+
+		$query = new WP_query( $args );
+
+		if($query->have_posts()) : while ($query->have_posts()) : $query->the_post();
+
+			get_template_part( 'content', 'contact_point' );
+
+		endwhile;
+
+		endif;
+
+		wp_reset_postdata();
+		wp_reset_query();
+
+		return ob_get_clean();
+
+	}
+
+}
+
+add_filter( 'searchwp_short_circuit', '__return_true' );
+

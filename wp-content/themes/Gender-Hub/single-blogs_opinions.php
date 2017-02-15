@@ -11,21 +11,16 @@
 <h1 class="maintitle"><span><a href="/be-inspired/blogs-opinion/">Blogs & opinion</a></span></h1>
 
 
-
-
 		<?php /* The loop */ ?>
 			<?php while ( have_posts() ) : the_post(); ?>
 
-				<?php get_template_part( 'content', 'blog' ); ?>
+				<?php get_template_part( 'content', 'blogs_opinions' ); ?>
 									
 		<?php edit_post_link(); ?>	
 		
 									<?php comments_template(); ?>
 									
 	
-
-
-
 
 		<!--<nav class="nav-single">
 							<h4 class="assistive-text center"><?php _e( 'Navigate below to view more posts...', 'twentythirteen' ); ?></h4>

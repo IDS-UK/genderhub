@@ -66,7 +66,7 @@ jQuery(document).ready(function() {
 
 <body <?php body_class();?>>
 
-<h3 style="background: red; color:#fff; position: fixed; padding: 10px;font-weight: bold; z-index: 10000; left: 50%; top: 10%; text-align; center; opacity: 0.7;" >NEW LIVE SITE</h3>
+<!---h3 style="background: red; color:#fff; position: fixed; padding: 10px;font-weight: bold; z-index: 10000; left: 50%; top: 10%; text-align; center; opacity: 0.7;" >NEW LIVE SITE</h3--->
 <header class="site">
 <div class="inner paddingright">
 <?php
