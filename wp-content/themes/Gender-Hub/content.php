@@ -30,14 +30,6 @@ endif;
 
 <article id="post-<?php the_ID(); ?>" <?php post_class($bgcolour); ?>>
 	
-<?php
-/*echo '<!--';
-echo 'QUERY: ';
-print_r($wp_query);
-echo '<br>';
-echo '-->';*/	
-?>
-	
 	<!-- HEADER -->
 	
 	<header class="entry-header">

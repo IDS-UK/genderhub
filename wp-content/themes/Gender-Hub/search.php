@@ -17,24 +17,20 @@ get_header(); ?>
 
 <div class="col span_3_of_4 archive_content padding10">
 
-
-<?php if (have_posts()) : ?>
-  <?php if($_GET['s']=='uwpsfsearchtrg'){
-          if($_GET['uformid']== '1930'){  //123 is your formid
-          
-        include(get_query_template('search-results-resources'));       
-          }
-             } else{
-
-        include(get_query_template('search-results-regular')); 
-   }
-  ;?>
-
-<?php else : ?>
-			<?php get_template_part( 'content', 'none' ); ?>
-		<?php endif; ?>
-
-
+<?php if (have_posts()) { 
+    if($_GET['s']=='uwpsfsearchtrg'){
+        if($_GET['uformid']== '1930'){  //123 is your formid
+            include(get_query_template('search-results-resources'));
+        } else {
+            include(get_query_template('search-results-regular'));
+        }
+    } else {
+        include(get_query_template('search-results-regular'));
+    }
+} else {
+    get_template_part( 'content', 'none' ); 
+}
+?>
 
 
 </div><!--/col span_3_of_4 padding10-->

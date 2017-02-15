@@ -19,7 +19,7 @@ foreach ( $myposts as $s ) : $c = get_post_custom($s->ID);
 <?php if ($s->post_type == 'events'):?><img src="/wp-content/uploads/2015/05/event-icon.png" />
 <?php elseif ($s->post_type == 'blogs_opinions'):?><img src="/wp-content/uploads/2015/05/blog-icon.png" />
 <?php elseif ($s->post_type == 'other_training'):?><img src="/wp-content/uploads/2015/05/training-icon.png" />
-<?php elseif ($s->post_type == 'news_stories'):?><img src="/wp-content/uploads/2015/05/news-icon.png" />
+<?php elseif ($s->post_type == 'news_stories'):?><img src="/wp-content/uploads/2015/05/bell-icon.png" />
 <?php endif;?>
 </div>
 
@@ -66,7 +66,7 @@ wp_reset_postdata();?>
     jQuery(document).ready(function() {
 		jQuery("a.filter").click(function(){
 			
-			 jQuery.ajax({url: "/ajax.php?ptype="+jQuery(this).attr("rel"), success: function(result){
+			jQuery.ajax({url: "/ajax.php?ptype="+jQuery(this).attr("rel"), success: function(result){
 			jQuery("#insp").html(result);
 		}});
 			

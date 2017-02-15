@@ -51,7 +51,7 @@ get_header(); ?>
 			<?php if(get_option($wp_query->query['post_type'].'-description') != ''): echo '<p class="introtext">'.get_option($wp_query->query['post_type'].'-description').'</p>'; endif;?>
 			<?php /* The loop */ ?>
 			<?php while ( have_posts() ) : the_post(); ?>
-				<?php get_template_part( 'content', 'news' ); ?>
+				<?php get_template_part( 'content', 'news_stories' ); ?>
 			<?php endwhile; ?>
 <br /><br />
 <?php genderhub_pagination(); ?>
