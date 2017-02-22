@@ -36228,3 +36228,19 @@ Failed to fetch feed "http://www.africa-times-news.com/feed/". A feed could not 
 Failed to fetch feed "http://www.africa-times-news.com/feed/". A feed could not be found at http://www.africa-times-news.com/feed/. A feed with an invalid mime type may fall victim to this error, or SimplePie was unable to auto-discover it.. Use force_feed() if you are certain this URL is a real feed.
 
 
+[19-02-2017 10:24:53] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[20-02-2017 11:58:12] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[20-02-2017 23:59:58] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[21-02-2017 23:52:20] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+

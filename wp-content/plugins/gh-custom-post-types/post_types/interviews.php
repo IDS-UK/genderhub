@@ -9,36 +9,39 @@
 function fetch_args_interviews() {
     
     $labels = array(
-        'name'              => _x('Interviews', 'post type general name'),
-        'singular_name'     => _x('Interview', 'post type singular name'),
-        'add_new'           => _x('Add New', 'Interview'),
-        'add_new_item'      => __('Add New Interview'),
-        'edit_item'         => __('Edit Interview'),
-        'new_item'          => __('New Interview'),
-        'view_item'         => __('View Interview'),
-        'search_items'      => __('Search Interviews'),
-        'not_found'         =>  __('Nothing found'),
-        'not_found_in_trash'=> __('Nothing found in Trash'),
-        'parent_item_colon' => ''
+        'name'                  => _x('Interviews', 'post type general name', 'genderhub'),
+        'singular_name'         => _x('Interview', 'post type singular name', 'genderhub'),
+        'add_new'               => _x('Add New', 'genderhub'),
+        'add_new_item'          => __('Add New Interview', 'genderhub'),
+        'edit_item'             => __('Edit Interview', 'genderhub'),
+        'new_item'              => __('New Interview', 'genderhub'),
+        'view_item'             => __('View Interview', 'genderhub'),
+        'search_items'          => __('Search Interviews', 'genderhub'),
+        'not_found'             => __('Nothing found', 'genderhub'),
+        'not_found_in_trash'    => __('Nothing found in Trash', 'genderhub'),
+        'parent_item_colon'     => ''
     );
 
     $args = array(
-        'labels'            => $labels,
-        'public'            => true,
-        'publicly_queryable'=> true,
-        'show_ui'           => true,
-        'query_var'         => true,
-        'menu_icon'         => 'dashicons-microphone',
-        'rewrite'           => array('slug'  => 'be-inspired/interviews', 'with_front' => false ),
-        'capability_type'   => 'post',
-        'hierarchical'      => true,
-        'menu_position'     => null,
-        'supports'          => array('title', 'editor', 'thumbnail', 'comments', 'excerpt'),
-        'taxonomies'        => array('topics')
+        'labels'                => $labels,
+        'public'                => true,
+        'publicly_queryable'    => true,
+        'show_ui'               => true,
+        'query_var'             => true,
+        'menu_icon'             => 'dashicons-microphone',
+        'rewrite'               => array('slug'  => 'be-inspired/interviews', 'with_front' => false ),
+        'capability_type'       => 'post',
+        'hierarchical'          => true,
+        'menu_position'         => null,
+        'supports'              => array('title', 'editor', 'thumbnail', 'comments', 'excerpt'),
+        'taxonomies'            => array('topics')
     );
     
     return $args;
 }
+
+add_action( 'add_meta_boxes', 'add_interviews_meta_boxes' );
+add_action( 'save_post', 'save_interviews_meta_boxes' );
 
 function add_interviews_meta_boxes() {
 
@@ -79,7 +82,6 @@ function add_interviews_meta_boxes() {
     );
 
 }
-add_action( 'add_meta_boxes', 'add_interviews_meta_boxes' );
 
 function additional_fields( $post ) {
 
@@ -236,7 +238,6 @@ function save_interviews_meta_boxes( $post_id ) {
         update_post_meta($post_id, '_is_sticky', false); // necessary for checkbox clearing
     }
 }
-add_action( 'save_post', 'save_interviews_meta_boxes' );
 
 function gh_get_post_list($type) {
     $args = array(

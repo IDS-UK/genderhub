@@ -9,45 +9,48 @@
 function fetch_args_contact_point() {
 
     $labels = array(
-        'name'=> _x( 'Contact Points', 'Post Type General Name', 'text_domain' ),
-        'singular_name'       => _x( 'Contact Point', 'Post Type Singular Name', 'text_domain' ),
-        'menu_name'   => __( 'Contact Point', 'text_domain' ),
-        'parent_item_colon'   => __( 'Parent Item:', 'text_domain' ),
-        'all_items'   => __( 'All Items', 'text_domain' ),
-        'view_item'   => __( 'View Item', 'text_domain' ),
-        'add_new_item'=> __( 'Add New Item', 'text_domain' ),
-        'add_new'     => __( 'Add New', 'text_domain' ),
-        'edit_item'   => __( 'Edit Item', 'text_domain' ),
-        'update_item' => __( 'Update Item', 'text_domain' ),
-        'search_items'=> __( 'Search Item', 'text_domain' ),
-        'not_found'   => __( 'Not found', 'text_domain' ),
-        'not_found_in_trash'  => __( 'Not found in Trash', 'text_domain' ),
+        'name'                  => _x( 'Contact Points', 'Post Type General Name', 'genderhub' ),
+        'singular_name'         => _x( 'Contact Point', 'Post Type Singular Name', 'genderhub' ),
+        'menu_name'             => __( 'Contact Point', 'genderhub' ),
+        'parent_item_colon'     => __( 'Parent Item:', 'genderhub' ),
+        'all_items'             => __( 'All Items', 'genderhub' ),
+        'view_item'             => __( 'View Item', 'genderhub' ),
+        'add_new_item'          => __( 'Add New Item', 'genderhub' ),
+        'add_new'               => __( 'Add New', 'genderhub' ),
+        'edit_item'             => __( 'Edit Item', 'genderhub' ),
+        'update_item'           => __( 'Update Item', 'genderhub' ),
+        'search_items'          => __( 'Search Item', 'genderhub' ),
+        'not_found'             => __( 'Not found', 'genderhub' ),
+        'not_found_in_trash'    => __( 'Not found in Trash', 'genderhub' ),
     );
     
     $args = array(
-        'label'       => __( 'contact_point', 'text_domain' ),
-        'description' => __( 'Contact Point Description', 'text_domain' ),
-        'labels'      => $labels,
-        'supports'    => array( 'title', 'editor', 'thumbnail', ),
-        'taxonomies'  => array( 'category', 'post_tag', 'bridge_themes', 'gender_hub_themes' ),
-        'hierarchical'=> true,
+        'label'                 => __( 'contact_point', 'text_domain' ),
+        'description'           => __( 'Contact Point Description', 'text_domain' ),
+        'labels'                => $labels,
+        'supports'              => array( 'title', 'editor', 'thumbnail', ),
+        'taxonomies'            => array( 'category', 'post_tag', 'bridge_themes', 'gender_hub_themes' ),
+        'hierarchical'          => true,
         //'rewrite' => array( 'slug'  => 'connect-and-discuss/join-the-conversation' ),
-        'public'      => true,
-        'show_ui'     => true,
-        'show_in_menu'=> true,
-        'show_in_nav_menus'   => true,
-        'show_in_admin_bar'   => true,
-        'menu_position'       => 5,
-        'menu_icon'   => 'http://genderhub.org/wp-content/themes/genderhub/images/contactpoint_icons16.png',
-        'can_export'  => true,
-        'has_archive' => true,
-        'exclude_from_search' => false,
-        'publicly_queryable'  => true,
-        'capability_type'     => 'page',
+        'public'                => true,
+        'show_ui'               => true,
+        'show_in_menu'          => true,
+        'show_in_nav_menus'     => true,
+        'show_in_admin_bar'     => true,
+        'menu_position'         => 5,
+        'menu_icon'             => 'http://genderhub.org/wp-content/themes/genderhub/images/contactpoint_icons16.png',
+        'can_export'            => true,
+        'has_archive'           => true,
+        'exclude_from_search'   => false,
+        'publicly_queryable'    => true,
+        'capability_type'       => 'page',
     );
     
     return $args;
 }
+
+add_action( 'add_meta_boxes', 'add_contact_point_meta_boxes' );
+add_action( 'save_post', 'save_contact_point_meta_boxes' );
 
 function add_contact_point_meta_boxes() {
 
@@ -61,7 +64,6 @@ function add_contact_point_meta_boxes() {
 	);
 
 }
-add_action( 'add_meta_boxes', 'add_contact_point_meta_boxes' );
 
 function cp_additional_fields( $post ) {
 
@@ -75,22 +77,22 @@ function cp_additional_fields( $post ) {
 	<p>
 		<label for="_contact_point_email">Email address :</label><br />
 		<input type="text" id="_contact_point_email" name="_contact_point_email" class="regular-text" value="<?php echo $cp_email; ?>" />
-	<p>
+	</p>
 
 	<p>
 		<label for="_contact_point_url">Website URL :</label><br />
 		<input type="text" id="_contact_point_url" name="_contact_point_url" class="regular-text" value="<?php echo $cp_url; ?>" />
-	<p>
+	</p>
 
 	<p>
 		<label for="_contact_point_twitter">Twitter :</label><br />
 		<input type="text" id="_contact_point_twitter" name="_contact_point_twitter" class="regular-text" value="<?php echo $cp_twitter ? '@'.$cp_twitter : ''; ?>" />
-	<p>
+	</p>
 
 	<p>
 		<label for="_contact_point_facebook">Facebook :</label><br />
 		<input type="text" id="_contact_point_facebook" name="_contact_point_facebook" class="regular-text" value="<?php echo $cp_facebook; ?>" />
-	<p>
+	</p>
 
 	<?php
 }
@@ -114,4 +116,3 @@ function save_contact_point_meta_boxes( $post_id ) {
 		update_post_meta($post_id, '_contact_point_facebook', $_POST['_contact_point_facebook'] );
 
 }
-add_action( 'save_post', 'save_contact_point_meta_boxes' );

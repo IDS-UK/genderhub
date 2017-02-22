@@ -152,7 +152,7 @@ if( !empty($image) ): ?>
 
       <div class="ids-fields">
       
-      <h3>Document details</h4>
+      <h3>Document details</h3>
       
    
   

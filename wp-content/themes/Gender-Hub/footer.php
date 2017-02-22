@@ -38,6 +38,36 @@ $c = get_post_custom($t->ID);
 
 <?php
 wp_footer();?>
+
+<?php
+
+if(is_front_page()) { ?>
+
+    <script type="text/javascript">
+
+        jQuery(document).ready(function() {
+            jQuery("#slider li.active").fadeIn();
+            jQuery("#lightSlider").lightSlider({
+                gallery:true,
+                item:1,
+                //vertical:true,
+                //verticalHeight:500,
+                //vThumbWidth:200,
+                thumbItem:6,
+                thumbMargin:4,
+                thumbWidth:100,
+                thumbItem:6,
+                thumbMargin:4,
+                slideMargin:0
+            });
+            jQuery("#slider li.lslide").fadeIn();
+
+        });
+
+    </script>
+
+<?php } ?>
+
 <script type="text/javascript">
 jQuery( "nav li a" ).not( "nav li li a" ).each(function( index ) {
 jQuery( this ).attr('href','#');

@@ -13,61 +13,19 @@ get_header();
 
 <?php while ( have_posts() ) : the_post(); ?>
 
-	<?php
-	// slider
-	if(get_the_content() != ''): $i = 1; $tc = 0;?>
-		<section id="slider"><div class="inner paddingleftright">
-				<?php
-				$start_limiter = '[gallery';
-				$end_limiter = ']';
-				$haystack = get_the_content();
-				$start_pos = strpos($haystack,$start_limiter);
-				$end_pos = strpos($haystack,$end_limiter,$start_pos);
-				$galldata = substr($haystack, $start_pos+1, ($end_pos-1)-$start_pos);
-				$ng = explode('ids="',$galldata);
-				?>
+    <section id="slider">
 
-				<?php
-				if(!empty($ng) && count($ng) > 1):
-					echo ' <ul id="lightSlider">';
-					$toget = array_reverse(explode(',',str_replace('"','',$ng[1])));
+        <div class="inner paddingleftright">
 
-					$args =  array (
-						'include' => $toget,
-						'post_type' => 'attachment',
-						'post_mime_type' => 'image',
-						'orderby' => 'post__in',
+            <ul id="lightSlider">
 
+                <?php echo GenderHub_2017::gh_get_slider_posts('programme_alerts'); ?>
 
-					);
+            </ul>
 
-					$j = 0;$slider_count = 0;
-					$myposts = get_posts( $args );
-					foreach ( $myposts as $image ) : setup_postdata( $image ); $ic =get_post_custom($image->ID); $tc++;
-						$img = wp_get_attachment_image_src( $image->ID, 'gallery' );
-						$imgt = wp_get_attachment_image_src( $image->ID, 'gallery-thumb' );
-						?>
+        </div>
 
-						<li class="slide-<?php echo $slider_count++; ?>" data-thumb="<?php echo $imgt[0];?>" data-thumb-text="<?php echo get_the_title($image->ID);?>" title="<?php echo $image->post_excerpt;?>">
-							<div class="slide <?php echo $ic['slide_colour'][0];?>">
-								<div class="title"><h3 class="<?php echo $ic['slide_colour'][0];?>"><span><?php echo get_the_title($image->ID);?></span></h3></div>
-								<img src="<?php echo $img[0];?>" />
-								<div class="text"><p><?php echo get_the_content($image->ID);?></p><p><a href="<?php echo  $ic['slide_link'][0];?>" class="<?php echo $ic['slide_colour'][0];?>"><?php echo  $ic['slide_link_text'][0];?></a></p></div>
-							</div>
-						</li>
-
-
-
-
-						<?php
-
-					endforeach;
-					echo '</ul>';
-				endif;
-				?>
-			</div></section>
-	<?php endif;?>
-
+    </section>
 
 	<section id="content">
 		<article id="inspiring">

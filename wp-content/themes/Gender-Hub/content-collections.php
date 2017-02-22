@@ -72,7 +72,7 @@ else : ?>
 
 			<?php
 
-			$coll_cp = gh_get_contact_point($id=NULL, $terms=$term_id_list);
+			$coll_cp = GH_Custom_Post_Types::gh_get_contact_point($id=NULL, $terms=$term_id_list);
 
 			if (!empty($coll_cp)) : ?>
 

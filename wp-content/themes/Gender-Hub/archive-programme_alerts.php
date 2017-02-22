@@ -21,77 +21,71 @@ The template for displaying Programme Alerts Archive pages
 
 get_header(); ?>
 
-<div class="section group main_content">
+    <div class="section group main_content">
 
-<div class="col span_3_of_4 archive_content padding10">
+        <div class="col span_3_of_4 archive_content padding10">
 
-<?php if ( have_posts() ) : ?>
-			<header class="archive-header">
-				<h1 class="archive-title"><span>
-				
-				<div class="rss_socials">
-<ul>
-<li class="rssNav"><a title="RSS Feed" href="<?php echo current_page_url(); ?>/feed"><span>RSS Feed</span></a></li>
-</ul>
-</div>
+            <?php if ( have_posts() ) : ?>
+                <header class="archive-header">
 
-<?php
-					if ( is_day() ) :
-						printf( __( 'Daily Archives: %s', 'twentythirteen' ), get_the_date() );
-					elseif ( is_month() ) :
-						printf( __( 'Monthly Archives: %s', 'twentythirteen' ), get_the_date( _x( 'F Y', 'monthly archives date format', 'twentythirteen' ) ) );
-					elseif ( is_year() ) :
-						printf( __( 'Yearly Archives: %s', 'twentythirteen' ), get_the_date( _x( 'Y', 'yearly archives date format', 'twentythirteen' ) ) );
-					else :
-						_e( 'Programme alerts', 'twentythirteen' );
-					endif;
-				?></span></h1>
-			</header><!-- .archive-header -->
+                    <h1 class="archive-title"><span>
+                            <div class="rss_socials">
 
+                                <ul>
 
-	 <span class="count-items"><?php echo $wp_query->found_posts; ?> post(s) for this section</span>	
+                                    <li class="rssNav"><a title="RSS Feed" href="<?php echo current_page_url(); ?>/feed"><span>RSS Feed</span></a></li>
+                                </ul>
+
+                            </div>
+
+                            <?php
+
+                            if ( is_day() ) :
+                                printf( __( 'Daily Archives: %s', 'twentythirteen' ), get_the_date() );
+                            elseif ( is_month() ) :
+                                printf( __( 'Monthly Archives: %s', 'twentythirteen' ), get_the_date( _x( 'F Y', 'monthly archives date format', 'twentythirteen' ) ) );
+                            elseif ( is_year() ) :
+                                printf( __( 'Yearly Archives: %s', 'twentythirteen' ), get_the_date( _x( 'Y', 'yearly archives date format', 'twentythirteen' ) ) );
+                            else :
+                                _e( 'Programme alerts', 'twentythirteen' );
+                            endif; ?>
+
+                        </span></h1>
+
+                </header><!-- .archive-header -->
+
+                <span class="count-items"><?php echo $wp_query->found_posts; ?> post(s) for this section</span>
 		
-<?php genderhub_pagination(); ?>
-			<?php if(get_option($wp_query->query['post_type'].'-description') != ''): echo '<p class="introtext">'.get_option($wp_query->query['post_type'].'-description').'</p>'; endif;?>
-			<?php /* The loop */ ?>
-			<?php while ( have_posts() ) : the_post(); ?>
-				<?php get_template_part( 'content', get_post_type() ); ?>
-			<?php endwhile; ?>
-<br /><br />
-<?php genderhub_pagination(); ?>
+                <?php genderhub_pagination(); ?>
 
+                <?php if(get_option($wp_query->query['post_type'].'-description') != ''):
+                    echo '<p class="introtext">'.get_option($wp_query->query['post_type'].'-description').'</p>';
+                endif;?>
 
+                <?php while ( have_posts() ) : the_post(); ?>
 
+                    <?php get_template_part( 'content', get_post_type() ); ?>
 
+                <?php endwhile; ?>
 
-		<?php else : ?>
-			<?php get_template_part( 'content', 'none' ); ?>
-		<?php endif; ?>
+                <br /><br />
 
+                <?php genderhub_pagination(); ?>
 
-		
+            <?php else : ?>
 
+                <?php get_template_part( 'content', 'none' ); ?>
 
-</div><!--/col span_3_of_4-->
+            <?php endif; ?>
 
+        </div><!--/col span_3_of_4-->
 
+        <div class="col span_1_of_4 sidebar padding10">
 
+            <?php if ( function_exists( 'dynamic_sidebar' ) ) dynamic_sidebar( "inspiration-sidebar" ); ?>
 
-<div class="col span_1_of_4 sidebar padding10">
+        </div><!--/col span_1_of_4-->
 
-
-
-<?php if ( function_exists( 'dynamic_sidebar' ) ) dynamic_sidebar( "inspiration-sidebar" ); ?> 
-
-</div><!--/col span_1_of_4-->
-
-
-	
-	
-
-</div><!--/section group-->
-
-
-
+    </div><!--/section group-->
 
 <?php get_footer(); ?>
