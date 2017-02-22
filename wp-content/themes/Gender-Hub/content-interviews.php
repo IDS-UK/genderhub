@@ -104,7 +104,7 @@ else : ?>
 
 					<h3>Contact Point</h3>
 
-					<?php echo gh_get_contact_point($id=$interview_contact_point, $terms=NULL); ?>
+					<?php echo GH_Custom_Post_Types::gh_get_contact_point($id=$interview_contact_point, $terms=NULL); ?>
 					
 				</div>
 

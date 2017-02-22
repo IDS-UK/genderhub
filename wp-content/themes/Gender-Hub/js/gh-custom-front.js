@@ -5,7 +5,6 @@
 
     $(document).ready(function () {
 
-
 	var largestHeight = 0;
 	$("#featured_content h6").each(function() {
 		largestHeight = ( $(this).height() > largestHeight ? $(this).height() : largestHeight );
@@ -66,6 +65,7 @@
             });
 
         });
+
 
     });
 

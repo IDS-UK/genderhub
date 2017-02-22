@@ -1,7 +1,460 @@
 <?php
-include(get_template_directory() . '/inc/gh-page-meta.php');
-include(get_template_directory() . '/inc/gh-social-media-posts.php');
 
+class GenderHub_2017 {
+
+    function __construct() {
+
+	    include('inc/gh-page-meta.php');
+	    include('inc/gh-social-media-posts.php');
+
+	    add_action( 'after_setup_theme', array($this, 'setup') );
+	    add_action( 'wp_enqueue_scripts', array($this, 'gh_header_loadscripts') );
+	    add_action( 'wp_footer', array($this, 'gh_footer_loadscripts') );
+	    add_action( 'admin_enqueue_scripts', array($this, 'gh_admin_loadscripts') );
+	    add_action( 'widgets_init', array($this, 'gh_sidebars') );
+	    add_action( 'pre_get_posts', array($this, 'practical_tools_filter') );
+	    add_action( 'login_enqueue_scripts', array($this, 'gh_custom_login_logo') );
+
+	    add_filter( 'image_size_names_choose', array($this, 'custom_image_sizes_choose') );
+	    add_filter( 'body_class', array($this, 'gh_body_classes') );
+	    add_filter( 'login_errors', create_function('$a', "return null;") );
+	    add_filter( 'wpcf7_load_js', '__return_false' );
+	    add_filter( 'wpcf7_load_css', '__return_false' );
+	    add_filter( 'gettext', array($this, 'gh_excerpt_label'), 10, 2 );
+	    add_filter( 'excerpt_length', array($this, 'gh_excerpt_length') );
+	    add_filter( 'tiny_mce_before_init', array($this, 'gh_styles_dropdown') );
+	    add_filter( 'mce_buttons', array($this, 'gh_style_select') );
+	    add_filter( 'the_content', array($this, 'filter_ptags_on_images') );
+
+	    remove_action( 'wp_head','wp_generator' );
+
+	    add_editor_style( 'css/editor-style.css' );
+
+	    add_shortcode( 'recent-posts', array($this, 'gh_recent_posts_shortcode') );
+
+    }
+
+	function setup() {
+
+		add_theme_support( 'menus' );
+		add_theme_support( 'post-thumbnails' ); // This feature enables post-thumbnail support for a theme
+
+		add_image_size( 'square_220', 220, 220, true ); //(cropped)
+		add_image_size( 'square_120', 120, 120, true ); //(cropped)
+		add_image_size( 'custom-thumb', 220, 180, true ); // 220 pixels wide by 180 pixels tall, soft proportional crop mode
+		add_image_size( 'gallery', 720, 362, true );
+		add_image_size( 'gallery-thumb', 80, 50, true );
+		add_image_size( 'box', 237, 155, true );
+		add_image_size( 'collection', 300, 200, false);
+		add_image_size( 'blog_featured', 500, 300 );
+
+		register_nav_menu( 'primary', __( 'Primary Menu', 'genderhub' ) );
+		register_nav_menu( 'secondary', __( 'Second Menu', 'genderhub' ) );
+
+	}
+
+	function gh_header_loadscripts() {
+
+		wp_enqueue_script( 'scripts', get_stylesheet_directory_uri() . '/js/genderhub.js', array(), '1.0.0', true );
+		wp_enqueue_style( 'gh-style', get_template_directory_uri() . '/style.css', NULL, false, 'all' );
+		wp_enqueue_style( 'google-font', '//fonts.googleapis.com/css?family=Asap:400,700,400italic,700italic', array(), 20131111 );
+		wp_enqueue_style( 'prefix-font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css', array(), '4.1' );
+
+		if(is_front_page()) {
+
+			wp_enqueue_style( 'lightslider-style', get_template_directory_uri() . '/css/lightslider.css', NULL, false, 'all' );
+			wp_enqueue_script( 'lightslider-script', get_stylesheet_directory_uri() . '/js/lightslider.js', array(), '1.0.0', true );
+
+        }
+	}
+
+	function gh_footer_loadscripts() {
+
+		wp_register_script( 'gh-frontend-jquery', get_stylesheet_directory_uri() . '/js/gh-custom-front.js', array( 'jquery'), null, true);
+		wp_enqueue_script( 'gh-frontend-jquery');
+	}
+
+	function gh_admin_scripts($hook) {
+
+		wp_enqueue_media();
+
+		wp_enqueue_style( 'jquery-ui-css','http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/base/jquery-ui.css',false,"1.9.0",false);
+
+		wp_register_script( 'genderhub-admin-js', get_stylesheet_directory_uri() . '/js/genderhub-custom-admin.js', array('jquery'), null, true );
+		wp_enqueue_script( 'genderhub-admin-js' );
+
+		$jquery_ui = array(
+			"jquery-ui-core",			//UI Core - do not remove this one
+			"jquery-ui-sortable",
+			"jquery-ui-draggable",
+			"jquery-ui-droppable",
+			"jquery-ui-selectable",
+			"jquery-ui-position",
+			"jquery-ui-datepicker"
+		);
+		foreach($jquery_ui as $script){
+			wp_enqueue_script($script);
+		}
+
+	}
+
+	function gh_body_classes( $classes ) {
+
+		global $post;
+
+		if ( isset( $post ) ) {
+			$classes[] = $post->post_name;
+
+			$this_template = get_post_meta($post->ID, '_wp_page_template', true);
+			$classes[] = $this_template;
+		}
+
+		foreach ( $classes as $k =>  $v ) {
+			if ( substr($v, 0, 21) == 'page-template-archive' ) {
+				$classes[ $k ] = substr( $v, 22 );
+			}
+		}
+
+		return $classes;
+	}
+
+	function gh_sidebars() {
+
+		register_sidebar( array(
+			'name' => __( 'Generic Sidebar', 'genderhub' ),
+			'id' => 'generic-sidebar',
+			'description' => __( 'generic-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Events Sidebar', 'genderhub' ),
+			'id' => 'events-sidebar',
+			'description' => __( 'events-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Training Sidebar', 'genderhub' ),
+			'id' => 'training-sidebar',
+			'description' => __( 'training-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Blogs Sidebar', 'genderhub' ),
+			'id' => 'blogs-sidebar',
+			'description' => __( 'blogs-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Alerts Sidebar', 'genderhub' ),
+			'id' => 'alerts-sidebar',
+			'description' => __( 'alerts-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'News Sidebar', 'genderhub' ),
+			'id' => 'news-sidebar',
+			'description' => __( 'news-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Search Sidebar', 'genderhub' ),
+			'id' => 'search-sidebar',
+			'description' => __( 'search-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Knowledge Sidebar', 'genderhub' ),
+			'id' => 'knowledge-sidebar',
+			'description' => __( 'knowledge-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Build Capacity Sidebar', 'genderhub' ),
+			'id' => 'build-capacity-sidebar',
+			'description' => __( 'build-capacity-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Collection Sidebar', 'genderhub' ),
+			'id' => 'collection-sidebar',
+			'description' => __( 'collection-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Connect and Discuss Content', 'genderhub' ),
+			'id' => 'connect-discuss-content',
+			'description' => __( 'connect-discuss-content', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Connect and Discuss Sidebar', 'genderhub' ),
+			'id' => 'connect-discuss-sidebar',
+			'description' => __( 'connect-discuss-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Inspiration Sidebar', 'genderhub' ),
+			'id' => 'inspiration-sidebar',
+			'description' => __( 'inspiration-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Footer 1', 'genderhub' ),
+			'id' => 'footer-1',
+			'description' => __( 'footer-1', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Footer 2', 'genderhub' ),
+			'id' => 'footer-2',
+			'description' => __( 'footer-2', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Footer 3', 'genderhub' ),
+			'id' => 'footer-3',
+			'description' => __( 'footer-3', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Footer 4', 'genderhub' ),
+			'id' => 'footer-4',
+			'description' => __( 'footer-4', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Sub Footer', 'genderhub' ),
+			'id' => 'subfooter',
+			'description' => __( 'subfooter', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+		register_sidebar( array(
+			'name' => __( 'Test Sidebar', 'genderhub' ),
+			'id' => 'test-sidebar',
+			'description' => __( 'test-sidebar', 'genderhub' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title white">',
+			'after_title' => '</h3>',
+		) );
+
+	}
+
+	function custom_image_sizes_choose( $sizes ) {
+
+		return array_merge( $sizes, array(
+
+			'square_220'        => 'square_220px',
+			'square_120'        => 'square_120px',
+			'gallery'           => 'Slider Image',
+			'gallery-thumb'     => 'Slider Thumbnail',
+		));
+	}
+
+	function practical_tools_filter($query) {
+		if (!is_admin() && is_post_type_archive('practical_tools')) {
+			$tax_query = array(
+				array(
+					'taxonomy' => 'content_type',
+					'field'    => 'slug',
+					'terms'    => 'tool',
+				),
+			);
+			$query->set('post_type', array('ids_documents', 'practical_tools'));
+			$query->set('tax_query', $tax_query);
+		}
+	}
+
+	function gh_excerpt_label( $new, $original ) {
+		global $post_type;
+		if ( 'Excerpt' == $original && $post_type == 'collections') {
+			return 'Explain why this collection was created';
+		} else {
+			$pos = strpos($original, 'Excerpts are optional hand-crafted summaries of your');
+			if ($pos !== false) {
+				return  '';
+			}
+		}
+		return $new;
+	}
+
+	function gh_excerpt_length($length) {
+		return 55;
+	}
+
+	function gh_custom_login_logo() { ?>
+
+        <style type="text/css">
+            h1 a { background-image:url("http://www.genderhub.org/wp-content/themes/genderhub/images/GenderHub_login.gif") !important; }
+            </style>
+
+        <?php
+	}
+
+	function gh_styles_dropdown( $settings ) {
+
+		$new_styles = array(
+			array(
+				'title'	=> __( 'Custom Styles', 'genderhub' ),
+				'items'	=> array(
+					array(
+						'title'		=> __('Button','genderhub'),
+						'selector'	=> 'a',
+						'classes'	=> 'button'
+					),
+					array(
+						'title'		=> __('Highlight','genderhub'),
+						'inline'	=> 'span',
+						'classes'	=> 'highlight',
+					),
+				),
+			),
+		);
+
+		// Merge old & new styles
+		$settings['style_formats_merge'] = true;
+
+		// Add new styles
+		$settings['style_formats'] = json_encode( $new_styles );
+
+		// Return New Settings
+		return $settings;
+
+	}
+
+	function gh_style_select( $buttons ) {
+		array_push( $buttons, 'styleselect' );
+		return $buttons;
+	}
+
+	function gh_recent_posts_shortcode( $atts ) {
+
+        extract( shortcode_atts( array( 'limit' => 5 ), $atts ) );
+
+		return '<ul class="my-recent-posts">' . wp_get_archives('type=postbypost&limit=' . $atts['limit'] . '&echo=0') . '</ul>';
+	}
+
+	function filter_ptags_on_images($content){
+		return preg_replace('/<p>\\s*?(<a .*?><img.*?><\\/a>|<img.*?>)?\\s*<\\/p>/s', '\1', $content);
+	}
+
+	public static function gh_get_slider_posts($type) {
+
+		$args = array(
+			'post_type'		    => $type,
+			'post_status'       => 'publish',
+
+			'meta_query'        => array(
+				array(
+					'key'       => '_pa_slide_include',
+					'value'     => '1',
+					'compare'   => '=',
+				),
+			),
+		);
+
+		$output = '';
+		$pa_query = new WP_Query( $args );
+
+		if ( $pa_query->have_posts() ) :
+
+			while ( $pa_query->have_posts() ) : $pa_query->the_post();
+
+				$slide_color = get_post_meta($pa_query->post->ID, '_pa_slide_bg', true);
+				$slide_link_url = get_post_meta($pa_query->post->ID, '_pa_slide_link_url', true);
+				$slide_link_text = get_post_meta($pa_query->post->ID, '_pa_slide_link_text', true);
+				$image_credit_url = get_post_meta($pa_query->post->ID, '_pa_image_credit_url', true);
+				$image_credit_text = get_post_meta($pa_query->post->ID, '_pa_image_credit_text', true);
+
+				$desc = esc_html(get_post(get_post_thumbnail_id())->post_content);
+
+				$output .= '<li class="slide-'.$pa_query->post->ID.'" data-thumb="'.wp_get_attachment_image_src( get_post_thumbnail_id(), 'gallery-thumb' )[0].'" data-thumb-text="'.$pa_query->post->post_title.'" title="'.get_the_excerpt().'">';
+                $output .= '<div class="slide '.$slide_color.'">';
+
+				$output .= '<div class="title"><h3 class="'.$slide_color.'"><span>'.$pa_query->post->post_title.'</span></h3></div>';
+				$output .= '<a href="'.$slide_link_url.'">'.get_the_post_thumbnail($post = null, 'gallery').'</a>';
+				$output .= '<div class="text"><p>'.$desc.'</p>';
+				$output .= '<p>';
+				$output .= '<a href="'.$slide_link_url.'" class="'.$slide_color.'">'.$slide_link_text.'</a>';
+
+				if(!empty($image_credit_text)) :
+
+				    $output .= '<span class="image-credit">Photo: '.(!empty($image_credit_url) ? '<a href="'.$image_credit_url.'">'.$image_credit_text.'</a>' : $image_credit_text).'</span>';
+
+				endif;
+
+				$output .= '</p>';
+				$output .= '</div>';
+
+				$output .= '</div>';
+				$output .= '</li>';
+
+			endwhile;
+
+			wp_reset_postdata();
+
+		endif;
+
+		return $output;
+
+	}
+}
+
+new GenderHub_2017;
 
 // Generic functiona and theme options
 function get_words($sentence, $count = 30) {
@@ -35,39 +488,6 @@ function twentytwelve_wp_title( $title, $sep ) {
 }
 add_filter( 'wp_title', 'twentytwelve_wp_title', 10, 2 );
 
-/**
- * Makes our wp_nav_menu() fallback -- wp_page_menu() -- show a home link.
- *
- * @since GenderHub 1.0
- */
-
-
-
-
-// Generic functions and theme options end
-
-// Custom post types end
-//add_action("admin_init", "admin_initB");
-// stop error message for incorrect logins
-add_filter('login_errors',create_function('$a', "return null;"));
-
-// Only load contact form 7 css and js on pages where it is needed
-add_filter( 'wpcf7_load_js', '__return_false' );
-add_filter( 'wpcf7_load_css', '__return_false' );
-
-function genderhub_scripts() {
-	wp_enqueue_script( 'scripts', get_stylesheet_directory_uri() . '/js/genderhub.js', array(), '1.0.0', true );
-}
-add_action( 'wp_enqueue_scripts', 'genderhub_scripts' );
-
-
-// change comments template title
-function comment_reform ($arg) {
-  $arg['title_reply'] = __('Comment on this');
-  return $arg;
-}
-add_filter('comment_form_defaults','comment_reform');
-
 // current page url
 function current_page_url() {
   $pageURL = 'http';
@@ -82,15 +502,6 @@ function current_page_url() {
   }
   return $pageURL;
 }
-/**
-* STOP WORDPRESS publishing version info
-*/
-remove_action('wp_head','wp_generator');
-
-/**
-* Custom CSS for WYSIWYG Editor – TinyMCE
-*/
-add_editor_style('css/editor-style.css');
 
 // paging nav
 if ( ! function_exists( 'twentythirteen_paging_nav' ) ) :
@@ -115,7 +526,7 @@ function twentythirteen_paging_nav() {
   <?php endif; ?>
 
   <?php if ( get_previous_posts_link() ) : ?>
-  <div class="nav-next"><?php previous_posts_link( __( '<img class="prev_next_arrows" alt=Next Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowR.png" /><br />Newer posts', 'twentythirteen' ) ); ?></div>
+  <div class="nav-next"><?php previous_posts_link( __( '<img class="prev_next_arrows" alt="Next Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowR.png" /><br />Newer posts', 'twentythirteen' ) ); ?></div>
   <?php endif; ?>
 
   </div><!-- .nav-links -->
@@ -144,7 +555,7 @@ function twentythirteen_post_nav() {
       <div class="nav-links">
     
       <?php previous_post_link( '%link', _x( '<img class="prev_next_arrows" alt="Previous Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowL.png" /><br /> %title', 'Previous post link', 'twentythirteen' ) ); ?>
-      <?php next_post_link( '%link', _x( '<img class="prev_next_arrows" alt=Next Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowR.png" /><br />%title ', 'Next post link', 'twentythirteen' ) ); ?>
+      <?php next_post_link( '%link', _x( '<img class="prev_next_arrows" alt="Next Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowR.png" /><br />%title ', 'Next post link', 'twentythirteen' ) ); ?>
     
       </div><!-- .nav-links -->
   </nav><!-- .navigation -->
@@ -195,668 +606,21 @@ function canonical_for_comments() {
 }
 add_action( 'wp_head', 'canonical_for_comments' );
 
-// Add Formats Dropdown Menu To MCE
-if ( ! function_exists( 'genderhub_style_select' ) ) {
-  function genderhub_style_select( $buttons ) {
-    array_push( $buttons, 'styleselect' );
-    return $buttons;
-  }
-}
-add_filter( 'mce_buttons', 'genderhub_style_select' );
 
-// Add new styles to the TinyMCE "formats" menu dropdown
-if ( ! function_exists( 'genderhub_styles_dropdown' ) ) {
-  function genderhub_styles_dropdown( $settings ) {
 
-    // Create array of new styles
-    $new_styles = array(
-    array(
-    'title'	=> __( 'Custom Styles', 'genderhub' ),
-    'items'	=> array(
-    array(
-    'title'		=> __('Button','genderhub'),
-    'selector'	=> 'a',
-    'classes'	=> 'button'
-    ),
-    array(
-    'title'		=> __('Highlight','genderhub'),
-    'inline'	=> 'span',
-    'classes'	=> 'highlight',
-    ),
-    ),
-    ),
-    );
-
-    // Merge old & new styles
-    $settings['style_formats_merge'] = true;
-
-    // Add new styles
-    $settings['style_formats'] = json_encode( $new_styles );
-
-    // Return New Settings
-    return $settings;
-
-  }
-}
-add_filter( 'tiny_mce_before_init', 'genderhub_styles_dropdown' );
-
-// recent posts shortcode
-function my_recent_posts_shortcode( $atts ) {
-  extract( shortcode_atts( array( 'limit' => 5 ), $atts ) );
-
-  return '<ul class="my-recent-posts">' . wp_get_archives('type=postbypost&limit=' . $limit . '&echo=0') . '</ul>';
-}
-add_shortcode( 'recent-posts', 'my_recent_posts_shortcode' );
-
-// Change login page logo
-
-function my_custom_login_logo() {
-  echo '<style type="text/css">
-h1 a { background-image:url("http://www.genderhub.org/wp-content/themes/genderhub/images/GenderHub_login.gif") !important; }
-    </style>';
-}
-add_action('login_head', 'my_custom_login_logo');
-
-//* Enqueue Google fonts
-add_action( 'wp_enqueue_scripts', 'google_fonts' );
-function google_fonts() {
-  wp_enqueue_style( 'google-font', '//fonts.googleapis.com/css?family=Asap:400,700,400italic,700italic', array(), 20131111 );
-}//* CSS Style for Google fonts - font-family: 'Asap', sans-serif;
-
-//* Enqueue font-awesome fonts
-add_action( 'wp_enqueue_scripts', 'prefix_enqueue_awesome' );
-/**
-* Register and load font awesome CSS files using a CDN.
-*
-* @link   http://www.bootstrapcdn.com/#fontawesome
-* @author FAT Media
-*/
-function prefix_enqueue_awesome() {
-  wp_enqueue_style( 'prefix-font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css', array(), '4.1' );
-  
-    function twentytwelve_page_menu_args( $args ) {
+function twentytwelve_page_menu_args( $args ) {
 	if ( ! isset( $args['show_home'] ) )
 		$args['show_home'] = true;
 	return $args;
 }
-}// Add new image sizes
-add_filter( 'wp_page_menu_args', 'twentytwelve_page_menu_args' );
-add_action( 'after_setup_theme', 'setup' );  
-function setup() {
-  // ...  
+//add_filter( 'wp_page_menu_args', 'twentytwelve_page_menu_args' );
 
-
-  add_theme_support( 'menus' );
-  add_theme_support( 'post-thumbnails' ); // This feature enables post-thumbnail support for a theme  
-  // To enable only for posts:  
-  //add_theme_support( 'post-thumbnails', array( 'post' ) );  
-  // To enable only for posts and custom post types:  
-  //add_theme_support( 'post-thumbnails', array( 'post', 'movie' ) );  
-  // Register a new image size.  
-  // This means that WordPress will create a copy of the post image with the specified dimensions  
-  // when you upload a new image. Register as many as needed.  
-  // Adding custom image sizes (name, width, height, crop)  
-  add_image_size( 'square_220', 220, 220, true ); //(cropped)
-  add_image_size( 'square_120', 120, 120, true ); //(cropped)
-  add_image_size( 'custom-thumb', 220, 180, true ); // 220 pixels wide by 180 pixels tall, soft proportional crop mode
-  add_image_size( 'gallery', 720, 362, true );
-  add_image_size( 'gallery-thumb', 80, 50, true );
-  add_image_size( 'box', 237, 155, true );
-  add_image_size ( 'collection', 300, 200, false);
-  add_image_size ( 'blog_featured', 500, 300);
-// ...  
-}
-
-add_filter( 'image_size_names_choose', 'custom_image_sizes_choose' );  
-function custom_image_sizes_choose( $sizes ) {  
-  $custom_sizes = array(  
-  'square_220' => 'square_220px' ,
-  'square_120' => 'square_120px'
-  );  
-  return array_merge( $sizes, $custom_sizes );  
-}
-
-// Stop multiple image sizes
-//add_filter('intermediate_image_sizes_advanced', 'filter_image_sizes');
-//function filter_image_sizes( $sizes) {
-//   unset( $sizes['medium']);
-//   unset( $sizes['large']);
-//   return $sizes;
-// }
-
-/*enable custom menu //////*/
-
-// This theme uses wp_nav_menu() in one location.
-
-function GenderHubChild_setup() {
-  register_nav_menu( 'primary', __( 'Primary Menu', 'GenderHubChild' ) );
-  register_nav_menu( 'secondary', __( 'Second Menu', 'GenderHubChild' ) );
-}
-add_action( 'after_setup_theme', 'GenderHubChild_setup' );
-
-// Truncates the blog page post content
-
-function my_excerpt_length($length) {
-  return 55;
-}
-add_filter('excerpt_length', 'my_excerpt_length');
-
-/*remove image p tags //////*/
-
-function filter_ptags_on_images($content){
-  return preg_replace('/<p>\\s*?(<a .*?><img.*?><\\/a>|<img.*?>)?\\s*<\\/p>/s', '\1', $content);
-}
-add_filter('the_content', 'filter_ptags_on_images');
-
-function GenderHubChild_widgets_init() {
-  register_sidebar( array(
-  'name' => __( 'Generic Sidebar', 'GenderHubChild' ),
-  'id' => 'generic-sidebar',
-  'description' => __( 'generic-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Events Sidebar', 'GenderHubChild' ),
-  'id' => 'events-sidebar',
-  'description' => __( 'events-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Training Sidebar', 'GenderHubChild' ),
-  'id' => 'training-sidebar',
-  'description' => __( 'training-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Blogs Sidebar', 'GenderHubChild' ),
-  'id' => 'blogs-sidebar',
-  'description' => __( 'blogs-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Alerts Sidebar', 'GenderHubChild' ),
-  'id' => 'alerts-sidebar',
-  'description' => __( 'alerts-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'News Sidebar', 'GenderHubChild' ),
-  'id' => 'news-sidebar',
-  'description' => __( 'news-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Search Sidebar', 'GenderHubChild' ),
-  'id' => 'search-sidebar',
-  'description' => __( 'search-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Knowledge Sidebar', 'GenderHubChild' ),
-  'id' => 'knowledge-sidebar',
-  'description' => __( 'knowledge-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Build Capacity Sidebar', 'GenderHubChild' ),
-  'id' => 'build-capacity-sidebar',
-  'description' => __( 'build-capacity-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Collection Sidebar', 'GenderHubChild' ),
-  'id' => 'collection-sidebar',
-  'description' => __( 'collection-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Connect and Discuss Content', 'GenderHubChild' ),
-  'id' => 'connect-discuss-content',
-  'description' => __( 'connect-discuss-content', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Connect and Discuss Sidebar', 'GenderHubChild' ),
-  'id' => 'connect-discuss-sidebar',
-  'description' => __( 'connect-discuss-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Inspiration Sidebar', 'GenderHubChild' ),
-  'id' => 'inspiration-sidebar',
-  'description' => __( 'inspiration-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Footer 1', 'GenderHubChild' ),
-  'id' => 'footer-1',
-  'description' => __( 'footer-1', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Footer 2', 'GenderHubChild' ),
-  'id' => 'footer-2',
-  'description' => __( 'footer-2', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Footer 3', 'GenderHubChild' ),
-  'id' => 'footer-3',
-  'description' => __( 'footer-3', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Footer 4', 'GenderHubChild' ),
-  'id' => 'footer-4',
-  'description' => __( 'footer-4', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Sub Footer', 'GenderHubChild' ),
-  'id' => 'subfooter',
-  'description' => __( 'subfooter', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );
-  register_sidebar( array(
-  'name' => __( 'Test Sidebar', 'GenderHubChild' ),
-  'id' => 'test-sidebar',
-  'description' => __( 'test-sidebar', 'GenderHubChild' ),
-  'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-  'after_widget' => '</aside>',
-  'before_title' => '<h3 class="widget-title white">',
-  'after_title' => '</h3>',
-  ) );  
-
-}
-add_action( 'widgets_init', 'GenderHubChild_widgets_init' );
-
-// Register Custom Post Types
-
-add_action('init', 'blocks_register');
- 
-function blocks_register() {
- 
-	$labels = array(
-		'name' => _x('Blocks', 'post type general name'),
-		'singular_name' => _x('Block Item', 'post type singular name'),
-		'add_new' => _x('Add New', 'Block item'),
-		'add_new_item' => __('Add New Block Item'),
-		'edit_item' => __('Edit Block Item'),
-		'new_item' => __('New Block Item'),
-		'view_item' => __('View Block Item'),
-		'search_items' => __('Search Block'),
-		'not_found' =>  __('Nothing found'),
-		'not_found_in_trash' => __('Nothing found in Trash'),
-		'parent_item_colon' => ''
-	);
- 
-	$args = array(
-		'labels' => $labels,
-		'public' => true,
-		'publicly_queryable' => true,
-		'show_ui' => true,
-		'query_var' => true,
-		'menu_icon'   => '/wp-content/uploads/2015/07/block-icon.png',
-		'rewrite' => true,
-		'capability_type' => 'post',
-		'hierarchical' => false,
-		'menu_position' => null,
-		'supports' => array('title','editor','thumbnail', 'page-attributes')
-	  ); 
- 
-	register_post_type( 'blocks' , $args );
-}
-
-
-
-// todo: slikkr - move all other CPTs to plugin!
-
-add_action('init', 'facebook_register');
- 
-function facebook_register() {
- 
-	$labels = array(
-		'name' => _x('Facebook', 'post type general name'),
-		'singular_name' => _x('Facebook Item', 'post type singular name'),
-		'add_new' => _x('Add New', 'Facebook item'),
-		'add_new_item' => __('Add New Facebook Item'),
-		'edit_item' => __('Edit Facebook Item'),
-		'new_item' => __('New Facebook Item'),
-		'view_item' => __('View Facebook Item'),
-		'search_items' => __('Search Facebook'),
-		'not_found' =>  __('Nothing found'),
-		'not_found_in_trash' => __('Nothing found in Trash'),
-		'parent_item_colon' => ''
-	);
- 
-	$args = array(
-		'labels' => $labels,
-		'public' => true,
-		'publicly_queryable' => true,
-		'show_ui' => true,
-		'query_var' => true,
-		'menu_icon'   => '/wp-content/uploads/2015/07/facebook-icon.png',
-		
-		'capability_type' => 'post',
-		'hierarchical' => false,
-		'menu_position' => null,
-		'hierarchical'=> true,
-	  'rewrite' => false,
-	  'public'      => true,
-	  'show_ui'     => true,
-	  'show_in_menu'=> true,
-	  'show_in_nav_menus'   => true,
-	  'show_in_admin_bar'   => true,
-	
-	 
-	  'can_export'  => true,
-	  'has_archive' => true,
-	  'exclude_from_search' => false,
-	  'publicly_queryable'  => true,
-		'supports' => array('title','editor','thumbnail', 'page-attributes','comments')
-	  ); 
- 
-	register_post_type( 'facebook' , $args );
-}
 
 function custom_rewrite_basic() {
   add_rewrite_rule('^csw60/?', 'index.php?page_id=30914', 'top');
 }
-add_action('init', 'custom_rewrite_basic');
+//add_action('init', 'custom_rewrite_basic');
 
-// Programme alerts
-function programme_alerts_post_type() {
-
-  $labels = array(
-  'name'=> _x( 'Programme Alerts', 'Post Type General Name', 'text_domain' ),
-  'singular_name'       => _x( 'Programme Alert', 'Post Type Singular Name', 'text_domain' ),
-  'menu_name'   => __( 'Programme Alerts', 'text_domain' ),
-  'parent_item_colon'   => __( 'Parent Item:', 'text_domain' ),
-  'all_items'   => __( 'All Items', 'text_domain' ),
-  'view_item'   => __( 'View Item', 'text_domain' ),
-  'add_new_item'=> __( 'Add New Item', 'text_domain' ),
-  'add_new'     => __( 'Add New', 'text_domain' ),
-  'edit_item'   => __( 'Edit Item', 'text_domain' ),
-  'update_item' => __( 'Update Item', 'text_domain' ),
-  'search_items'=> __( 'Search Item', 'text_domain' ),
-  'not_found'   => __( 'Not found', 'text_domain' ),
-  'not_found_in_trash'  => __( 'Not found in Trash', 'text_domain' ),
-  );
-  $args = array(
-  'label'       => __( 'programme-alerts', 'text_domain' ),
-  'description' => __( 'Programme Alert Description', 'text_domain' ),
-  'labels'      => $labels,
-  'supports'    => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', ),
-  'taxonomies'  => array( 'category', 'post_tag', 'bridge_themes', 'gender_hub_themes' ),
-  'hierarchical'=> true,
-  'rewrite' => array(
-  'slug'  => 'be-inspired/programme-alerts'
-  ),
-  'public'      => true,
-  'show_ui'     => true,
-  'show_in_menu'=> true,
-  'show_in_nav_menus'   => true,
-  'show_in_admin_bar'   => true,
-  'menu_position'       => 6,
-  'menu_icon'   => '/wp-content/uploads/2015/06/bell-icon.png',
-  'can_export'  => true,
-  'has_archive' => true,
-  'exclude_from_search' => false,
-  'publicly_queryable'  => true,
-  'capability_type'     => 'page',
-  );
-  register_post_type( 'programme_alerts', $args );
-
-}
-
-// Hook into the 'init' action
-add_action( 'init', 'programme_alerts_post_type', 0 );
-
-// Blogs + Opinions
-function blogs_opinions_post_type() {
-
-  $labels = array(
-  'name'=> _x( 'Blogs & Opinions', 'Post Type General Name', 'text_domain' ),
-  'singular_name'       => _x( 'Blogs & Opinions', 'Post Type Singular Name', 'text_domain' ),
-  'menu_name'   => __( 'Blogs & Opinions', 'text_domain' ),
-  'parent_item_colon'   => __( 'Parent Item:', 'text_domain' ),
-  'all_items'   => __( 'All Items', 'text_domain' ),
-  'view_item'   => __( 'View Item', 'text_domain' ),
-  'add_new_item'=> __( 'Add New Item', 'text_domain' ),
-  'add_new'     => __( 'Add New', 'text_domain' ),
-  'edit_item'   => __( 'Edit Item', 'text_domain' ),
-  'update_item' => __( 'Update Item', 'text_domain' ),
-  'search_items'=> __( 'Search Item', 'text_domain' ),
-  'not_found'   => __( 'Not found', 'text_domain' ),
-  'not_found_in_trash'  => __( 'Not found in Trash', 'text_domain' ),
-  );
-  $args = array(
-  'label'       => __( 'blogs-opinions', 'text_domain' ),
-  'description' => __( 'Blogs & Opinions Description', 'text_domain' ),
-  'labels'      => $labels,
-  'supports'    => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', ),
-  'taxonomies'  => array( 'category', 'post_tag', 'bridge_themes', 'gender_hub_themes', 'topics' ),
-  'hierarchical'=> true,
-  'rewrite' => array(
-  'slug'  => 'be-inspired/blogs-opinion'
-  ),
-  'public'      => true,
-  'show_ui'     => true,
-  'show_in_menu'=> true,
-  'show_in_nav_menus'   => true,
-  'show_in_admin_bar'   => true,
-  'menu_position'       => 7,
-  'menu_icon'   => '/wp-content/uploads/2015/05/blog-icon.png',
-  'can_export'  => true,
-  'has_archive' => true,
-  'exclude_from_search' => false,
-  'publicly_queryable'  => true,
-  'capability_type'     => 'page',
-  );
-  register_post_type( 'blogs_opinions', $args );
-
-}
-
-// Hook into the 'init' action
-add_action( 'init', 'blogs_opinions_post_type', 0 );
-
-// Events
-function events_post_type() {
-
-  $labels = array(
-  'name'=> _x( 'Events', 'Post Type General Name', 'text_domain' ),
-  'singular_name'       => _x( 'Event', 'Post Type Singular Name', 'text_domain' ),
-  'menu_name'   => __( 'Events', 'text_domain' ),
-  'parent_item_colon'   => __( 'Parent Item:', 'text_domain' ),
-  'all_items'   => __( 'All Items', 'text_domain' ),
-  'view_item'   => __( 'View Item', 'text_domain' ),
-  'add_new_item'=> __( 'Add New Item', 'text_domain' ),
-  'add_new'     => __( 'Add New', 'text_domain' ),
-  'edit_item'   => __( 'Edit Item', 'text_domain' ),
-  'update_item' => __( 'Update Item', 'text_domain' ),
-  'search_items'=> __( 'Search Item', 'text_domain' ),
-  'not_found'   => __( 'Not found', 'text_domain' ),
-  'not_found_in_trash'  => __( 'Not found in Trash', 'text_domain' ),
-  );
-  $args = array(
-  'label'       => __( 'Events', 'text_domain' ),
-  'description' => __( 'Events Description', 'text_domain' ),
-  'labels'      => $labels,
-  'supports'    => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', ),
-  'taxonomies'  => array( 'category', 'post_tag', 'bridge_themes', 'gender_hub_themes', 'topics' ),
-  'hierarchical'=> true,
-  'rewrite' => array(
-  'slug'  => 'build-capacity/events'
-  ),
-  'public'      => true,
-  'show_ui'     => true,
-  'show_in_menu'=> true,
-  'show_in_nav_menus'   => true,
-  'show_in_admin_bar'   => true,
-  'menu_position'       => 8,
-  'menu_icon'   => '/wp-content/uploads/2015/05/event-icon.png',
-  'can_export'  => true,
-  'has_archive' => true,
-  'exclude_from_search' => false,
-  'publicly_queryable'  => true,
-  'capability_type'     => 'page',
-  );
-  register_post_type( 'events', $args );
-
-}
-
-// Hook into the 'init' action
-add_action( 'init', 'events_post_type', 0 );
-
-// Other Training
-function other_training_post_type() {
-
-  $labels = array(
-  'name'=> _x( 'Other Training', 'Post Type General Name', 'text_domain' ),
-  'singular_name'       => _x( 'Other Training', 'Post Type Singular Name', 'text_domain' ),
-  'menu_name'   => __( 'Other Training', 'text_domain' ),
-  'parent_item_colon'   => __( 'Parent Item:', 'text_domain' ),
-  'all_items'   => __( 'All Items', 'text_domain' ),
-  'view_item'   => __( 'View Item', 'text_domain' ),
-  'add_new_item'=> __( 'Add New Item', 'text_domain' ),
-  'add_new'     => __( 'Add New', 'text_domain' ),
-  'edit_item'   => __( 'Edit Item', 'text_domain' ),
-  'update_item' => __( 'Update Item', 'text_domain' ),
-  'search_items'=> __( 'Search Item', 'text_domain' ),
-  'not_found'   => __( 'Not found', 'text_domain' ),
-  'not_found_in_trash'  => __( 'Not found in Trash', 'text_domain' ),
-  );
-  $args = array(
-  'label'       => __( 'Other Training', 'text_domain' ),
-  'description' => __( 'Other Training Description', 'text_domain' ),
-  'labels'      => $labels,
-  'supports'    => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', ),
-  'taxonomies'  => array( 'category', 'post_tag', 'bridge_themes', 'gender_hub_themes', 'topics' ),
-  'hierarchical'=> true,
-  'rewrite' => array(
-  'slug'  => 'build-capacity/other-training'
-  ),
-  'public'      => true,
-  'show_ui'     => true,
-  'show_in_menu'=> true,
-  'show_in_nav_menus'   => true,
-  'show_in_admin_bar'   => true,
-  'menu_position'       => 9,
-  'menu_icon'   => '/wp-content/uploads/2015/05/training-icon.png',
-  'can_export'  => true,
-  'has_archive' => true,
-  'exclude_from_search' => false,
-  'publicly_queryable'  => true,
-  'capability_type'     => 'page',
-  );
-  register_post_type( 'other_training', $args );
-
-}
-
-// Hook into the 'init' action
-add_action( 'init', 'other_training_post_type', 0 );
-
-// News & Stories
-function news_stories_post_type() {
-
-  $labels = array(
-  'name'=> _x( 'News & Stories', 'Post Type General Name', 'text_domain' ),
-  'singular_name'       => _x( 'News & Story', 'Post Type Singular Name', 'text_domain' ),
-  'menu_name'   => __( 'News & Stories', 'text_domain' ),
-  'parent_item_colon'   => __( 'Parent Item:', 'text_domain' ),
-  'all_items'   => __( 'All Items', 'text_domain' ),
-  'view_item'   => __( 'View Item', 'text_domain' ),
-  'add_new_item'=> __( 'Add New Item', 'text_domain' ),
-  'add_new'     => __( 'Add New', 'text_domain' ),
-  'edit_item'   => __( 'Edit Item', 'text_domain' ),
-  'update_item' => __( 'Update Item', 'text_domain' ),
-  'search_items'=> __( 'Search Item', 'text_domain' ),
-  'not_found'   => __( 'Not found', 'text_domain' ),
-  'not_found_in_trash'  => __( 'Not found in Trash', 'text_domain' ),
-  );
-  $args = array(
-  'label'       => __( 'News & Stories', 'text_domain' ),
-  'description' => __( 'News & Stories Description', 'text_domain' ),
-  'labels'      => $labels,
-  'supports'    => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', ),
-  'taxonomies'  => array( 'category', 'post_tag', 'bridge_themes', 'gender_hub_themes', 'topics' ),
-  'hierarchical'=> true,
-  'rewrite' => array(
-  'slug'  => 'be-inspired/news-stories'
-  ),
-  'public'      => true,
-  'show_ui'     => true,
-  'show_in_menu'=> true,
-  'show_in_nav_menus'   => true,
-  'show_in_admin_bar'   => true,
-  'menu_position'       => 10,
-  'menu_icon'   => '/wp-content/uploads/2015/05/bell-icon.png',
-  'can_export'  => true,
-  'has_archive' => true,
-  'exclude_from_search' => false,
-  'publicly_queryable'  => true,
-  'capability_type'     => 'page',
-  );
-  register_post_type( 'news_stories', $args );
-
-}
-
-// Hook into the 'init' action
-add_action( 'init', 'news_stories_post_type', 0 );
 
 function process_found_posts($posts) {
   $post_types = get_query_var('post_type');
@@ -869,7 +633,6 @@ function process_found_posts($posts) {
   return $posts;  
 }
 add_filter('the_posts', 'process_found_posts');
-add_filter( 'default_hidden_meta_boxes', 'enable_custom_fields_per_default', 20, 1 );
 
 function enable_custom_fields_per_default( $hidden )
 {
@@ -882,142 +645,8 @@ if ( 'postcustom' == $metabox )
     }
     return $hidden;
 }
+add_filter( 'default_hidden_meta_boxes', 'enable_custom_fields_per_default', 20, 1 );
 
-// Change the query in practical-tools to include ids_documents.
-function practical_tools_filter($query) {
-  if (!is_admin() && is_post_type_archive('practical_tools')) {
-    $tax_query = array(
-  array(
-    'taxonomy' => 'content_type',
-    'field'    => 'slug',
-    'terms'    => 'tool',
-  ),
-);
-    $query->set('post_type', array('ids_documents', 'practical_tools'));
-    $query->set('tax_query', $tax_query);
-  }
-}
-add_action('pre_get_posts','practical_tools_filter');
-
-// Practical Tools
-function practical_tools_post_type() {
-
-  $labels = array(
-  'name'=> _x( 'Practical Tools', 'Post Type General Name', 'text_domain' ),
-  'singular_name'       => _x( 'Practical Tool', 'Post Type Singular Name', 'text_domain' ),
-  'menu_name'   => __( 'Practical Tools', 'text_domain' ),
-  'parent_item_colon'   => __( 'Parent Item:', 'text_domain' ),
-  'all_items'   => __( 'All Items', 'text_domain' ),
-  'view_item'   => __( 'View Item', 'text_domain' ),
-  'add_new_item'=> __( 'Add New Item', 'text_domain' ),
-  'add_new'     => __( 'Add New', 'text_domain' ),
-  'edit_item'   => __( 'Edit Item', 'text_domain' ),
-  'update_item' => __( 'Update Item', 'text_domain' ),
-  'search_items'=> __( 'Search Item', 'text_domain' ),
-  'not_found'   => __( 'Not found', 'text_domain' ),
-  'not_found_in_trash'  => __( 'Not found in Trash', 'text_domain' ),
-  );
-  $args = array(
-  'label'       => __( 'Practical Tools', 'text_domain' ),
-  'description' => __( 'Practical Tools Description', 'text_domain' ),
-  'labels'      => $labels,
-  'supports'    => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', ),
-  'taxonomies'  => array( 'category', 'post_tag', 'bridge_themes', 'gender_hub_themes' ),
-  'hierarchical'=> true,
-  'rewrite' => array(
-  'slug'  => 'build-capacity/practical-tools'
-  ),
-  'public'      => true,
-  'show_ui'     => true,
-  'show_in_menu'=> true,
-  'show_in_nav_menus'   => true,
-  'show_in_admin_bar'   => true,
-  'menu_position'       => 10,
-  'menu_icon'   => '/wp-content/uploads/2015/06/presentation-icon.png',
-  'can_export'  => true,
-  'has_archive' => true,
-  'exclude_from_search' => false,
-  'publicly_queryable'  => true,
-  'capability_type'     => 'page',
-  );
-  register_post_type( 'practical_tools', $args );
-
-}
-
-// Hook into the 'init' action
-add_action( 'init', 'practical_tools_post_type', 0 );
-// Register Resource Types Custom Taxonomy
-function resource_type_custom_taxonomy() {
-
-  $labels = array(
-  'name'       => _x( 'Resource Types', 'Taxonomy General Name', 'text_domain' ),
-  'singular_name'      => _x( 'Resource Type', 'Taxonomy Singular Name', 'text_domain' ),
-  'menu_name'  => __( 'Resource Type', 'text_domain' ),
-  'all_items'  => __( 'All Resource Types', 'text_domain' ),
-  'parent_item'=> __( 'Parent Resource Type', 'text_domain' ),
-  'parent_item_colon'  => __( 'Parent Resource Type:', 'text_domain' ),
-  'new_item_name'      => __( 'New Resource Type', 'text_domain' ),
-  'add_new_item'       => __( 'Add New Resource Type', 'text_domain' ),
-  'edit_item'  => __( 'Edit Resource Type', 'text_domain' ),
-  'update_item'=> __( 'Update Resource Type', 'text_domain' ),
-  'separate_items_with_commas' => __( 'Separate Resource Types with commas', 'text_domain' ),
-  'search_items'       => __( 'Search Resource Types', 'text_domain' ),
-  'add_or_remove_items'=> __( 'Add or remove Resource Types', 'text_domain' ),
-  'choose_from_most_used'      => __( 'Choose from the most used Resource Types', 'text_domain' ),
-  'not_found'  => __( 'Not Found', 'text_domain' ),
-  );
-  $args = array(
-  'labels'     => $labels,
-  'hierarchical'       => false,
-  'public'     => true,
-  'show_ui'    => true,
-  'show_admin_column'  => true,
-  'show_in_nav_menus'  => true,
-  'show_tagcloud'      => true,
-  );
-  register_taxonomy( 'resource_type', array( 'ids_documents' ), $args );
-
-}
-
-
-
-// Hook into the 'init' action
-add_action( 'init', 'resource_type_custom_taxonomy', 0 );
-
-// Register Collection Custom Taxonomy
-function topics_custom_taxonomy() {
-
-  $labels = array(
-  'name'       => _x( 'Topics', 'Taxonomy General Name', 'text_domain' ),
-  'singular_name'      => _x( 'Topic', 'Taxonomy Singular Name', 'text_domain' ),
-  'menu_name'  => __( 'Topics', 'text_domain' ),
-  'all_items'  => __( 'All Topics', 'text_domain' ),
-  'parent_item'=> __( 'Parent Topic', 'text_domain' ),
-  'parent_item_colon'  => __( 'Parent Topic:', 'text_domain' ),
-  'new_item_name'      => __( 'New Topic', 'text_domain' ),
-  'add_new_item'       => __( 'Add New Topic', 'text_domain' ),
-  'edit_item'  => __( 'Edit Topic', 'text_domain' ),
-  'update_item'=> __( 'Update Topic', 'text_domain' ),
-  'separate_items_with_commas' => __( 'Separate Topics with commas', 'text_domain' ),
-  'search_items'       => __( 'Search Topics', 'text_domain' ),
-  'add_or_remove_items'=> __( 'Add or remove Topic', 'text_domain' ),
-  'choose_from_most_used'      => __( 'Choose from the most used Topics', 'text_domain' ),
-  'not_found'  => __( 'Not Found', 'text_domain' ),
-  );
-  $args = array(
-  'labels'     => $labels,
-  'hierarchical'       => true,
-  'public'     => true,
-  'show_ui'    => true,
-  'show_admin_column'  => true,
-  'show_in_nav_menus'  => true,
-  'show_tagcloud'      => true,
-  );
-  register_taxonomy( 'topics', array( 'ids_documents','contact_point','events','blogs_opinions','other_training','programme_alerts','practical_tools','news_stories','collections' ), $args );
-
-}
-// Hook into the 'init' action
-add_action( 'init', 'topics_custom_taxonomy', 0 );
 
 global $wp_taxonomies;
 if( isset( $wp_taxonomies[ 'collections' ] ) ) {
@@ -1025,78 +654,6 @@ if( isset( $wp_taxonomies[ 'collections' ] ) ) {
     unset( $wp_taxonomies[ 'collections' ] );
 }
 
-
-
-function content_type_custom_taxonomy() {
-
-  $labels = array(
-  'name'       => _x( 'Content Types', 'Taxonomy General Name', 'text_domain' ),
-  'singular_name'      => _x( 'Content Type', 'Taxonomy Singular Name', 'text_domain' ),
-  'menu_name'  => __( 'Content Type', 'text_domain' ),
-  'all_items'  => __( 'All Content Types', 'text_domain' ),
-  'parent_item'=> __( 'Parent Content Type', 'text_domain' ),
-  'parent_item_colon'  => __( 'Parent Content Type:', 'text_domain' ),
-  'new_item_name'      => __( 'New Content Type', 'text_domain' ),
-  'add_new_item'       => __( 'Add New Content Type', 'text_domain' ),
-  'edit_item'  => __( 'Edit Content Type', 'text_domain' ),
-  'update_item'=> __( 'Update Content Type', 'text_domain' ),
-  'separate_items_with_commas' => __( 'Separate Content Types with commas', 'text_domain' ),
-  'search_items'       => __( 'Search Content Types', 'text_domain' ),
-  'add_or_remove_items'=> __( 'Add or remove Content Types', 'text_domain' ),
-  'choose_from_most_used'      => __( 'Choose from the most used Content Types', 'text_domain' ),
-  'not_found'  => __( 'Not Found', 'text_domain' ),
-  );
-  $args = array(
-  'labels'     => $labels,
-  'hierarchical'       => false,
-  'public'     => true,
-  'show_ui'    => true,
-  'show_admin_column'  => true,
-  'show_in_nav_menus'  => true,
-  'show_tagcloud'      => true,
-  );
-  register_taxonomy( 'content_type', array( 'events', 'other_training', 'news_stories', 'blogs_opinions', 'programme_alerts', 'contact_point','practical_tools','ids_documents' ), $args );
-
-}
-
-// Hook into the 'init' action
-add_action( 'init', 'content_type_custom_taxonomy', 0 );
-// Register Attribution Custom Taxonomy
-function attribution_custom_taxonomy() {
-
-  $labels = array(
-  'name'       => _x( 'Attribution', 'Taxonomy General Name', 'text_domain' ),
-  'singular_name'      => _x( 'Attribution', 'Taxonomy Singular Name', 'text_domain' ),
-  'menu_name'  => __( 'Attribution', 'text_domain' ),
-  'all_items'  => __( 'All sources', 'text_domain' ),
-  'parent_item'=> __( 'Parent Attribution', 'text_domain' ),
-  'parent_item_colon'  => __( 'Parent Attribution:', 'text_domain' ),
-  'new_item_name'      => __( 'New attribution information', 'text_domain' ),
-  'add_new_item'       => __( 'Add New Attribution information', 'text_domain' ),
-  'edit_item'  => __( 'Edit Attribution', 'text_domain' ),
-  'update_item'=> __( 'Update Attribution', 'text_domain' ),
-  'separate_items_with_commas' => __( 'Separate Attribution with commas', 'text_domain' ),
-  'search_items'       => __( 'Search Attribution', 'text_domain' ),
-  'add_or_remove_items'=> __( 'Add or remove Attribution', 'text_domain' ),
-  'choose_from_most_used'      => __( 'Choose from the most used Attribution information', 'text_domain' ),
-  'not_found'  => __( 'GenderHub', 'text_domain' ),
-  );
-  $args = array(
-  'labels'     => $labels,
-  'hierarchical'       => true,
-  'public'     => true,
-  'show_ui'    => true,
-  'show_admin_column'  => true,
-  'show_in_nav_menus'  => false,
-  'show_tagcloud'      => false,
-  );
-  register_taxonomy( 'attribution', array( 'ids_documents', 'practical_tools' ), $args );
-
-}
-
-// Hook into the 'init' action
-add_action( 'init', 'attribution_custom_taxonomy', 0 );
-add_filter( 'pre_get_posts', 'genderhub_cpt_search' );
 /**
 * This function modifies the main WordPress query to include an array of post types instead of the default 'post' post type.
 *
@@ -1108,8 +665,8 @@ function genderhub_cpt_search( $query ) {
   $query->set('post_type', array( 'post', 'news_stories', 'other_training', 'events', 'blogs_opinions', 'programme_alerts', 'contact_point', 'practical_tools' ));
   return $query;
 };
+add_filter( 'pre_get_posts', 'genderhub_cpt_search' );
 
-add_filter( 'posts_search', 'whole_words_search', 20, 2 );
 function whole_words_search( $search, $wp_query ) {
   global $wpdb;
   if ( empty( $search ) )
@@ -1129,6 +686,7 @@ function whole_words_search( $search, $wp_query ) {
   }
   return $search;
 }
+add_filter( 'posts_search', 'whole_words_search', 20, 2 );
 
 // Add IDS Import categories in the edit.php post columns
 add_filter('manage_events_posts_columns', 'idsimport_posts_columns');
@@ -1162,7 +720,6 @@ function custom_term_output($args){
 }
 
 //MODIFY TAXFIELD DROPDOWN OUTPUT TO IDENTIFY AND STYLE CHILD CATEGORIES
-add_filter('uwpqsf_tax_field_dropdown','custom_dropdown_output','',12);
 function custom_dropdown_output($html,$type,$exc,$hide,$taxname,$taxlabel,$taxall,$opt,$c,$defaultclass,$formid,$divclass,$eid=''){
   $args = array('hide_empty'=>$hide,'exclude'=>$eid );
   $taxoargs = apply_filters('uwpqsf_taxonomy_arg',$args,$taxname,$formid);
@@ -1202,6 +759,7 @@ foreach ( $childterms as $childterm ) {
   }
 
 }
+add_filter('uwpqsf_tax_field_dropdown','custom_dropdown_output','',12);
 
 // add post count to search drop downs - Ultimate WP Query Search Filter
 // http://9-sec.com/support-forum/?mingleforumaction=viewtopic&t=221
@@ -1209,7 +767,6 @@ foreach ( $childterms as $childterm ) {
 
 // add query terms to search results - Ultimate WP Query Search Filter
 
-add_filter( 'get_search_query', 'uwpqsf_var', 20, 1 );
 function uwpqsf_var($s){
   if(is_search() && isset($_GET['s']) && $_GET['s'] == 'uwpsfsearchtrg' && isset($_GET['uformid']) ){
     if(isset($_GET['taxo'])){
@@ -1236,37 +793,10 @@ if(isset($v['term'])){
     return $s;
   }
 }
-
-
-//add_filter('body_class','filter_body');
-function filter_body($classes){
-  if(count($_GET)===1 && isset($_GET['s'])) $classes[] = 'ny_highlight';
-  return $classes;
-}
-
-add_filter('nav_menu_css_class','hide_submenu',100,3);
-function hide_submenu( $classes, $item, $args )
-{  if($args->menu_id !== 'ubermenu-nav-main-2-primary') return $classes;
-  if(count($_GET)===1 && isset($_GET['s']))
-  {
-    $c = array();
-    foreach($classes as $id=>$l)
-    {
-      if($l==='ubermenu-current-menu-ancestor' || $l === 'ubermenu-active')
-      {
-$c[] = 'ny_hide';
-continue;
-      }
-      $c[]  = $l;
-    }
-    return $c;
-  }
-  return $classes;
-}
+add_filter( 'get_search_query', 'uwpqsf_var', 20, 1 );
 
 // nyasro sort countries //
 
-add_filter('nyasro_dropdown_sort','nyasro_terms_sort','',2);
 function nyasro_terms_sort( $terms, $taxname )
 { 
   if($taxname === 'bridge_countries')
@@ -1287,11 +817,11 @@ continue;
   }
   return $terms;
 }// end of nyasro sort countries //
+add_filter('nyasro_dropdown_sort','nyasro_terms_sort','',2);
 
 ///////////////// updated to remove bridge- string from urls already in databse /////////////////////
 
 //////////////// Stop selected categories appearing at the top of categories list in metabox, keep it all in correct heirachy order ///////////////
-add_filter( 'wp_terms_checklist_args', 'genderhub_wp_terms_checklist_args', 1, 2 );
 function genderhub_wp_terms_checklist_args( $args, $post_id ) {
 
    $args[ 'checked_ontop' ] = false;
@@ -1299,13 +829,14 @@ function genderhub_wp_terms_checklist_args( $args, $post_id ) {
    return $args;
 
 }
+add_filter( 'wp_terms_checklist_args', 'genderhub_wp_terms_checklist_args', 1, 2 );
 
-///// ADD NEW META BOX ///
+
 /**
- * Adds a meta box to the post editing screen
+ * this belongs in ids documents post type
  */
 function genderhub_custom_meta() {
-    add_meta_box( 'genderhub_meta', __( 'Current Active Categories', 'genderhub-textdomain' ), 'genderhub_meta_callback', 'ids_documents', 'side', 'high'  );
+    add_meta_box( 'genderhub_meta', __( 'Current Active Categories', 'genderhub' ), 'genderhub_meta_callback', 'ids_documents', 'side', 'high'  );
 }
 add_action( 'add_meta_boxes', 'genderhub_custom_meta' );
 
@@ -1318,6 +849,9 @@ foreach((get_the_category()) as $category) {
 echo $sep . $category->cat_name; $sep = ', ';
 };  
 }
+
+
+
 /// place RSS Aggregator Images to Custom Field ///
 add_filter( 'wprss_ftp_featured_image_meta', 'save_url_custom_field' );
 function save_url_custom_field() {
@@ -1457,135 +991,7 @@ $vt_image = array(
 return $vt_image;
     }
 }
-add_action('admin_menu', 'add_content_intros');
-function add_content_intros()  
-{  
-    add_options_page('Content intros', 'Content intros', 'manage_options', 'functions','add_content_intros_page');  
-}  
-function add_content_intros_page()  
-{  
 
-?>  
-<div class="wrap">  
-    <h2>Content intros</h2>  
-    <form method="post" action="options.php">  
-        <?php wp_nonce_field('update-options') ?>  
-        <?php
-    $nf = '';
-    $post_types = get_post_types(array('public'   => true, '_builtin' => false), 'names' ); 
-    
-    foreach ( $post_types as $post_type ) {
-    if($post_type != 'contact_point' && $post_type != 'wprss_feed' && $post_type != 'wprss_feed_item' && $post_type != 'blocks' && $post_type != 'facebook'):
-    ?>
-     <p><strong><?php echo ucfirst(str_replace('-',' ',str_replace('_',' ',$post_type)));?>:</strong><br />  
-     <?php
-     wp_editor( get_option($post_type.'-description'), $post_type.'-description', $settings = array() );
-     ?>
-    
-        </p>  
-<?php
-$nf = $nf.$post_type.'-description,';
-endif;
-}
-
-?>
-   
-   
-    <input type="hidden" name="action" value="update" />  
-    <input type="hidden" name="page_options" value="<?php echo $nf;?>" />  
-      <p><input type="submit" name="Submit" value="Store Options" /></p>  
-</form>  
-    </div>  
-<?php  
-}  
-
-/**
- * Add  fields to media uploader
- *
- * @param $form_fields array, fields to include in attachment form
- * @param $post object, attachment record in database
- * @return $form_fields, modified form fields
- */
- function slide_background_colour_dropdown($post,$value){
-	 $options = array(
-			array('name' => 'Green', 'value' => 'greenbg'),
-			array('name' => 'Orange', 'value' => 'orangebg'),
-			array('name' => 'Pink', 'value' => 'pinkbg'),
-			array('name' => 'Purple', 'value' => 'purplebg')
-			);
-		$dropdown = '<select name="attachments['.$post->ID.'][slide-colour]">
-		<option value="" selected="">None</option>';
-		foreach($options as $op):
-		if($value==$op['value']):$s=' selected="selected"'; else: $s = ''; endif;
-		$dropdown .= '<option value="'.$op['value'].'" '.$s.'>'.$op['name'].'</option>';
-		endforeach;
-		$dropdown .= '</select>';	
-		return $dropdown;	
-	 
- }
-function be_attachment_field_credit( $form_fields, $post ) {
-	$form_fields['slide-colour'] = array(
-		'label' => 'Slide colour',
-		'input'      => 'html',
-		'html'       => slide_background_colour_dropdown($post,get_post_meta( $post->ID, 'slide_colour', true )),
-		
-		'value' => get_post_meta( $post->ID, 'slide_colour', true ),
-		'helps' => 'Sets the background button and title colour',
-	);
-
-	$form_fields['slide-link'] = array(
-		'label' => 'Slide Link',
-		'input' => 'text',
-		'value' => get_post_meta( $post->ID, 'slide_link', true ),
-		'helps' => 'Add Slide URL',
-	);
-	$form_fields['slide-link-text'] = array(
-		'label' => 'Slide Link Text',
-		'input' => 'text',
-		'value' => get_post_meta( $post->ID, 'slide_link_text', true ),
-		'helps' => 'Add Slide Link Text',
-	);
-
-	return $form_fields;
-}
-
-add_filter( 'attachment_fields_to_edit', 'be_attachment_field_credit', 10, 2 );
-
-/**
- * Save values of fields in media uploader
- *
- * @param $post array, the post data for database
- * @param $attachment array, attachment fields from $_POST form
- * @return $post array, modified post data
- */
-
-function be_attachment_field_credit_save( $post, $attachment ) {
-	if( isset( $attachment['slide-colour'] ) )
-	update_post_meta( $post['ID'], 'slide_colour', $attachment['slide-colour'] );
-
-	if( isset( $attachment['slide-link'] ) )
-	update_post_meta( $post['ID'], 'slide_link',  $attachment['slide-link']  );
-
-	if( isset( $attachment['slide-link-text'] ) )
-	update_post_meta( $post['ID'], 'slide_link_text',  $attachment['slide-link-text'] );
-	return $post;
-	}
-
-add_filter( 'attachment_fields_to_save', 'be_attachment_field_credit_save', 10, 2 );
-
-// slkr - what on earth is going on under here?!
-// Trigger insert prev / next
-add_filter( 'loop_end', 'prev_next' );
-
-function prev_next( $post ) {
-	global $post;
-	if (!is_front_page()):
-		if (is_single() ) {
-			if(get_post_type() == 'collection'):     
-      			endif;
-		}
-	endif;
-}
 
 
 /**
@@ -1663,236 +1069,4 @@ function ids_pretty_date( $start, $end = NULL, $fmt = NULL ) {
     return $complete_date;
 }
 
-/* AUTOMATICALLY SELECT PARENT TERMS WHEN A POST IS ADDED TO A TOPIC */
-function gh_select_parent_terms($post_ID, $post) {
-    if(!wp_is_post_revision($post_ID)) {
-        $taxonomies = get_taxonomies(array('_builtin' => false));
-        foreach ($taxonomies as $taxonomy ) {
-            $terms = wp_get_object_terms($post->ID, $taxonomy);
-            foreach ($terms as $term) {
-                $parenttags = get_ancestors($term->term_id,$taxonomy);
-                wp_set_object_terms( $post->ID, $parenttags, $taxonomy, true );
-            }
-        }
-    }
-}
-add_action('publish_ids_documents', 'gh_select_parent_terms', 10, 2);
-add_action('publish_contact_point', 'gh_select_parent_terms', 10, 2);
-add_action('publish_events', 'gh_select_parent_terms', 10, 2);
-add_action('publish_blogs_opinions', 'gh_select_parent_terms', 10, 2);
-add_action('publish_other_training', 'gh_select_parent_terms', 10, 2);
-add_action('publish_programme_alerts', 'gh_select_parent_terms', 10, 2);
-add_action('publish_practical_tools', 'gh_select_parent_terms', 10, 2);
-add_action('publish_news_stories', 'gh_select_parent_terms', 10, 2);
-add_action('publish_collections', 'gh_select_parent_terms', 10, 2);
-
-function gh_footer_loadscripts() {
-
-    wp_register_script( 'gh_frontend_jquery', get_stylesheet_directory_uri() . '/js/gh-custom-front.js', array( 'jquery'), null, true);
-
-    wp_enqueue_script('gh_frontend_jquery');
-}
-add_action( 'wp_footer', 'gh_footer_loadscripts' );
-
-function gh_excerpt_label( $new, $original ) {
-    global $post_type;
-    if ( 'Excerpt' == $original && $post_type == 'collections') {
-        return 'Explain why this collection was created';
-    }else{
-        $pos = strpos($original, 'Excerpts are optional hand-crafted summaries of your');
-        if ($pos !== false) {
-            return  '';
-        }
-    }
-    return $new;
-}
-add_filter( 'gettext', 'gh_excerpt_label', 10, 2 );
-
-function gh_archive_shortcode($atts, $content, $tag) {
-
-	$type = str_replace('gh', '', $tag);
-
-	ob_start();
-
-	if($atts == NULL) {
-		$atts =
-			shortcode_atts(
-				array(
-					'type'  => ''
-				), $atts, $tag
-			);
-	}
-
-	$args = array(
-		'numberposts' => 20,
-		'post_type' => $type,
-		'order'     => 'DESC'
-	);
-
-	$items = new WP_Query( $args );
-
-	if(($atts['type'] == 'sidebar')) {
-
-		$html = '';
-
-		$html .= '<div class="archive-summary-container">';
-		$html .= '<ul class="linklist '.$type.'">';
-
-		if ( $items->have_posts() ) : while ($items->have_posts()) : $items->the_post();
-
-			$html .= '<li><a href="'.get_the_permalink().'">'.$items->post->post_title;
-			$html .= !empty($date) ? ' ('.$date->format('M Y').')</a></p>' : '</a></li>';
-
-		endwhile;
-
-		endif;
-
-		$html .= '</ul>';
-
-		$html .= '</div>';
-
-		wp_reset_postdata();
-		wp_reset_query();
-
-		return $html;
-
-	} else {
-
-		if ( $items->have_posts() ) : while ($items->have_posts()) : $items->the_post();
-
-			get_template_part( 'content', $type );
-
-		endwhile;
-
-		endif;
-
-	}
-
-	return ob_get_clean();
-
-}
-add_shortcode('ghcollections', 'gh_archive_shortcode');
-add_shortcode('ghinterviews', 'gh_archive_shortcode');
-add_shortcode('ghcontact_point', 'gh_archive_shortcode');
-
-function genderhub_admin_scripts($hook) {
-
-    wp_enqueue_media();
-
-    wp_enqueue_style('jquery-ui-css','http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/base/jquery-ui.css',false,"1.9.0",false);
-
-    wp_register_script( 'genderhub-admin-js', get_stylesheet_directory_uri() . '/js/genderhub-custom-admin.js', array('jquery'), null, true );
-    wp_enqueue_script( 'genderhub-admin-js' );
-
-    $jquery_ui = array(
-        "jquery-ui-core",			//UI Core - do not remove this one
-        "jquery-ui-sortable",
-        "jquery-ui-draggable",
-        "jquery-ui-droppable",
-        "jquery-ui-selectable",
-        "jquery-ui-position",
-        "jquery-ui-datepicker"
-    );
-    foreach($jquery_ui as $script){
-        wp_enqueue_script($script);
-    }
-
-}
-add_action( 'admin_enqueue_scripts', 'genderhub_admin_scripts');
-
-function genderhub_body_classes( $classes ) {
-
-	global $post;
-
-	if ( isset( $post ) ) {
-		$classes[] = $post->post_name;
-
-		$this_template = get_post_meta($post->ID, '_wp_page_template', true);
-		$classes[] = $this_template;
-	}
-
-	foreach ( $classes as $k =>  $v ) {
-		if ( substr($v, 0, 21) == 'page-template-archive' ) {
-			$classes[ $k ] = substr( $v, 22 );
-		}
-	}
-
-	return $classes;
-}
-add_filter( 'body_class', 'genderhub_body_classes' );
-
-/**
- * @param $id
- * @param $terms
- *
- * @return string
- *
- * Can return a contact_point based on either
- * an array of terms (e.g. via single-collections.php)
- * or a specific contact_point id (e.g. via single-interviews.php)
- */
-function gh_get_contact_point($id, $terms) {
-
-	if ($id) {
-
-		ob_start();
-
-		$args = array(
-			'numberposts' => 1,
-			'post_type' => array('contact_point'),
-			'p' => $id
-		);
-
-		$query = new WP_query( $args );
-
-		if($query->have_posts()) : while ($query->have_posts()) : $query->the_post();
-
-			get_template_part( 'content', 'contact_point' );
-
-		endwhile;
-
-		endif;
-
-		wp_reset_postdata();
-		wp_reset_query();
-
-		return ob_get_clean();
-
-	} else {
-
-		ob_start();
-
-		$args = array(
-			'numberposts' => 1,
-			'post_type' => array('contact_point'),
-			'tax_query' => array(
-
-				array(
-					'taxonomy' => 'topics',
-					'field'    => 'term_id',
-					'operator' => 'IN',
-					'terms'    => $terms,
-				))
-		);
-
-		$query = new WP_query( $args );
-
-		if($query->have_posts()) : while ($query->have_posts()) : $query->the_post();
-
-			get_template_part( 'content', 'contact_point' );
-
-		endwhile;
-
-		endif;
-
-		wp_reset_postdata();
-		wp_reset_query();
-
-		return ob_get_clean();
-
-	}
-
-}
-
 add_filter( 'searchwp_short_circuit', '__return_true' );
-
