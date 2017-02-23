@@ -25,7 +25,11 @@ class GenderHub_2017 {
 	    add_filter( 'tiny_mce_before_init', array($this, 'gh_styles_dropdown') );
 	    add_filter( 'mce_buttons', array($this, 'gh_style_select') );
 	    add_filter( 'the_content', array($this, 'filter_ptags_on_images') );
+	    add_filter( 'wp_terms_checklist_args', array($this, 'gh_wp_terms_checklist_args'), 1, 2 );
 
+	    add_filter( 'attachment_fields_to_edit', array($this, 'gh_attachment_credit'), 10, 2 );
+	    add_filter( 'attachment_fields_to_save', array($this, 'gh_save_attachment_credit'), 10, 2 );
+        
 	    remove_action( 'wp_head','wp_generator' );
 
 	    add_editor_style( 'css/editor-style.css' );
@@ -392,6 +396,14 @@ class GenderHub_2017 {
 		return preg_replace('/<p>\\s*?(<a .*?><img.*?><\\/a>|<img.*?>)?\\s*<\\/p>/s', '\1', $content);
 	}
 
+	function gh_wp_terms_checklist_args( $args, $post_id ) {
+
+		$args[ 'checked_ontop' ] = false;
+
+		return $args;
+
+	}
+
 	public static function gh_get_slider_posts($type) {
 
 		$args = array(
@@ -417,8 +429,9 @@ class GenderHub_2017 {
 				$slide_color = get_post_meta($pa_query->post->ID, '_pa_slide_bg', true);
 				$slide_link_url = get_post_meta($pa_query->post->ID, '_pa_slide_link_url', true);
 				$slide_link_text = get_post_meta($pa_query->post->ID, '_pa_slide_link_text', true);
-				$image_credit_url = get_post_meta($pa_query->post->ID, '_pa_image_credit_url', true);
-				$image_credit_text = get_post_meta($pa_query->post->ID, '_pa_image_credit_text', true);
+
+				$image_credit_url = get_post_meta(get_post_thumbnail_id(), '_image_credit_url', true);
+				$image_credit_text = get_post_meta(get_post_thumbnail_id(), '_image_credit_text', true);
 
 				$desc = esc_html(get_post(get_post_thumbnail_id())->post_content);
 
@@ -452,6 +465,40 @@ class GenderHub_2017 {
 		return $output;
 
 	}
+
+	function gh_attachment_credit( $form_fields, $post ) {
+
+		$form_fields['image-credit-text'] = array(
+			'label' => 'Image Credit Text',
+			'input' => 'text',
+			'value' => get_post_meta( $post->ID, '_image_credit_text', true ),
+			'helps' => 'Add a credit for this image',
+		);
+		$form_fields['image-credit-url'] = array(
+			'label' => 'Image Credit URL',
+			'input' => 'text',
+			'value' => get_post_meta( $post->ID, '_image_credit_url', true ),
+			'helps' => 'Add a link for this image\'s credit',
+		);
+
+		return $form_fields;
+	}
+
+	function gh_save_attachment_credit( $post, $attachment ) {
+
+		if( isset( $attachment['image-credit-text'] ) )
+
+			update_post_meta( $post['ID'], '_image_credit_text', $attachment['image-credit-text'] );
+
+
+		if( isset( $attachment['image-credit-url'] ) )
+
+			update_post_meta( $post['ID'], '_image_credit_url', esc_url( $attachment['image-credit-url'] ) );
+
+		return $post;
+
+	}
+
 }
 
 new GenderHub_2017;
@@ -720,6 +767,7 @@ function custom_term_output($args){
 }
 
 //MODIFY TAXFIELD DROPDOWN OUTPUT TO IDENTIFY AND STYLE CHILD CATEGORIES
+// TODO ADDS COUNT BESIDE TERMS LIST
 function custom_dropdown_output($html,$type,$exc,$hide,$taxname,$taxlabel,$taxall,$opt,$c,$defaultclass,$formid,$divclass,$eid=''){
   $args = array('hide_empty'=>$hide,'exclude'=>$eid );
   $taxoargs = apply_filters('uwpqsf_taxonomy_arg',$args,$taxname,$formid);
@@ -766,7 +814,7 @@ add_filter('uwpqsf_tax_field_dropdown','custom_dropdown_output','',12);
 
 
 // add query terms to search results - Ultimate WP Query Search Filter
-
+// outputs terms searched for on search template
 function uwpqsf_var($s){
   if(is_search() && isset($_GET['s']) && $_GET['s'] == 'uwpsfsearchtrg' && isset($_GET['uformid']) ){
     if(isset($_GET['taxo'])){
@@ -822,14 +870,8 @@ add_filter('nyasro_dropdown_sort','nyasro_terms_sort','',2);
 ///////////////// updated to remove bridge- string from urls already in databse /////////////////////
 
 //////////////// Stop selected categories appearing at the top of categories list in metabox, keep it all in correct heirachy order ///////////////
-function genderhub_wp_terms_checklist_args( $args, $post_id ) {
 
-   $args[ 'checked_ontop' ] = false;
 
-   return $args;
-
-}
-add_filter( 'wp_terms_checklist_args', 'genderhub_wp_terms_checklist_args', 1, 2 );
 
 
 /**
@@ -1068,5 +1110,3 @@ function ids_pretty_date( $start, $end = NULL, $fmt = NULL ) {
 
     return $complete_date;
 }
-
-add_filter( 'searchwp_short_circuit', '__return_true' );

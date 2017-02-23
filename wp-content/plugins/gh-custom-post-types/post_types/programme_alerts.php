@@ -70,8 +70,6 @@ function programme_alert_slide_details( $post ) {
 	$pa_sbg     = get_post_meta( $post->ID, '_pa_slide_bg', true );
 	$pa_slurl   = get_post_meta( $post->ID, '_pa_slide_link_url', true );
 	$pa_sltext  = get_post_meta( $post->ID, '_pa_slide_link_text', true );
-	$pa_icurl   = get_post_meta( $post->ID, '_pa_image_credit_url', true );
-	$pa_ictext  = get_post_meta( $post->ID, '_pa_image_credit_text', true );
 
 	$colors = array(
 		array('name' => 'Green', 'value' => 'greenbg'),
@@ -107,14 +105,6 @@ function programme_alert_slide_details( $post ) {
 		<label for="_pa_slide_link_text">Link Text :</label><br />
 		<input type="text" id="_pa_slide_link_text" name="_pa_slide_link_text" class="widefat" value="<?php _e($pa_sltext); ?>" />
 	</p>
-	<p>
-		<label for="_pa_image_credit_url">Image Credit URL :</label><br />
-		<input type="text" id="_pa_image_credit_url" name="_pa_image_credit_url" class="widefat" value="<?php _e($pa_icurl); ?>" />
-	</p>
-	<p>
-		<label for="_pa_image_credit_text">Image Credit Text :</label><br />
-		<input type="text" id="_pa_image_credit_text" name="_pa_image_credit_text" class="widefat" value="<?php _e($pa_ictext); ?>" />
-	</p>
 	<?php
 }
 
@@ -138,11 +128,5 @@ function save_programme_alert_meta_boxes( $post_id ) {
 
 	if( isset( $_POST['_pa_slide_link_text'] ) )
 		update_post_meta( $post_id, '_pa_slide_link_text', $_POST['_pa_slide_link_text'] );
-
-	if( isset( $_POST['_pa_image_credit_url'] ) )
-		update_post_meta( $post_id, '_pa_image_credit_url', $_POST['_pa_image_credit_url'] );
-
-	if( isset( $_POST['_pa_image_credit_text'] ) )
-		update_post_meta( $post_id, '_pa_image_credit_text', $_POST['_pa_image_credit_text'] );
 
 }
