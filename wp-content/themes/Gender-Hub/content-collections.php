@@ -247,12 +247,10 @@ else : ?>
 					</div>
 
 				</div>
-			<?php } ?>
+			<?php }
 
-			<?php
-			$featured=maybe_unserialize(get_post_meta($post->ID,'featured_content',true)) ;?>
+			$featured=maybe_unserialize(get_post_meta($post->ID,'featured_content',true));
 
-			<?php
 			if ($featured):
 				$args = array(
 					'numberposts' => 10,

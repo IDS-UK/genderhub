@@ -5,7 +5,19 @@
   * articles, tools, documents, etc. relating to a topic
   */
 
-get_header(); ?>
+get_header();
+
+$topic_list = array();
+$topics = wp_get_post_terms(get_the_ID(), 'topics', array('fields' => 'all','orderby' => 't.term_id'));
+
+foreach($topics as $topic) {
+	$topic_list[] = $topic->term_id;
+}
+
+$topics = implode(',',$topic_list);
+
+$featured=maybe_unserialize(get_post_meta(get_the_ID(),'featured_content',true)) ;
+?>
 
 				<div class="section group main_content">
 
@@ -23,22 +35,11 @@ get_header(); ?>
 		<article id="inspiring">
 			<div class="inner blue">
 				<div class="paddingleftright">
+
 					<h3>More on this topic</h3>
 
-					<div id="insp">
-                        <?php 
-                        $topic_list = array();
-                        $topics = wp_get_post_terms(get_the_ID(), 'topics', array('fields' => 'all','orderby' => 't.term_id'));
-                        foreach($topics as $topic) {
-                            $topic_list[] = $topic->term_id;
-                        }?>
-						<?php //print 'xxx'.print_r($topic_list,true);
-                                                $path = $_SERVER['DOCUMENT_ROOT'].'/ajax.php';
-                                                $topics = implode(',',$topic_list);
-						include($path);
-						?>
+                    <?php echo GenderHub_2017::gh_get_carousel($post_types=null, $topics, $exclude=$featured, false); ?>
 
-					</div>
 				</div>
 			</div>
 		</article>

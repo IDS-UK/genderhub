@@ -38,7 +38,7 @@ function fetch_args_contact_point() {
         'show_in_nav_menus'     => true,
         'show_in_admin_bar'     => true,
         'menu_position'         => 5,
-        'menu_icon'             => 'http://genderhub.org/wp-content/themes/genderhub/images/contactpoint_icons16.png',
+        'menu_icon'             => 'dashicons-groups',
         'can_export'            => true,
         'has_archive'           => true,
         'exclude_from_search'   => false,

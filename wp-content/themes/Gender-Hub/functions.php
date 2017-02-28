@@ -8,12 +8,16 @@ class GenderHub_2017 {
 	    include('inc/gh-social-media-posts.php');
 
 	    add_action( 'after_setup_theme', array($this, 'setup') );
-	    add_action( 'wp_enqueue_scripts', array($this, 'gh_header_loadscripts') );
+	    add_action( 'wp_enqueue_scripts', array($this, 'gh_loadscripts') );
 	    add_action( 'wp_footer', array($this, 'gh_footer_loadscripts') );
 	    add_action( 'admin_enqueue_scripts', array($this, 'gh_admin_loadscripts') );
 	    add_action( 'widgets_init', array($this, 'gh_sidebars') );
 	    add_action( 'pre_get_posts', array($this, 'practical_tools_filter') );
 	    add_action( 'login_enqueue_scripts', array($this, 'gh_custom_login_logo') );
+
+	    add_action( 'do_meta_boxes', array($this, 'gh_remove_default_metaboxes') );
+	    add_action( 'add_meta_boxes', array($this, 'gh_reposition_metaboxes') );
+	    add_action( 'edit_form_after_title', array($this, 'gh_after_title_metaboxes') );
 
 	    add_filter( 'image_size_names_choose', array($this, 'custom_image_sizes_choose') );
 	    add_filter( 'body_class', array($this, 'gh_body_classes') );
@@ -26,10 +30,13 @@ class GenderHub_2017 {
 	    add_filter( 'mce_buttons', array($this, 'gh_style_select') );
 	    add_filter( 'the_content', array($this, 'filter_ptags_on_images') );
 	    add_filter( 'wp_terms_checklist_args', array($this, 'gh_wp_terms_checklist_args'), 1, 2 );
+        add_filter( 'nyasro_dropdown_sort',array($this, 'nyasro_terms_sort'),'',2 );
 
 	    add_filter( 'attachment_fields_to_edit', array($this, 'gh_attachment_credit'), 10, 2 );
 	    add_filter( 'attachment_fields_to_save', array($this, 'gh_save_attachment_credit'), 10, 2 );
-        
+
+	    //add_action( 'pre_get_posts', array($this, 'gh_super_search') );
+
 	    remove_action( 'wp_head','wp_generator' );
 
 	    add_editor_style( 'css/editor-style.css' );
@@ -42,6 +49,8 @@ class GenderHub_2017 {
 
 		add_theme_support( 'menus' );
 		add_theme_support( 'post-thumbnails' ); // This feature enables post-thumbnail support for a theme
+
+		add_post_type_support( 'page', 'excerpt' );
 
 		add_image_size( 'square_220', 220, 220, true ); //(cropped)
 		add_image_size( 'square_120', 120, 120, true ); //(cropped)
@@ -57,9 +66,14 @@ class GenderHub_2017 {
 
 	}
 
-	function gh_header_loadscripts() {
+	function gh_loadscripts() {
+
+		wp_register_script( 'gh-frontend-jquery', get_stylesheet_directory_uri() . '/js/gh-custom-front.js', array( 'jquery'), null, true);
+		wp_enqueue_script( 'gh-frontend-jquery');
 
 		wp_enqueue_script( 'scripts', get_stylesheet_directory_uri() . '/js/genderhub.js', array(), '1.0.0', true );
+		wp_enqueue_script( 'plugins', get_stylesheet_directory_uri() . '/js/gh-plugins.js', array(), '1.0.0', true );
+
 		wp_enqueue_style( 'gh-style', get_template_directory_uri() . '/style.css', NULL, false, 'all' );
 		wp_enqueue_style( 'google-font', '//fonts.googleapis.com/css?family=Asap:400,700,400italic,700italic', array(), 20131111 );
 		wp_enqueue_style( 'prefix-font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css', array(), '4.1' );
@@ -73,9 +87,6 @@ class GenderHub_2017 {
 	}
 
 	function gh_footer_loadscripts() {
-
-		wp_register_script( 'gh-frontend-jquery', get_stylesheet_directory_uri() . '/js/gh-custom-front.js', array( 'jquery'), null, true);
-		wp_enqueue_script( 'gh-frontend-jquery');
 	}
 
 	function gh_admin_scripts($hook) {
@@ -343,7 +354,7 @@ class GenderHub_2017 {
 	function gh_custom_login_logo() { ?>
 
         <style type="text/css">
-            h1 a { background-image:url("http://www.genderhub.org/wp-content/themes/genderhub/images/GenderHub_login.gif") !important; }
+            h1 a { background-image:url("<?php echo get_stylesheet_directory_uri() ?>/img/GenderHub_login.gif") !important; }
             </style>
 
         <?php
@@ -404,68 +415,6 @@ class GenderHub_2017 {
 
 	}
 
-	public static function gh_get_slider_posts($type) {
-
-		$args = array(
-			'post_type'		    => $type,
-			'post_status'       => 'publish',
-
-			'meta_query'        => array(
-				array(
-					'key'       => '_pa_slide_include',
-					'value'     => '1',
-					'compare'   => '=',
-				),
-			),
-		);
-
-		$output = '';
-		$pa_query = new WP_Query( $args );
-
-		if ( $pa_query->have_posts() ) :
-
-			while ( $pa_query->have_posts() ) : $pa_query->the_post();
-
-				$slide_color = get_post_meta($pa_query->post->ID, '_pa_slide_bg', true);
-				$slide_link_url = get_post_meta($pa_query->post->ID, '_pa_slide_link_url', true);
-				$slide_link_text = get_post_meta($pa_query->post->ID, '_pa_slide_link_text', true);
-
-				$image_credit_url = get_post_meta(get_post_thumbnail_id(), '_image_credit_url', true);
-				$image_credit_text = get_post_meta(get_post_thumbnail_id(), '_image_credit_text', true);
-
-				$desc = esc_html(get_post(get_post_thumbnail_id())->post_content);
-
-				$output .= '<li class="slide-'.$pa_query->post->ID.'" data-thumb="'.wp_get_attachment_image_src( get_post_thumbnail_id(), 'gallery-thumb' )[0].'" data-thumb-text="'.$pa_query->post->post_title.'" title="'.get_the_excerpt().'">';
-                $output .= '<div class="slide '.$slide_color.'">';
-
-				$output .= '<div class="title"><h3 class="'.$slide_color.'"><span>'.$pa_query->post->post_title.'</span></h3></div>';
-				$output .= '<a href="'.$slide_link_url.'">'.get_the_post_thumbnail($post = null, 'gallery').'</a>';
-				$output .= '<div class="text"><p>'.$desc.'</p>';
-				$output .= '<p>';
-				$output .= '<a href="'.$slide_link_url.'" class="'.$slide_color.'">'.$slide_link_text.'</a>';
-
-				if(!empty($image_credit_text)) :
-
-				    $output .= '<span class="image-credit">Photo: '.(!empty($image_credit_url) ? '<a href="'.$image_credit_url.'">'.$image_credit_text.'</a>' : $image_credit_text).'</span>';
-
-				endif;
-
-				$output .= '</p>';
-				$output .= '</div>';
-
-				$output .= '</div>';
-				$output .= '</li>';
-
-			endwhile;
-
-			wp_reset_postdata();
-
-		endif;
-
-		return $output;
-
-	}
-
 	function gh_attachment_credit( $form_fields, $post ) {
 
 		$form_fields['image-credit-text'] = array(
@@ -499,6 +448,254 @@ class GenderHub_2017 {
 
 	}
 
+	public function gh_super_search($query) {
+
+	    if(is_search()) {
+			$post_types = get_post_types(array('public' => true, 'exclude_from_search' => false), 'objects');
+			$searchable_types = array();
+			if($post_types) {
+				foreach( $post_types as $type) {
+					$searchable_types[] = $type->name;
+				}
+			}
+			$query->set('post_type', $searchable_types);
+		}
+		return $query;
+	}
+
+	function nyasro_terms_sort( $terms, $taxname ) {
+
+	    if($taxname === 'bridge_countries') {
+			$_a   = array();
+			$_n   = array();
+			foreach( $terms as $lterm ) {
+				if($lterm->name === 'Nigeria') {
+					$_n[$lterm->name] = $lterm;
+					continue;
+				}
+				$_a[$lterm->name] = $lterm;
+			}
+			ksort($_a);
+			return ($_n + $_a);
+		}
+		return $terms;
+	}
+
+	function gh_remove_default_metaboxes() {
+
+		remove_meta_box( 'postexcerpt', 'programme_alerts', 'normal' );
+		remove_meta_box( 'postimagediv', 'programme_alerts', 'side' );
+	}
+
+	function gh_reposition_metaboxes( $post_type ) {
+
+		if ( in_array( $post_type, array( 'programme_alerts' ) ) ) {
+			add_meta_box('gh_excerpt', __( 'Text to be overlaid on the image in the Home Page slider', 'genderhub' ), 'post_excerpt_meta_box', $post_type, 'after_title', 'high' );
+			add_meta_box('gh_featured_image', __('Featured Image', 'genderhub'), 'post_thumbnail_meta_box', $post_type, 'side', 'high');
+		}
+	}
+
+	function gh_after_title_metaboxes() {
+
+		global $post, $wp_meta_boxes;
+		do_meta_boxes( get_current_screen(), 'after_title', $post );
+	}
+
+	public static function gh_get_slider_posts($type) {
+
+		$args = array(
+			'post_type'		    => $type,
+			'post_status'       => 'publish',
+
+			'meta_query'        => array(
+				array(
+					'key'       => '_pa_slide_include',
+					'value'     => '1',
+					'compare'   => '=',
+				),
+			),
+		);
+
+		$output = '';
+		$pa_query = new WP_Query( $args );
+
+		if ( $pa_query->have_posts() ) :
+
+			while ( $pa_query->have_posts() ) : $pa_query->the_post();
+
+				$slide_color = get_post_meta($pa_query->post->ID, '_pa_slide_bg', true);
+				$slide_link_url = get_post_meta($pa_query->post->ID, '_pa_slide_link_url', true);
+				$slide_link_text = get_post_meta($pa_query->post->ID, '_pa_slide_link_text', true);
+
+				$image_credit_url = get_post_meta(get_post_thumbnail_id(), '_image_credit_url', true);
+				$image_credit_text = get_post_meta(get_post_thumbnail_id(), '_image_credit_text', true);
+
+				$desc = esc_html(get_post(get_post_thumbnail_id())->post_content);
+
+				$output .= '<li class="slide-'.$pa_query->post->ID.'" data-thumb="'.wp_get_attachment_image_src( get_post_thumbnail_id(), 'gallery-thumb' )[0].'" data-thumb-text="'.$pa_query->post->post_title.'" title="'.$desc.'">';
+				$output .= '<div class="slide '.$slide_color.'">';
+
+				$output .= '<div class="title"><h3 class="'.$slide_color.'"><span>'.$pa_query->post->post_title.'</span></h3></div>';
+				$output .= '<a href="'.$slide_link_url.'">'.get_the_post_thumbnail($post = null, 'gallery').'</a>';
+				$output .= '<div class="text"><p>'.get_the_excerpt().'</p>';
+				$output .= '<p>';
+				$output .= '<a href="'.$slide_link_url.'" class="'.$slide_color.'">'.$slide_link_text.'</a>';
+
+				if(!empty($image_credit_text)) :
+
+					$output .= '<span class="image-credit">Photo: '.(!empty($image_credit_url) ? '<a href="'.$image_credit_url.'">'.$image_credit_text.'</a>' : $image_credit_text).'</span>';
+
+				endif;
+
+				$output .= '</p>';
+				$output .= '</div>';
+
+				$output .= '</div>';
+				$output .= '</li>';
+
+			endwhile;
+
+			wp_reset_postdata();
+
+		endif;
+
+		return $output;
+
+	}
+
+	public static function gh_get_carousel($pt, $t, $ex, $show_filter) {
+
+        $post_types     = $pt ?: array('blogs_opinions','events','other_training','news_stories');
+		$exclude        = $ex ?: NULL;
+        $topics         = $t ?: NULL;
+
+        $tax_query      = NULL;
+		$meta_query     = NULL;
+        $html           = NULL;
+
+		if($topics):
+			$tax_query = array(
+                array(
+                    'taxonomy' => 'topics',
+                    'field'    => 'term_id',
+                    'operator' => 'IN',
+                    'terms'    => $topics,
+                ),
+
+			);
+		endif;
+
+
+		$args = array(
+            'numberposts'   => 100,
+            'post_type'     => $post_types,
+            'orderby'       => 'post_date',
+            'order'         => 'DESC',
+            'tax_query'     => $tax_query,
+            'meta_query'    => $meta_query,
+            'post__not_in'  => $exclude,
+            );
+
+		$posts = get_posts( $args );
+
+		if($show_filter) :
+		$html .= '<aside id="filter">';
+		$html .= 'Filter: <a rel="news_stories" data-filter=".news_stories" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-bell.png" /> News</a><a rel="other_training" data-filter=".other_training" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-training.png" /> Training</a><a rel="events" data-filter=".events" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-event.png" /> Event</a><a rel="blogs_opinions" data-filter=".blogs_opinions" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-blog.png" /> Blog</a>';
+		$html .= '</aside>';
+		endif;
+
+        $html .= '<div id="carousel-container">';
+        $html .= '<div id="gh-owl" class="owl-carousel owl-theme">';
+
+		foreach ( $posts as $s ) :
+
+            setup_postdata($s);
+
+            $img = get_the_post_thumbnail( $s->ID, 'full' );
+            $thumb = wp_get_attachment_image_src(get_post_thumbnail_id($s->ID), 'medium');
+            $url = $thumb[0];
+
+            $c = get_post_custom($s->ID);
+
+            $html .= '<div class="item '.(strlen($img) ? 'with-image' : 'no-image').' '.$s->post_type.'">';
+            $html .='<figure>';
+            $html .= '<div class="icon">';
+
+            if ($s->post_type == 'events'):
+                $html .= '<img src="'.get_stylesheet_directory_uri().'/img/icon-event.png" /><span> Event</span>';
+
+            elseif ($s->post_type == 'blogs_opinions'):
+                $html .= '<img src="'.get_stylesheet_directory_uri().'/img/icon-blog.png" /><span> Blog</span>';
+
+            elseif ($s->post_type == 'other_training'):
+                $html .= '<img src="'.get_stylesheet_directory_uri().'/img/icon-training.png" /><span> Training</span>';
+
+            elseif ($s->post_type == 'news_stories'):
+                $html .= '<img src="'.get_stylesheet_directory_uri().'/img/icon-bell.png" /><span> News</span>';
+
+            endif;
+
+            $html .= '</div>';
+
+			$link = get_permalink($s->ID);
+			if ($s->post_type == 'news_stories') {
+				$link = get_field('source', $s->ID);
+			}
+
+            $html .= '<div class="item-top" style="background-image: url('.(strlen($img) ? $url : '').')">';
+            $html .= '<div class="item-top-inner">';
+
+            if(strlen($img)==0) {
+                $html .= '<h4><span><a href="'.$link.'">'.get_the_title($s->ID).'</a></span></h4>';
+            }
+
+            $html .= '</div>';
+            $html .= '</div>';
+
+            $html .= '<div class="text">';
+
+            if(strlen($img)) {
+                $html .= '<h4><span><a href="'.$link.'">'.get_the_title($s->ID).'</a></span></h4>';
+            }
+
+            $this_excerpt = wp_filter_nohtml_kses(get_the_excerpt($s->ID));
+            $html .= '<p>'.get_words($this_excerpt,  (strlen($img) ? 20 : 30)).'...</p>';
+
+            $html .= '</div>';
+
+            $html .= '<p class="pleftright">';
+
+            if ($s->post_type == 'events') :
+                $html .= '<strong>Event Date:</strong> '.date('jS M',strtotime(substr($c['start_date'][0],0,4).'-'.substr($c['start_date'][0],4,2).'-'.substr($c['start_date'][0],6,2))).' to the '.date('jS M',strtotime(substr($c['end_date'][0],0,4).'-'.substr($c['end_date'][0],4,2).'-'.substr($c['end_date'][0],6,2)));
+            else :
+                $html .= '<strong>'.$c['author'][0].'</strong> '. date('jS M Y',strtotime(substr($c['date_published'][0],0,4).'-'.substr($c['date_published'][0],4,2).'-'.substr($c['date_published'][0],6,2)));
+            endif;
+
+            $html .= '</p>';
+            $html .= '<div class="item-link">';
+            $html .= '<a href="'.get_permalink($s->ID).'" class="readmore">';
+
+            if ($s->post_type == 'events'): $html .= 'Full event details';
+            elseif ($s->post_type == 'blogs_opinions'): $html .= 'View blog post';
+            elseif ($s->post_type == 'other_training'): $html .= 'Read article';
+            elseif ($s->post_type == 'news_stories'): $html .= 'Read article';
+            endif;
+
+            $html .= '</a>';
+            $html .= '</div>';
+
+            $html .= '</figure>';
+			$html .= '</div>';
+
+		endforeach;
+
+	    $html .= '</div>';
+	    $html .= '</div>';
+
+	    return $html;
+
+    }
+
 }
 
 new GenderHub_2017;
@@ -508,32 +705,6 @@ function get_words($sentence, $count = 30) {
   preg_match("/(?:\w+(?:\W+|$)){0,$count}/", $sentence, $matches);
   return $matches[0];
 }
-add_action( 'init', 'my_add_excerpts_to_pages' );
-function my_add_excerpts_to_pages() {
-   add_post_type_support( 'page', 'excerpt' );
-}
-
-function twentytwelve_wp_title( $title, $sep ) {
-	global $paged, $page;
-
-	if ( is_feed() )
-		return $title;
-
-	// Add the site name.
-	$title .= get_bloginfo( 'name' );
-
-	// Add the site description for the home/front page.
-	$site_description = get_bloginfo( 'description', 'display' );
-	if ( $site_description && ( is_home() || is_front_page() ) )
-		$title = "$title $sep $site_description";
-
-	// Add a page number if necessary.
-	if ( $paged >= 2 || $page >= 2 )
-		$title = "$title $sep " . sprintf( __( 'Page %s', 'twentytwelve' ), max( $paged, $page ) );
-
-	return $title;
-}
-add_filter( 'wp_title', 'twentytwelve_wp_title', 10, 2 );
 
 // current page url
 function current_page_url() {
@@ -550,67 +721,9 @@ function current_page_url() {
   return $pageURL;
 }
 
-// paging nav
-if ( ! function_exists( 'twentythirteen_paging_nav' ) ) :
-/**
-* Display navigation to next/previous set of posts when applicable.
-*
-* @since Twenty Thirteen 1.0
-*/
-function twentythirteen_paging_nav() {
-  global $wp_query;
-
-  // Don't print empty markup if there's only one page.
-  if ( $wp_query->max_num_pages < 2 )
-  return;
-  ?>
-  <nav class="navigation paging-navigation" role="navigation">
-  <h1 class="screen-reader-text"><?php _e( 'Posts navigation', 'twentythirteen' ); ?></h1>
-  <div class="nav-links">
-
-  <?php if ( get_next_posts_link() ) : ?>
-  <div class="nav-previous"><?php next_posts_link( __( '<img class="prev_next_arrows" alt="Previous Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowL.png" /><br />  Older posts', 'twentythirteen' ) ); ?></div>
-  <?php endif; ?>
-
-  <?php if ( get_previous_posts_link() ) : ?>
-  <div class="nav-next"><?php previous_posts_link( __( '<img class="prev_next_arrows" alt="Next Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowR.png" /><br />Newer posts', 'twentythirteen' ) ); ?></div>
-  <?php endif; ?>
-
-  </div><!-- .nav-links -->
-  </nav><!-- .navigation -->
-  <?php
-}
-endif;
-
-if ( ! function_exists( 'twentythirteen_post_nav' ) ) :
-/**
-* Display navigation to next/previous post when applicable.
-** @since Twenty Thirteen 1.0
-*/
-function twentythirteen_post_nav() {
-  global $post;
-
-  // Don't print empty markup if there's nowhere to navigate.
-  $previous = ( is_attachment() ) ? get_post( $post->post_parent ) : get_adjacent_post( false, '', true );
-  $next     = get_adjacent_post( false, '', false );
-
-  if ( ! $next && ! $previous )
-  return;
-  ?>
-  <nav class="navigation post-navigation" role="navigation">
-      <h1 class="screen-reader-text"><?php _e( 'Post navigation', 'twentythirteen' ); ?></h1>
-      <div class="nav-links">
-    
-      <?php previous_post_link( '%link', _x( '<img class="prev_next_arrows" alt="Previous Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowL.png" /><br /> %title', 'Previous post link', 'twentythirteen' ) ); ?>
-      <?php next_post_link( '%link', _x( '<img class="prev_next_arrows" alt="Next Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowR.png" /><br />%title ', 'Next post link', 'twentythirteen' ) ); ?>
-    
-      </div><!-- .nav-links -->
-  </nav><!-- .navigation -->
-  <?php
-}
-endif;
 
 // Numbered Pagination
+// used on search results - checked feb 2017
 if ( !function_exists( 'genderhub_pagination' ) ) {
   function genderhub_pagination() {  
     $prev_arrow = is_rtl() ? '' : '&larr;';
@@ -655,18 +768,11 @@ add_action( 'wp_head', 'canonical_for_comments' );
 
 
 
-function twentytwelve_page_menu_args( $args ) {
-	if ( ! isset( $args['show_home'] ) )
-		$args['show_home'] = true;
-	return $args;
-}
-//add_filter( 'wp_page_menu_args', 'twentytwelve_page_menu_args' );
-
 
 function custom_rewrite_basic() {
   add_rewrite_rule('^csw60/?', 'index.php?page_id=30914', 'top');
 }
-//add_action('init', 'custom_rewrite_basic');
+add_action('init', 'custom_rewrite_basic');
 
 
 function process_found_posts($posts) {
@@ -681,25 +787,6 @@ function process_found_posts($posts) {
 }
 add_filter('the_posts', 'process_found_posts');
 
-function enable_custom_fields_per_default( $hidden )
-{
-    foreach ( $hidden as $i => $metabox )
-    {
-if ( 'postcustom' == $metabox )
-{
-    unset ( $hidden[$i] );
-}
-    }
-    return $hidden;
-}
-add_filter( 'default_hidden_meta_boxes', 'enable_custom_fields_per_default', 20, 1 );
-
-
-global $wp_taxonomies;
-if( isset( $wp_taxonomies[ 'collections' ] ) ) {
-
-    unset( $wp_taxonomies[ 'collections' ] );
-}
 
 /**
 * This function modifies the main WordPress query to include an array of post types instead of the default 'post' post type.
@@ -709,31 +796,12 @@ if( isset( $wp_taxonomies[ 'collections' ] ) ) {
 */
 function genderhub_cpt_search( $query ) {
   if ( !is_admin() && $query->is_search() )
-  $query->set('post_type', array( 'post', 'news_stories', 'other_training', 'events', 'blogs_opinions', 'programme_alerts', 'contact_point', 'practical_tools' ));
+  $query->set('post_type', array( 'post', 'blogs_opinions', 'contact_point', 'events', 'interviews', 'news_stories', 'other_training', 'practical_tools', 'programme_alerts' ));
   return $query;
 };
 add_filter( 'pre_get_posts', 'genderhub_cpt_search' );
 
-function whole_words_search( $search, $wp_query ) {
-  global $wpdb;
-  if ( empty( $search ) )
-    return $search;
-  $q = $wp_query->query_vars;
-  $n = !empty( $q['exact'] ) ? '' : '%';
-  $search = $searchand = '';
-  foreach ( (array) $q['search_terms'] as $term ) {
-    $term = esc_sql( like_escape( $term ) );
-    $search .= "{$searchand}($wpdb->posts.post_title REGEXP '[[:<:]]{$term}[[:>:]]') OR ($wpdb->posts.post_content REGEXP '[[:<:]]{$term}[[:>:]]')";
-    $searchand = ' AND ';
-  }
-  if ( ! empty( $search ) ) {
-    $search = " AND ({$search}) ";
-    if ( ! is_user_logged_in() )
-      $search .= " AND ($wpdb->posts.post_password = '') ";
-  }
-  return $search;
-}
-add_filter( 'posts_search', 'whole_words_search', 20, 2 );
+
 
 // Add IDS Import categories in the edit.php post columns
 add_filter('manage_events_posts_columns', 'idsimport_posts_columns');
@@ -809,67 +877,7 @@ foreach ( $childterms as $childterm ) {
 }
 add_filter('uwpqsf_tax_field_dropdown','custom_dropdown_output','',12);
 
-// add post count to search drop downs - Ultimate WP Query Search Filter
-// http://9-sec.com/support-forum/?mingleforumaction=viewtopic&t=221
 
-
-// add query terms to search results - Ultimate WP Query Search Filter
-// outputs terms searched for on search template
-function uwpqsf_var($s){
-  if(is_search() && isset($_GET['s']) && $_GET['s'] == 'uwpsfsearchtrg' && isset($_GET['uformid']) ){
-    if(isset($_GET['taxo'])){
-      foreach($_GET['taxo'] as $v){
-if(isset($v['term'])){
-  if($v['term'] == 'uwpqsftaxoall'){
-
-  }else{
-    $termname = get_term_by('slug',$v['term'],$v['name']);
-    $var[] = $termname->name;
-  }
-}
-      }
-      if(!empty($_GET['skeyword'])){
-		$var[] = $_GET['skeyword'];
-      }
-      $return = '';
-      if(!empty($var)){
-		$return = implode(' | ', $var);
-      }
-      return $return;
-    }
-  }else{
-    return $s;
-  }
-}
-add_filter( 'get_search_query', 'uwpqsf_var', 20, 1 );
-
-// nyasro sort countries //
-
-function nyasro_terms_sort( $terms, $taxname )
-{ 
-  if($taxname === 'bridge_countries')
-  {   
-    $_a   = array();
-    $_n   = array();
-    foreach( $terms as $lterm )
-    {
-      if($lterm->name === 'Nigeria')
-      {
-$_n[$lterm->name] = $lterm;
-continue;
-      }
-      $_a[$lterm->name] = $lterm;
-    }
-    ksort($_a);
-    return ($_n + $_a); 
-  }
-  return $terms;
-}// end of nyasro sort countries //
-add_filter('nyasro_dropdown_sort','nyasro_terms_sort','',2);
-
-///////////////// updated to remove bridge- string from urls already in databse /////////////////////
-
-//////////////// Stop selected categories appearing at the top of categories list in metabox, keep it all in correct heirachy order ///////////////
 
 
 
@@ -893,6 +901,38 @@ echo $sep . $category->cat_name; $sep = ', ';
 }
 
 
+
+
+// add query terms to search results - Ultimate WP Query Search Filter
+// outputs terms searched for on search template
+// todo feb 2017 - on inspection, this *seems* to output filters that have been selected in the search box, but NOT actioned by the plugin. Need to ascertain whether it's an EITHER/OR kinda thang
+function uwpqsf_var($s){
+	if(is_search() && isset($_GET['s']) && $_GET['s'] == 'uwpsfsearchtrg' && isset($_GET['uformid']) ){
+		if(isset($_GET['taxo'])){
+			foreach($_GET['taxo'] as $v){
+				if(isset($v['term'])){
+					if($v['term'] == 'uwpqsftaxoall'){
+
+					}else{
+						$termname = get_term_by('slug',$v['term'],$v['name']);
+						$var[] = $termname->name;
+					}
+				}
+			}
+			if(!empty($_GET['skeyword'])){
+				$var[] = $_GET['skeyword'];
+			}
+			$return = '';
+			if(!empty($var)){
+				$return = implode(' | ', $var);
+			}
+			return $return;
+		}
+	}else{
+		return $s;
+	}
+}
+add_filter( 'get_search_query', 'uwpqsf_var', 20, 1 );
 
 /// place RSS Aggregator Images to Custom Field ///
 add_filter( 'wprss_ftp_featured_image_meta', 'save_url_custom_field' );
@@ -1034,8 +1074,6 @@ return $vt_image;
     }
 }
 
-
-
 /**
  * Takes one or two TIMESTAMPs, and an optional formatting array of the form ($year, $month, $day),
  * and returns a date that is appropriate to the situation
@@ -1110,3 +1148,145 @@ function ids_pretty_date( $start, $end = NULL, $fmt = NULL ) {
 
     return $complete_date;
 }
+
+
+
+
+// POSSIBLY CAN DELETE EVERYTHING UNDER HERE
+
+
+function whole_words_search( $search, $wp_query ) {
+	global $wpdb;
+	if ( empty( $search ) )
+		return $search;
+	$q = $wp_query->query_vars;
+	$n = !empty( $q['exact'] ) ? '' : '%';
+	$search = $searchand = '';
+	foreach ( (array) $q['search_terms'] as $term ) {
+		$term = esc_sql( like_escape( $term ) );
+		$search .= "{$searchand}($wpdb->posts.post_title REGEXP '[[:<:]]{$term}[[:>:]]') OR ($wpdb->posts.post_content REGEXP '[[:<:]]{$term}[[:>:]]')";
+		$searchand = ' AND ';
+	}
+	if ( ! empty( $search ) ) {
+		$search = " AND ({$search}) ";
+		if ( ! is_user_logged_in() )
+			$search .= " AND ($wpdb->posts.post_password = '') ";
+	}
+	return $search;
+}
+add_filter( 'posts_search', 'whole_words_search', 20, 2 );
+
+
+
+function twentytwelve_wp_title( $title, $sep ) {
+	global $paged, $page;
+
+	if ( is_feed() )
+		return $title;
+
+	// Add the site name.
+	$title .= get_bloginfo( 'name' );
+
+	// Add the site description for the home/front page.
+	$site_description = get_bloginfo( 'description', 'display' );
+	if ( $site_description && ( is_home() || is_front_page() ) )
+		$title = "$title $sep $site_description";
+
+	// Add a page number if necessary.
+	if ( $paged >= 2 || $page >= 2 )
+		$title = "$title $sep " . sprintf( __( 'Page %s', 'twentytwelve' ), max( $paged, $page ) );
+
+	return $title;
+}
+add_filter( 'wp_title', 'twentytwelve_wp_title', 10, 2 );
+
+
+
+function twentytwelve_page_menu_args( $args ) {
+	if ( ! isset( $args['show_home'] ) )
+		$args['show_home'] = true;
+	return $args;
+}
+add_filter( 'wp_page_menu_args', 'twentytwelve_page_menu_args' );
+
+
+// paging nav
+if ( ! function_exists( 'twentythirteen_paging_nav' ) ) :
+	/**
+	 * Display navigation to next/previous set of posts when applicable.
+	 *
+	 * @since Twenty Thirteen 1.0
+	 */
+	function twentythirteen_paging_nav() {
+		global $wp_query;
+
+		// Don't print empty markup if there's only one page.
+		if ( $wp_query->max_num_pages < 2 )
+			return;
+		?>
+        <nav class="navigation paging-navigation" role="navigation">
+            <h1 class="screen-reader-text"><?php _e( 'Posts navigation', 'twentythirteen' ); ?></h1>
+            <div class="nav-links">
+
+				<?php if ( get_next_posts_link() ) : ?>
+                    <div class="nav-previous"><?php next_posts_link( __( '<img class="prev_next_arrows" alt="Previous Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowL.png" /><br />  Older posts', 'twentythirteen' ) ); ?></div>
+				<?php endif; ?>
+
+				<?php if ( get_previous_posts_link() ) : ?>
+                    <div class="nav-next"><?php previous_posts_link( __( '<img class="prev_next_arrows" alt="Next Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowR.png" /><br />Newer posts', 'twentythirteen' ) ); ?></div>
+				<?php endif; ?>
+
+            </div><!-- .nav-links -->
+        </nav><!-- .navigation -->
+		<?php
+	}
+endif;
+
+if ( ! function_exists( 'twentythirteen_post_nav' ) ) :
+	/**
+	 * Display navigation to next/previous post when applicable.
+	 ** @since Twenty Thirteen 1.0
+	 */
+	function twentythirteen_post_nav() {
+		global $post;
+
+		// Don't print empty markup if there's nowhere to navigate.
+		$previous = ( is_attachment() ) ? get_post( $post->post_parent ) : get_adjacent_post( false, '', true );
+		$next     = get_adjacent_post( false, '', false );
+
+		if ( ! $next && ! $previous )
+			return;
+		?>
+        <nav class="navigation post-navigation" role="navigation">
+            <h1 class="screen-reader-text"><?php _e( 'Post navigation', 'twentythirteen' ); ?></h1>
+            <div class="nav-links">
+
+				<?php previous_post_link( '%link', _x( '<img class="prev_next_arrows" alt="Previous Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowL.png" /><br /> %title', 'Previous post link', 'twentythirteen' ) ); ?>
+				<?php next_post_link( '%link', _x( '<img class="prev_next_arrows" alt="Next Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowR.png" /><br />%title ', 'Next post link', 'twentythirteen' ) ); ?>
+
+            </div><!-- .nav-links -->
+        </nav><!-- .navigation -->
+		<?php
+	}
+endif;
+
+
+global $wp_taxonomies;
+if( isset( $wp_taxonomies[ 'collections' ] ) ) {
+
+	unset( $wp_taxonomies[ 'collections' ] );
+}
+
+
+
+function enable_custom_fields_per_default( $hidden ) {
+
+	foreach ( $hidden as $i => $metabox ) {
+		if ( 'postcustom' == $metabox ) {
+
+			unset ( $hidden[$i] );
+		}
+	}
+	return $hidden;
+}
+add_filter( 'default_hidden_meta_boxes', 'enable_custom_fields_per_default', 20, 1 );

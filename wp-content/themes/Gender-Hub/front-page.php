@@ -28,23 +28,22 @@ get_header();
     </section>
 
 	<section id="content">
+
 		<article id="inspiring">
-			<div class="inner blue">
 
-				<div class="paddingleftright">
-					<h3>What's inspiring us</h3>
-					<aside id="filter">
-						Filter: <a rel="news_stories" class="filter"><img src="/wp-content/uploads/2015/05/bell-icon.png" /> News</a><a rel="other_training"  class="filter"><img src="/wp-content/uploads/2015/05/training-icon.png" /> Training</a><a rel="events" class="filter"><img src="/wp-content/uploads/2015/05/event-icon.png" /> Event</a><a rel="blogs_opinions" class="filter"><img src="/wp-content/uploads/2015/05/blog-icon.png" /> Blog</a>
+            <div class="inner blue">
 
-					</aside>
+                <div class="paddingleftright">
 
-					<div id="insp"><?php include($_SERVER['DOCUMENT_ROOT'].'/ajax.php');?></div>
+                    <h3>What's inspiring us</h3>
 
-				</div>
+                    <?php echo GenderHub_2017::gh_get_carousel($post_types=null, $topics=null, $exclude=null, true); ?>
 
-			</div>
-			</div>
-		</article>
+                </div>
+
+            </div>
+
+        </article>
 
 	</section>
 
