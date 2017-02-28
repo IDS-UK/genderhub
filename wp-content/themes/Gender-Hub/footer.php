@@ -11,27 +11,44 @@
  */
 ?>
 <?php if(!is_front_page()):?>
-</div>
-</div>
 
-</section>
+    </div>
+
+    </div>
+
+    </section>
 <?php endif;?>
 <footer>
-<div class="paddingleftright inner outer">
-<?php
 
-$t = get_post(30290);
-$c = get_post_custom($t->ID);
+    <div class="paddingleftright inner outer">
 
-?>
-<div class="col4"><?php echo $t->post_content;?></div>
-<div class="col4"><?php echo $c['_secondary_html_30294'][0];?></div>
-<div class="col4 more"><?php echo $c['_secondary_html_30295'][0];?></div>
-<div class="col4 more"><?php echo $c['_secondary_html_30296'][0];?></div>
-<div class="col4"><?php echo $c['_secondary_html_30297'][0];?></div>
-<?php wp_reset_postdata();?>
+        <div class="col4">
+            <h5>Funded by</h5>
+            <?php echo GH_Site_Settings::gh_funded_by(); ?>
+        </div>
 
-</div>
+        <div class="col4">
+            <h5>Delivered by</h5>
+            <?php echo GH_Site_Settings::gh_delivered_by(); ?>
+        </div>
+
+        <div class="col4 more">
+            <h5>More...</h5>
+            <?php wp_nav_menu( array('menu' => 'Footer More Menu') ); ?>
+        </div>
+
+        <div class="col4 more">
+            <h5>More...</h5>
+            <?php wp_nav_menu( array('menu' => 'Main Sections Menu', 'depth' => 1) ); ?>
+        </div>
+
+        <div class="col4">
+            <h5>Connect</h5>
+            <?php echo GH_Site_Settings::gh_social_media_links(); ?>
+        </div>
+
+    </div>
+
 </footer>
 
 
