@@ -12,15 +12,8 @@
 $main_options = get_option( 'gh_custom_main_settings' );
 $header_options = get_option( 'gh_custom_header_settings' );
 
-if(!empty($main_options)) {
-
-	$logo = !empty( $main_options['gh_site_logo'] ) ? $main_options['gh_site_logo'] : $logo = blog_info('name');
-}
-
-if(!empty($header_options)) {
-
-	$strapline = !empty( $header_options['gh_strapline'] ) ? wpautop($header_options['gh_strapline']) : $strapline = '';
-}
+$logo = !empty( $main_options['gh_site_logo'] ) ? $main_options['gh_site_logo'] : $logo = bloginfo('name');
+$strapline = !empty( $header_options['gh_strapline'] ) ? wpautop($header_options['gh_strapline']) : $strapline = '';
 
 ?><!DOCTYPE html>
 <!--[if IE 7]>
