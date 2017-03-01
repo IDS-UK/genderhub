@@ -876,13 +876,15 @@ font-family: 'Asap', Arial, Helvetica, sans-serif;
 .wpcf7-form{}
 .wpcf7-form.sent, .wpcf7-not-valid-tip {display:none}
 .form_panel {margin-top:20px}
-.home .wpcf7-form input {width:66%; display:inline-block; padding:2%; float:left; margin-top:40px}
+.home .wpcf7-form input {width:66%; display:inline-block; padding:2%; float:left; margin-top:10px}
 .wpcf7-form.invalid input {margin-top:20px}
 .home .wpcf7-form input.wpcf7-submit{width:25%; margin-left:1%; display:inline-block; background-color:#01aac7; color:#fff; font-size:17px; border:none; cursor:pointer; float:left; border-radius:5px}
 .wpcf7-form p {overflow:hidden; clear:both}
 .wpcf7-form input, .wpcf7-form select, .wpcf7-form textarea {width:66%; display:inline-block; padding:1%; float:none; margin-bottom:10px}
 .wpcf7-form input.wpcf7-submit{width:auto;display:inline-block; background-color:#53a669; color:#fff; font-size:17px; border:none; cursor:pointer; float:none; border-radius:5px}
 .wpcf7-form input[type="radio"], .wpcf7-form input[type="checkbox"] {width:auto; }
+
+
 
 header #searchform { float:right; width:0px; display:inline-block; webkit-transition: width 0.8s;-moz-transition: width 0.8s; transition: width 0.8s; overflow: hidden;}
 header #searchform.active, aside #searchform { display:block; width:150px; }
