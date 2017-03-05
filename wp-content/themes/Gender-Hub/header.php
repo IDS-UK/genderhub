@@ -12,8 +12,9 @@
 $main_options = get_option( 'gh_custom_main_settings' );
 $header_options = get_option( 'gh_custom_header_settings' );
 
-$logo = !empty( $main_options['gh_site_logo'] ) ? $main_options['gh_site_logo'] : $logo = bloginfo('name');
+$logo = !empty( $main_options['gh_site_logo'] ) ? '<img src="'.$main_options['gh_site_logo'].'" />' : $logo = get_bloginfo('name');
 $strapline = !empty( $header_options['gh_strapline'] ) ? wpautop($header_options['gh_strapline']) : $strapline = '';
+$social_media_links = method_exists('GH_Site_Settings', 'gh_social_media_links') ? GH_Site_Settings::gh_social_media_links() : NULL;
 
 ?><!DOCTYPE html>
 <!--[if IE 7]>
@@ -43,9 +44,9 @@ $strapline = !empty( $header_options['gh_strapline'] ) ? wpautop($header_options
     <div class="inner paddingleftright">
 
         <a href="<?php echo home_url(); ?>"><img src="<?php echo get_stylesheet_directory_uri(); ?>/img/icon-home.png" class="home-icon" /></a>
-        <a href="<?php echo home_url(); ?>"><img src="<?php echo $logo; ?>" class="site-logo" /></a>
+        <a href="<?php echo home_url(); ?>" class="site-logo"><?php echo $logo; ?></a>
         <span class="strapline"><?php echo $strapline;?></span>
-        <?php echo GH_Site_Settings::gh_social_media_links(); ?>
+        <?php echo $social_media_links; ?>
         <a id="searchicon"><img class="header-search" src="/wp-content/uploads/2015/05/search-icon.png" alt="search icon" width="18" height="18"></a>
         <form action="/" id="searchform" method="get" ><input type="text" name="s" id="s" placeholder="Search"><input type="hidden" name="search_loc" value="all" /></form>
 
@@ -60,7 +61,17 @@ $strapline = !empty( $header_options['gh_strapline'] ) ? wpautop($header_options
 
 </header>
 
-<nav class=""><div class="inner paddingleftright"><?php wp_nav_menu( array('menu' => 'Main Sections Menu'));?></div></nav>
+<nav class="">
+    <div class="inner paddingleftright">
+        <?php
+        if ( has_nav_menu( 'primary' ) ) :
+	        wp_nav_menu( array( 'theme_location' => 'primary' ) );
+        else :
+	        wp_nav_menu( array('menu' => 'Main Sections Menu'));
+        endif;
+        ?>
+    </div>
+</nav>
 
 <?php if(!is_front_page()):?>
 <section id="main">

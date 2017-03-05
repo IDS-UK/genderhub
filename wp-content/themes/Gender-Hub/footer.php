@@ -9,6 +9,10 @@
  * @subpackage GenderHub
  * @since GenderHub 1.0
  */
+$funded_by = method_exists('GH_Site_Settings', 'gh_funded_by') ? GH_Site_Settings::gh_funded_by() : NULL;
+$delivered_by = method_exists('GH_Site_Settings', 'gh_delivered_by') ? GH_Site_Settings::gh_delivered_by() : NULL;
+$social_media_links = method_exists('GH_Site_Settings', 'gh_social_media_links') ? '<h5>Connect</h5>'.GH_Site_Settings::gh_social_media_links() : NULL;
+
 ?>
 <?php if(!is_front_page()):?>
 
@@ -23,13 +27,11 @@
     <div class="paddingleftright inner outer">
 
         <div class="col4">
-            <h5>Funded by</h5>
-            <?php echo GH_Site_Settings::gh_funded_by(); ?>
+            <?php echo $funded_by; ?>
         </div>
 
         <div class="col4">
-            <h5>Delivered by</h5>
-            <?php echo GH_Site_Settings::gh_delivered_by(); ?>
+            <?php echo $delivered_by; ?>
         </div>
 
         <div class="col4 more">
@@ -43,8 +45,7 @@
         </div>
 
         <div class="col4">
-            <h5>Connect</h5>
-            <?php echo GH_Site_Settings::gh_social_media_links(); ?>
+            <?php echo $social_media_links; ?>
         </div>
 
     </div>
@@ -73,8 +74,6 @@ if(is_front_page()) { ?>
                 thumbItem:6,
                 thumbMargin:4,
                 thumbWidth:100,
-                thumbItem:6,
-                thumbMargin:4,
                 slideMargin:0
             });
             jQuery("#slider li.lslide").fadeIn();

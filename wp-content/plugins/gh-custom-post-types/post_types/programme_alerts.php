@@ -54,7 +54,7 @@ add_action( 'save_post', 'save_programme_alert_meta_boxes' );
 function add_programme_alerts_meta_boxes() {
 
 	add_meta_box(
-		'programme-alert-slide-details-mb',
+		'paslidedetails',
 		'Home Page Slide Details',
 		'programme_alert_slide_details',
 		'programme_alerts',

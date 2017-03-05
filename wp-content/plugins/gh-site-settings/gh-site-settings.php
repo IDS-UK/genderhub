@@ -26,6 +26,21 @@ class GH_Site_Settings {
 
     }
 
+	public static function gh_plugin_activated() {
+
+		delete_option('gh_custom_general_settings');
+		delete_option('gh_other_custom_settings');
+    }
+
+	public static function gh_plugin_deactivated() {
+		delete_option('gh_custom_main_settings');
+		delete_option('gh_custom_header_settings');
+		delete_option('gh_custom_footer_settings');
+		delete_option('gh_custom_misc_settings');
+    }
+
+	public static function gh_plugin_uninstalled() {}
+
 	function gh_admin_menu() {
 
 		add_menu_page('Custom Site Settings', 'Custom Site Settings', 'administrator', 'gh_site_settings', array($this, 'gh_main_page'), 'dashicons-admin-appearance', 4);
@@ -67,6 +82,31 @@ class GH_Site_Settings {
 	    register_setting( 'gh_custom_header_settings',  'gh_custom_header_settings',    array($this, 'gh_sanitize_input'));
 	    register_setting( 'gh_custom_footer_settings',  'gh_custom_footer_settings',    array($this, 'gh_sanitize_input'));
 	    register_setting( 'gh_custom_misc_settings',    'gh_custom_misc_settings',      array($this, 'gh_sanitize_input'));
+
+	    $default_main_settings          = array(
+		    'gh_site_logo'              => get_stylesheet_directory_uri().'/img/gender-hub-logo.png',
+		    'gh_twitter_handle'         => 'gender_hub',
+		    'gh_facebook_pagename'      => 'GenderHubNigeria'
+        );
+
+	    $default_header_settings        = array(
+		    'gh_strapline'              => "SHARING KNOWLEDGE FOR\nGENDER JUSTICE IN NIGERIA",
+        );
+
+	    $default_footer_settings        = array(
+		    'gh_fundedby_logo'          => get_stylesheet_directory_uri().'/img/ukaid.jpg',
+		    'gh_deliveredby_logo'       => get_stylesheet_directory_uri().'/img/voicesforchange.jpg',
+        );
+
+	    $default_misc_settings          = array(
+		    'gh_reports_narrative_text' => '',
+        );
+
+
+        add_option( 'gh_custom_main_settings', $default_main_settings );
+        add_option( 'gh_custom_header_settings', $default_header_settings );
+        add_option( 'gh_custom_footer_settings', $default_footer_settings );
+        add_option( 'gh_custom_misc_settings', $default_misc_settings );
 
     }
 
@@ -343,7 +383,7 @@ class GH_Site_Settings {
 
 		$options = get_option( 'gh_custom_footer_settings' );
 
-		$html = !empty( $options['gh_fundedby_logo'] ) ? '<image src="'.$options['gh_fundedby_logo'].'" />' : NULL;
+		$html = !empty( $options['gh_fundedby_logo'] ) ? '<h5>Funded by</h5><image src="'.$options['gh_fundedby_logo'].'" />' : NULL;
 
 		return $html;
 
@@ -353,7 +393,7 @@ class GH_Site_Settings {
 
 		$options = get_option( 'gh_custom_footer_settings' );
 
-		$html = !empty( $options['gh_deliveredby_logo'] ) ? '<image src="'.$options['gh_deliveredby_logo'].'" />' : NULL;
+		$html = !empty( $options['gh_deliveredby_logo'] ) ? '<h5>Delivered by</h5><image src="'.$options['gh_deliveredby_logo'].'" />' : NULL;
 
 		return $html;
 
@@ -372,12 +412,14 @@ class GH_Site_Settings {
 		$html .= !empty($facebook_pagename) ? '<a href="https://www.facebook.com/'.$facebook_pagename.'" class="social_link" target="_blank">'.(!empty($facebook_icon) ? $facebook_icon : $facebook_pagename).'</a>' : NULL;
 		$html .= !empty($twitter_handle) ? '<a href="https://twitter.com/'.$twitter_handle.'" class="social_link" target="_blank">'.(!empty($twitter_icon) ? $twitter_icon : $twitter_handle).'</a>' : NULL;
 
-        return $html;
+		return $html;
     }
 
 }
 new GH_Site_Settings;
 
-// todo add activate function
-// todo add deactivate function
-// todo add delete function
+register_activation_hook( __FILE__, array( 'GH_Site_Settings', 'gh_plugin_activated' ) );
+
+register_deactivation_hook( __FILE__, array( 'GH_Site_Settings', 'gh_plugin_deactivated' ) );
+
+register_uninstall_hook(__FILE__, array( 'GH_Site_Settings', 'gh_plugin_uninstalled') );
