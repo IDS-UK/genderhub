@@ -36,7 +36,7 @@ function fetch_args_content_type() {
 		'show_tagcloud'             => true,
 	);
 
-	$t['post_types'] = array( 'events', 'other_training', 'news_stories', 'blogs_opinions', 'programme_alerts', 'contact_point','practical_tools','ids_documents' );
+	$t['post_types'] = array( 'events', 'other_training', 'news_stories', 'blogs_opinions', 'contact_point','practical_tools','ids_documents' );
 
 	return $t;
 

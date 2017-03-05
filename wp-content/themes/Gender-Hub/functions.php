@@ -25,7 +25,7 @@ class GenderHub_2017 {
 	    add_filter( 'wpcf7_load_js', '__return_false' );
 	    add_filter( 'wpcf7_load_css', '__return_false' );
 	    add_filter( 'gettext', array($this, 'gh_excerpt_label'), 10, 2 );
-	    add_filter( 'excerpt_length', array($this, 'gh_excerpt_length') );
+	    //add_filter( 'excerpt_length', array($this, 'gh_excerpt_length') );
 	    add_filter( 'tiny_mce_before_init', array($this, 'gh_styles_dropdown') );
 	    add_filter( 'mce_buttons', array($this, 'gh_style_select') );
 	    add_filter( 'the_content', array($this, 'filter_ptags_on_images') );
@@ -34,6 +34,8 @@ class GenderHub_2017 {
 
 	    add_filter( 'attachment_fields_to_edit', array($this, 'gh_attachment_credit'), 10, 2 );
 	    add_filter( 'attachment_fields_to_save', array($this, 'gh_save_attachment_credit'), 10, 2 );
+
+	    add_filter( 'get_user_option_meta-box-order_programme_alerts', array($this, 'gh_programme_alerts_metabox_order') );
 
 	    //add_action( 'pre_get_posts', array($this, 'gh_super_search') );
 
@@ -62,7 +64,35 @@ class GenderHub_2017 {
 		add_image_size( 'blog_featured', 500, 300 );
 
 		register_nav_menu( 'primary', __( 'Primary Menu', 'genderhub' ) );
-		register_nav_menu( 'secondary', __( 'Second Menu', 'genderhub' ) );
+		register_nav_menu( 'secondary', __( 'Footer Menu', 'genderhub' ) );
+
+		$menu_name = 'Footer More Menu';
+		$menu_exists = wp_get_nav_menu_object( $menu_name );
+
+		if( !$menu_exists){
+			$menu_id = wp_create_nav_menu($menu_name);
+
+			wp_update_nav_menu_item($menu_id, 0, array(
+				'menu-item-title' =>  __('About'),
+				'menu-item-url' => home_url( '/about/' ),
+				'menu-item-status' => 'publish'));
+
+			wp_update_nav_menu_item($menu_id, 0, array(
+				'menu-item-title' =>  __('Contact'),
+				'menu-item-url' => home_url( '/connect-and-discuss/contact-us/' ),
+				'menu-item-status' => 'publish'));
+
+			wp_update_nav_menu_item($menu_id, 0, array(
+				'menu-item-title' =>  __('Terms and conditions'),
+				'menu-item-url' => home_url( '/terms-and-conditions/' ),
+				'menu-item-status' => 'publish'));
+
+			wp_update_nav_menu_item($menu_id, 0, array(
+				'menu-item-title' =>  __('Site map'),
+				'menu-item-url' => home_url( '/site-map/' ),
+				'menu-item-status' => 'publish'));
+
+		}
 
 	}
 
@@ -487,10 +517,23 @@ class GenderHub_2017 {
 		remove_meta_box( 'postimagediv', 'programme_alerts', 'side' );
 	}
 
+	function gh_programme_alerts_metabox_order( $order ) {
+		return array(
+			'side' => join(
+				",",
+				array(
+					'submitdiv',
+					'gh_featured_image',
+					'paslidedetails',
+				)
+			),
+		);
+	}
+
 	function gh_reposition_metaboxes( $post_type ) {
 
 		if ( in_array( $post_type, array( 'programme_alerts' ) ) ) {
-			add_meta_box('gh_excerpt', __( 'Text to be overlaid on the image in the Home Page slider', 'genderhub' ), 'post_excerpt_meta_box', $post_type, 'after_title', 'high' );
+			add_meta_box('postexcerpt', __( 'Text for archive pages - also overlaid on the image in the Home Page slider', 'genderhub' ), 'post_excerpt_meta_box', $post_type, 'after_title', 'high' );
 			add_meta_box('gh_featured_image', __('Featured Image', 'genderhub'), 'post_thumbnail_meta_box', $post_type, 'side', 'high');
 		}
 	}
@@ -523,23 +566,28 @@ class GenderHub_2017 {
 
 			while ( $pa_query->have_posts() ) : $pa_query->the_post();
 
-				$slide_color = get_post_meta($pa_query->post->ID, '_pa_slide_bg', true);
-				$slide_link_url = get_post_meta($pa_query->post->ID, '_pa_slide_link_url', true);
-				$slide_link_text = get_post_meta($pa_query->post->ID, '_pa_slide_link_text', true);
+                $post_id = get_the_ID();
+
+				$slide_color = get_post_meta($post_id, '_pa_slide_bg', true);
+				$slide_link_url = get_post_meta($post_id, '_pa_slide_link_url', true);
+				$slide_link_text = get_post_meta($post_id, '_pa_slide_link_text', true);
 
 				$image_credit_url = get_post_meta(get_post_thumbnail_id(), '_image_credit_url', true);
 				$image_credit_text = get_post_meta(get_post_thumbnail_id(), '_image_credit_text', true);
 
 				$desc = esc_html(get_post(get_post_thumbnail_id())->post_content);
 
-				$output .= '<li class="slide-'.$pa_query->post->ID.'" data-thumb="'.wp_get_attachment_image_src( get_post_thumbnail_id(), 'gallery-thumb' )[0].'" data-thumb-text="'.$pa_query->post->post_title.'" title="'.$desc.'">';
+				$slider_image = get_the_post_thumbnail_url($post_id, 'gallery')?:get_the_post_thumbnail_url($post_id, array(720,362));
+				$slider_thumb = get_the_post_thumbnail_url($post_id, 'gallery-thumb')?:get_the_post_thumbnail_url($post_id, array(80,50));
+
+				$output .= '<li class="slide-'.$post_id.'" data-thumb="'.$slider_thumb.'" data-thumb-text="'.get_the_title().'" title="'.$desc.'">';
 				$output .= '<div class="slide '.$slide_color.'">';
 
-				$output .= '<div class="title"><h3 class="'.$slide_color.'"><span>'.$pa_query->post->post_title.'</span></h3></div>';
-				$output .= '<a href="'.$slide_link_url.'">'.get_the_post_thumbnail($post = null, 'gallery').'</a>';
+				$output .= '<div class="title"><h3 class="'.$slide_color.'"><span>'.get_the_title().'</span></h3></div>';
+				$output .= '<a href="'.$slide_link_url.'"><img src="'.$slider_image.'" /></a>';
 				$output .= '<div class="text"><p>'.get_the_excerpt().'</p>';
 				$output .= '<p>';
-				$output .= '<a href="'.$slide_link_url.'" class="'.$slide_color.'">'.$slide_link_text.'</a>';
+				$output .= !empty($slide_link_url) ? '<a href="'.$slide_link_url.'" class="'.$slide_color.'">'.$slide_link_text.'</a>' : NULL;
 
 				if(!empty($image_credit_text)) :
 
@@ -584,7 +632,6 @@ class GenderHub_2017 {
 
 			);
 		endif;
-
 
 		$args = array(
             'numberposts'   => 100,
@@ -646,7 +693,7 @@ class GenderHub_2017 {
             $html .= '<div class="item-top-inner">';
 
             if(strlen($img)==0) {
-                $html .= '<h4><span><a href="'.$link.'">'.get_the_title($s->ID).'</a></span></h4>';
+                $html .= '<h4><a href="'.$link.'">'.get_the_title($s->ID).'</a></h4>';
             }
 
             $html .= '</div>';
@@ -655,7 +702,7 @@ class GenderHub_2017 {
             $html .= '<div class="text">';
 
             if(strlen($img)) {
-                $html .= '<h4><span><a href="'.$link.'">'.get_the_title($s->ID).'</a></span></h4>';
+                $html .= '<h4><a href="'.$link.'">'.get_the_title($s->ID).'</a></h4>';
             }
 
             $this_excerpt = wp_filter_nohtml_kses(get_the_excerpt($s->ID));
@@ -883,7 +930,7 @@ add_filter('uwpqsf_tax_field_dropdown','custom_dropdown_output','',12);
 
 
 /**
- * this belongs in ids documents post type
+ * slkr - this really belongs in ids documents post type
  */
 function genderhub_custom_meta() {
     add_meta_box( 'genderhub_meta', __( 'Current Active Categories', 'genderhub' ), 'genderhub_meta_callback', 'ids_documents', 'side', 'high'  );
