@@ -55,8 +55,9 @@ class GenderHub_2017 {
 		add_image_size( 'square_220', 220, 220, true ); //(cropped)
 		add_image_size( 'square_120', 120, 120, true ); //(cropped)
 		add_image_size( 'custom-thumb', 220, 180, true ); // 220 pixels wide by 180 pixels tall, soft proportional crop mode
-		add_image_size( 'gallery', 720, 362, true );
-		add_image_size( 'gallery-thumb', 80, 50, true );
+		add_image_size( 'gallery', 720, 362, true ); // used in home page slider
+		add_image_size( 'carousel', 233, 140, array('center', 'top') ); // used in carousels
+		add_image_size( 'gallery-thumb', 80, 50, true ); // used as thumbnail in list beside home page slider
 		add_image_size( 'box', 237, 155, true );
 		add_image_size( 'collection', 300, 200, false);
 		add_image_size( 'blog_featured', 500, 300 );
@@ -647,7 +648,7 @@ class GenderHub_2017 {
 
             setup_postdata($s);
 
-            $img = get_the_post_thumbnail( $s->ID, 'full' );
+            $img = get_the_post_thumbnail_url( $s->ID, 'carousel' );
             $thumb = wp_get_attachment_image_src(get_post_thumbnail_id($s->ID), 'medium');
             $url = $thumb[0];
 
@@ -678,7 +679,7 @@ class GenderHub_2017 {
 				$link = get_field('source', $s->ID);
 			}
 
-            $html .= '<div class="item-top" style="background-image: url('.(strlen($img) ? $url : '').')">';
+            $html .= '<div class="item-top" style="background-image: url('.(strlen($img) ? $img : '').')">';
             $html .= '<div class="item-top-inner">';
 
             if(strlen($img)==0) {
