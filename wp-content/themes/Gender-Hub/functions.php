@@ -15,8 +15,7 @@ class GenderHub_2017 {
 	    add_action( 'pre_get_posts', array($this, 'practical_tools_filter') );
 	    add_action( 'login_enqueue_scripts', array($this, 'gh_custom_login_logo') );
 
-	    add_action( 'do_meta_boxes', array($this, 'gh_remove_default_metaboxes') );
-	    add_action( 'add_meta_boxes', array($this, 'gh_reposition_metaboxes') );
+	    add_action( 'do_meta_boxes', array($this, 'gh_reposition_metaboxes') );
 	    add_action( 'edit_form_after_title', array($this, 'gh_after_title_metaboxes') );
 
 	    add_filter( 'image_size_names_choose', array($this, 'custom_image_sizes_choose') );
@@ -25,7 +24,6 @@ class GenderHub_2017 {
 	    add_filter( 'wpcf7_load_js', '__return_false' );
 	    add_filter( 'wpcf7_load_css', '__return_false' );
 	    add_filter( 'gettext', array($this, 'gh_excerpt_label'), 10, 2 );
-	    //add_filter( 'excerpt_length', array($this, 'gh_excerpt_length') );
 	    add_filter( 'tiny_mce_before_init', array($this, 'gh_styles_dropdown') );
 	    add_filter( 'mce_buttons', array($this, 'gh_style_select') );
 	    add_filter( 'the_content', array($this, 'filter_ptags_on_images') );
@@ -377,10 +375,6 @@ class GenderHub_2017 {
 		return $new;
 	}
 
-	function gh_excerpt_length($length) {
-		return 55;
-	}
-
 	function gh_custom_login_logo() { ?>
 
         <style type="text/css">
@@ -511,10 +505,13 @@ class GenderHub_2017 {
 		return $terms;
 	}
 
-	function gh_remove_default_metaboxes() {
+	function gh_reposition_metaboxes() {
 
 		remove_meta_box( 'postexcerpt', 'programme_alerts', 'normal' );
 		remove_meta_box( 'postimagediv', 'programme_alerts', 'side' );
+
+		add_meta_box('postexcerpt', __( 'Text for archive pages - also overlaid on the image in the Home Page slider', 'genderhub' ), 'post_excerpt_meta_box','programme_alerts', 'after_title', 'high' );
+		add_meta_box('postimagediv', __('Featured Image', 'genderhub'), 'post_thumbnail_meta_box', 'programme_alerts', 'side', 'high');
 	}
 
 	function gh_programme_alerts_metabox_order( $order ) {
@@ -523,19 +520,11 @@ class GenderHub_2017 {
 				",",
 				array(
 					'submitdiv',
-					'gh_featured_image',
+					'postimagediv',
 					'paslidedetails',
 				)
 			),
 		);
-	}
-
-	function gh_reposition_metaboxes( $post_type ) {
-
-		if ( in_array( $post_type, array( 'programme_alerts' ) ) ) {
-			add_meta_box('postexcerpt', __( 'Text for archive pages - also overlaid on the image in the Home Page slider', 'genderhub' ), 'post_excerpt_meta_box', $post_type, 'after_title', 'high' );
-			add_meta_box('gh_featured_image', __('Featured Image', 'genderhub'), 'post_thumbnail_meta_box', $post_type, 'side', 'high');
-		}
 	}
 
 	function gh_after_title_metaboxes() {
@@ -846,7 +835,7 @@ function genderhub_cpt_search( $query ) {
   $query->set('post_type', array( 'post', 'blogs_opinions', 'contact_point', 'events', 'interviews', 'news_stories', 'other_training', 'practical_tools', 'programme_alerts' ));
   return $query;
 };
-add_filter( 'pre_get_posts', 'genderhub_cpt_search' );
+//add_filter( 'pre_get_posts', 'genderhub_cpt_search' );
 
 
 
@@ -922,7 +911,7 @@ foreach ( $childterms as $childterm ) {
   }
 
 }
-add_filter('uwpqsf_tax_field_dropdown','custom_dropdown_output','',12);
+//add_filter('uwpqsf_tax_field_dropdown','custom_dropdown_output','',12);
 
 
 
@@ -979,7 +968,7 @@ function uwpqsf_var($s){
 		return $s;
 	}
 }
-add_filter( 'get_search_query', 'uwpqsf_var', 20, 1 );
+//add_filter( 'get_search_query', 'uwpqsf_var', 20, 1 );
 
 /// place RSS Aggregator Images to Custom Field ///
 add_filter( 'wprss_ftp_featured_image_meta', 'save_url_custom_field' );
