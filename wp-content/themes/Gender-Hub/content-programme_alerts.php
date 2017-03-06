@@ -73,7 +73,7 @@ $image_credit_url = get_post_meta(get_post_thumbnail_id(), '_image_credit_url', 
 
             <?php the_content(); ?>
 
-            <?php if (!empty(get_post_meta(get_the_ID(), '_pa_slide_link_url'))) : ?>
+            <?php if (!empty(get_post_meta(get_the_ID(), '_pa_slide_link_url', true))) : ?>
                 <p class="button-container"><a class="button" href="<?php echo get_post_meta(get_the_ID(), '_pa_slide_link_url', true); ?>"><?php echo get_post_meta(get_the_ID(), '_pa_slide_link_text', true); ?></a></p>
             <?php endif; ?>
 
