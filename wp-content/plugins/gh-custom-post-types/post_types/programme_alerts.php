@@ -124,7 +124,7 @@ function save_programme_alert_meta_boxes( $post_id ) {
 		update_post_meta( $post_id, '_pa_slide_bg', $_POST['_pa_slide_bg'] );
 
 	if( isset( $_POST['_pa_slide_link_url'] ) )
-		update_post_meta( $post_id, '_pa_slide_link_url', $_POST['_pa_slide_link_url'] );
+		update_post_meta( $post_id, '_pa_slide_link_url', esc_url($_POST['_pa_slide_link_url']) );
 
 	if( isset( $_POST['_pa_slide_link_text'] ) )
 		update_post_meta( $post_id, '_pa_slide_link_text', $_POST['_pa_slide_link_text'] );
