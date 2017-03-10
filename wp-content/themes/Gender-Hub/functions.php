@@ -696,7 +696,7 @@ class GenderHub_2017 {
             }
 
             $this_excerpt = wp_filter_nohtml_kses(get_the_excerpt($s->ID));
-            $html .= '<p>'.get_words($this_excerpt,  (strlen($img) ? 20 : 30)).'...</p>';
+            $html .= '<p>'.get_words($this_excerpt, (strlen($img) ? 20 : 30)).'...</p>';
 
             $html .= '</div>';
 
@@ -710,7 +710,7 @@ class GenderHub_2017 {
 
             $html .= '</p>';
             $html .= '<div class="item-link">';
-            $html .= '<a href="'.get_permalink($s->ID).'" class="readmore">';
+            $html .= '<a href="'.$link.'" class="readmore">';
 
             if ($s->post_type == 'events'): $html .= 'Full event details';
             elseif ($s->post_type == 'blogs_opinions'): $html .= 'View blog post';
