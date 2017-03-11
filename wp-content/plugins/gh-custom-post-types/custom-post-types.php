@@ -32,6 +32,61 @@ class GH_Custom_Post_Types {
 
 	}
 
+	public static function gh_plugin_activated() {
+
+		$default_posts = include('assets/programme_alert_default_posts.php');
+
+		foreach($default_posts as $post) {
+
+			$post_id = wp_insert_post( $post['post_data'] );
+
+			$image = plugins_url( '/gh-custom-post-types/assets/img/'.basename($post['image_data']['guid']), dirname(__FILE__) );
+			$image_filename = basename($image);
+
+			$move_file = wp_upload_bits($image_filename, null, file_get_contents($image));
+
+			if (!$move_file['error']) {
+
+			    $wp_filetype = wp_check_filetype($image_filename, null );
+
+			    $data = array(
+					'post_mime_type' => $wp_filetype['type'],
+					'post_parent' => $post_id
+				);
+
+				$attachment = array_merge($data, $post['image_data']);
+
+				$attachment_id = wp_insert_attachment( $attachment, $move_file['file'], $post_id );
+				set_post_thumbnail( $post_id, $attachment_id );
+
+				if (!is_wp_error($attachment_id)) {
+					require_once(ABSPATH . "wp-admin" . '/includes/image.php');
+					$attachment_data = wp_generate_attachment_metadata( $attachment_id, $move_file['file'] );
+					wp_update_attachment_metadata( $attachment_id,  $attachment_data );
+				}
+
+				update_post_meta( $attachment_id, '_image_credit_text', $post['image_meta']['credit_text'] );
+				update_post_meta( $attachment_id, '_image_credit_url', $post['image_meta']['credit_url'] );
+
+			}
+
+            update_post_meta( $post_id, '_pa_slide_link_text', $post['post_meta']['link_text'] );
+			update_post_meta( $post_id, '_pa_slide_link_url', $post['post_meta']['link_url'] );
+            update_post_meta( $post_id, '_pa_slide_include', $post['post_meta']['in_slider'] );
+			update_post_meta( $post_id, '_pa_slide_bg', $post['post_meta']['slider_color'] );
+
+        }
+
+	}
+
+	public static function gh_plugin_deactivated() {
+
+	}
+
+	public static function gh_plugin_uninstalled() {
+
+    }
+
 	function init() {
 
 		$post_types = array(
@@ -266,3 +321,9 @@ class GH_Custom_Post_Types {
 }
 
 new GH_Custom_Post_Types;
+
+register_activation_hook( __FILE__, array( 'GH_Custom_Post_Types', 'gh_plugin_activated' ) );
+
+register_deactivation_hook( __FILE__, array( 'GH_Custom_Post_Types', 'gh_plugin_deactivated' ) );
+
+register_uninstall_hook(__FILE__, array( 'GH_Custom_Post_Types', 'gh_plugin_uninstalled') );
