@@ -1,6 +1,8 @@
 <?php
 $image_credit_text = get_post_meta(get_post_thumbnail_id(), '_image_credit_text', true);
 $image_credit_url = get_post_meta(get_post_thumbnail_id(), '_image_credit_url', true);
+$slide_link_text = get_post_meta(get_the_ID(), '_pa_slide_link_text', true);
+$slide_link_url = get_post_meta(get_the_ID(), '_pa_slide_link_url', true);
 ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
@@ -73,8 +75,8 @@ $image_credit_url = get_post_meta(get_post_thumbnail_id(), '_image_credit_url', 
 
             <?php the_content(); ?>
 
-            <?php if (!empty(get_post_meta(get_the_ID(), '_pa_slide_link_url', true))) : ?>
-                <p class="button-container"><a class="button" href="<?php echo get_post_meta(get_the_ID(), '_pa_slide_link_url', true); ?>"><?php echo get_post_meta(get_the_ID(), '_pa_slide_link_text', true); ?></a></p>
+            <?php if (!empty($slide_link_url)) : ?>
+                <p class="button-container"><a class="button" href="<?php echo $slide_link_url; ?>"><?php echo $slide_link_text; ?></a></p>
             <?php endif; ?>
 
             <?php echo do_shortcode('[ssbp]'); ?>
