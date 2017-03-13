@@ -28,7 +28,7 @@ function fetch_args_programme_alerts() {
 		'description'           => __( 'Programme Alert Description', 'genderhub' ),
 		'labels'                => $labels,
 		'supports'              => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', ),
-		'taxonomies'            => array( 'category', 'post_tag', 'bridge_themes', 'gender_hub_themes' ),
+		'taxonomies'            => array( 'category', 'post_tag', 'gender_hub_themes' ),
 		'hierarchical'          => true,
 		'rewrite'               => array( 'slug'  => 'be-inspired/programme-alerts' ),
 		'public'                => true,
