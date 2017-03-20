@@ -171,10 +171,17 @@ header.site .home-icon {margin: 7px 0 2px -37px;}
 header.site .social_link {width: 18px; height: 18px; margin-top: 6px; margin-left: 1em; }
 header.site #searchicon {float: right; margin-top: 11px;}
 
-header.site #searchform input {margin-top: 9px;}
+header.site #searchform { float:right; width:0px; display:inline-block; webkit-transition: width 0.8s;-moz-transition: width 0.8s; transition: width 0.8s; overflow: hidden;}
+header.site #searchform input {width: 92%;padding: 3px;margin-top: 9px;margin-right: 10px;}
 header.site #searchform input:focus {outline: none;}
 
-/* Section */
+header #searchform.active, aside #searchform { display:block; width:150px; }
+
+aside #searchform input {padding: 3px;margin-top: 13px;}
+aside #searchform {padding: 10px;}
+aside #searchform #searchsubmit {background-color: #333333; border-radius: 5px; color: #fff; font-size: 16px; padding: 6px; border: none; cursor: pointer; height: auto; display: inline-block;}
+
+	/* Section */
 section {margin-bottom:20px}
 section#connect {margin-bottom:0; padding-bottom:20px; padding-top:20px}
 
@@ -530,7 +537,7 @@ article.contact_point .archive-summary-container .archive-summary-details h2 {co
 
 /* Homepage slider */
 .galleryTextThumbs .rsThumbs span {background:none}
-#slider {font-size:18px}
+#slider {max-height: 370px;font-size:18px}
 #slider .slide .text a {color: #fff; font-size: 18px; padding: 10px; border-radius: 5px;}
 #slider h3 {color:#fff; }
 #slider p {margin-top:10px}
@@ -907,11 +914,6 @@ font-family: 'Asap', Arial, Helvetica, sans-serif;
 
 
 
-header #searchform { float:right; width:0px; display:inline-block; webkit-transition: width 0.8s;-moz-transition: width 0.8s; transition: width 0.8s; overflow: hidden;}
-header #searchform.active, aside #searchform { display:block; width:150px; }
-aside #searchform {padding: 10px;}
-aside #searchform #searchsubmit {background-color: #333333; border-radius: 5px; color: #fff; font-size: 16px; padding: 6px; border: none; cursor: pointer; height: auto; display: inline-block;}
-#searchform input {padding: 3px;margin-top: 13px;}
 
 /* Comments */
 #commentform {padding-top:15px}
