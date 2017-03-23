@@ -133,11 +133,16 @@ else : ?>
 			<?php if (count($topic_list)>1) { ?>
 				<div id="documents">
 					<aside class="filter">
-						<?php
-						foreach($topic_list as $topic) : ?>
-							<a rel="<?php echo $topic->term_id;?>" class="docfilter<?php echo $topic->parent === 0 ? ' active' : '' ;?>"><?php echo $topic->parent === 0 ? 'Topics' : $topic->name; ?></a>
-						<?php endforeach;
-						?>
+                        <?php
+
+                        $topic_list = GenderHub_2017::gh_array_shift($topic_list, 'parent', 0)
+
+                        ?>
+						<?php foreach($topic_list as $topic) : ?>
+
+                            <a rel="<?php echo $topic->term_id;?>" class="docfilter<?php echo $topic->parent === 0 ? ' active' : '' ;?>"><?php echo $topic->parent === 0 ? 'Topics' : $topic->name; ?></a>
+
+                        <?php endforeach; ?>
 					</aside>
 
 					<div id="doc-container">

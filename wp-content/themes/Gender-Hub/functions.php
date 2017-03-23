@@ -519,6 +519,16 @@ class GenderHub_2017 {
 		do_meta_boxes( get_current_screen(), 'after_title', $post );
 	}
 
+	public static function gh_array_shift($array, $k, $id) {
+		foreach($array as $key => $val){
+			if($val->$k == $id){
+				unset($array[$key]);
+				array_unshift($array, $val);
+				return $array;
+			}
+		}
+	}
+
 	public static function gh_get_slider_posts($type) {
 
 		$args = array(
