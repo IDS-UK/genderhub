@@ -297,6 +297,7 @@ function idsview_help_page() {
   <p>
   <?php _e('For terms and condition for using API see'); ?> <a href="http://api.ids.ac.uk/about/terms/" target="_new"><?php _e('here'); ?></a>.
   </p>
+  </div>
 <?php
 }
 

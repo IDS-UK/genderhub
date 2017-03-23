@@ -1,0 +1,100 @@
+[26-02-2017 23:51:19] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[27-02-2017 23:52:32] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[01-03-2017 01:59:21] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[02-03-2017 12:22:29] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[03-03-2017 12:06:00] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[04-03-2017 14:11:56] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[04-03-2017 23:52:10] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[05-03-2017 23:58:50] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[06-03-2017 13:13:30] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[07-03-2017 09:17:14] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[07-03-2017 23:51:22] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[09-03-2017 12:23:30] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[10-03-2017 12:04:27] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[11-03-2017 00:22:34] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[13-03-2017 13:36:29] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[14-03-2017 11:50:32] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[14-03-2017 23:51:12] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[16-03-2017 10:45:26] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[16-03-2017 23:52:35] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[17-03-2017 23:51:15] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[19-03-2017 00:39:09] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[20-03-2017 11:32:30] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[20-03-2017 23:51:22] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[21-03-2017 23:51:17] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+
+[22-03-2017 23:51:16] [Error] WPRSS:
+The feed URL is not valid! Please recheck: 
+
+

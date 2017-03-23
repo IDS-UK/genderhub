@@ -108,11 +108,11 @@ html{overflow-x: hidden;}
 /* Generic */
 body {
 width:100%;
-padding: 0px;
+padding: 0;
 background-color:#fff;
-margin-top: 0px;
+margin-top: 0;
 margin-right: auto;
-margin-bottom: 0px;
+margin-bottom: 0;
 margin-left: auto;
 overflow-x: hidden;
 font-family: 'Asap', sans-serif;
@@ -124,15 +124,10 @@ background-image:url(/wp-content/themes/Gender-Hub/img/banner.gif); background-r
 body.home {padding-top:160px}
 body.logged-in {margin-top:28px}
 .inner {width:1030px;
-padding: 0px;
-margin-top: 0px;
+padding: 0;
+margin-top: 0;
 margin-right: auto;
-	padding: 0px;
-	
-	
-	margin-top: 0px;
-	margin-right: auto;
-	margin-bottom: 0px;
+	margin-bottom: 0;
 	margin-left: auto;
 	position:relative;
 	
@@ -150,7 +145,8 @@ header.site,nav,section,footer {width: 100%; overflow:hidden}
 
 #main {width:100%}
 .span_3_of_4 {width:71%; float:left}
-.span_1_of_4 {width:28%; float:right}.rss_socials {display:none}
+.span_1_of_4 {width:28%; float:right}
+.rss_socials {display:none}
 .count-items {float:right; margin-top:-28px; color:#646e78; }
 img.alignright {float:right; padding-left:15px; padding-bottom:15px}
 img.alignleft {float:right; padding-right:15px; padding-bottom:15px}
@@ -169,7 +165,7 @@ header.site .home-icon {margin: 7px 0 2px -37px;}
 .social_link { float: right; background-color: #fff; padding: 5px;  -webkit-border-radius: 5px;  -moz-border-radius: 5px;  border-radius: 5px; }
 .social_link img {width: 100%; height: auto; display: block;}
 header.site .social_link {width: 18px; height: 18px; margin-top: 6px; margin-left: 1em; }
-header.site #searchicon {float: right; margin-top: 11px;}
+header.site #searchicon {float: right; margin-top: 11px; margin-left: 10px;}
 
 header.site #searchform { float:right; width:0px; display:inline-block; webkit-transition: width 0.8s;-moz-transition: width 0.8s; transition: width 0.8s; overflow: hidden;}
 header.site #searchform input {width: 92%;padding: 3px;margin-top: 9px;margin-right: 10px;}
@@ -180,14 +176,53 @@ header #searchform.active, aside #searchform { display:block; width:150px; }
 aside #searchform input {padding: 3px;margin-top: 13px;}
 aside #searchform {padding: 10px;}
 aside #searchform #searchsubmit {background-color: #333333; border-radius: 5px; color: #fff; font-size: 16px; padding: 6px; border: none; cursor: pointer; height: auto; display: inline-block;}
+aside.widget {box-sizing: border-box;}
+aside.widget .textwidget { color:#000; padding:0;}
+
+
+/* search/filter plugin in the knowledge sidebar of Document Library and search results pages */
+
+.sidebar .widget form.searchandfilter ul { padding: 0; }
+.sidebar .widget form.searchandfilter ul li.sf-field-search label { width: 99%; }
+.sidebar .widget form.searchandfilter ul li.sf-field-search input[type="text"] {  -webkit-box-sizing: border-box;  -moz-box-sizing: border-box;  box-sizing: border-box; padding: 0 7px; width: 99%; }
+.sidebar .widget form.searchandfilter ul li input[type="checkbox"] { height: auto; vertical-align: top; }
+.sidebar .widget form.searchandfilter ul li input, .sidebar .widget form.searchandfilter ul li select { margin-bottom: 10px; }
+
+.sidebar .widget form.searchandfilter .sf-level-0, .sidebar .widget form.searchandfilter ul li { position: relative; padding: 6px 0 4px 4px; }
+.sidebar .widget form.searchandfilter .sf-level-0 label { width: 78%; }
+.sidebar .widget form.searchandfilter .sf-level-0 div.expand-arrow { position: absolute; top: 8px; right: 0; width: 16px; height: 16px; background-size:contain; background-repeat: no-repeat; background-position: 0 5px;}
+.sidebar .widget form.searchandfilter .sf-level-0 ul.children { max-height: 0;  overflow: hidden; transition: 0.4s;}
+.sidebar.green .widget form.searchandfilter .sf-level-0 div.expand-arrow { background-image: url('img/arrow-down-green.png'); }
+.sidebar.purple .widget form.searchandfilter .sf-level-0 div.expand-arrow { background-image: url('img/arrow-down-purple.png'); }
+
+.sidebar .widget form.searchandfilter .sf-level-0.active ul.children {  max-height: unset; }
+.sidebar.green .widget form.searchandfilter .sf-level-0.active div.expand-arrow { background-image : url('img/arrow-up-green.png'); }
+.sidebar.purple .widget form.searchandfilter .sf-level-0.active div.expand-arrow { background-image : url('img/arrow-up-purple.png'); }
+
+.sidebar .widget form.searchandfilter .sf-level-1 { border-bottom: none; padding: 7px 0 0 24px; }
+
+.sidebar.blockheaders .widget.widget_text { padding: 0; }
+.sidebar.blockheaders .widget.widget_text h3.widget-title { padding-bottom: 0.4em; }
+.sidebar.blockheaders .widget.widget_text .textwidget { margin: 1em; }
+
+
+.sidebar.blockheaders.green .widget, .sidebar.blockheaders.purple .widget { background-color: unset; }
+
+.sidebar.blockheaders.green .widget.widget_text { background-color: #b9ddb6; }
+.sidebar.blockheaders.green .widget.widget_text h3.widget-title { background-color: #53a669; }
+
+.sidebar.blockheaders.purple .widget.widget_text { background-color: #e0e1e3; }
+.sidebar.blockheaders.purple .widget.widget_text h3.widget-title { background-color: #422f5d; }
+
+
+
 
 	/* Section */
 section {margin-bottom:20px}
 section#connect {margin-bottom:0; padding-bottom:20px; padding-top:20px}
 
-
 /* Main Menu */
-nav {background-color:#646e78; font-size:18px; color:#fff; height:35px; position:fixed; top:48px; left:0px; z-index:9999999}
+nav {background-color:#646e78; font-size:18px; color:#fff; height:35px; position:fixed; top:48px; left:0; z-index:9999999}
 nav.active{height:auto; z-index:9999}
 nav a {line-height:31px; color:#fff; display: block; padding:2%}
 nav ul li {width:24.4%; float:left; margin-right:0.8%; display:block; padding-bottom: 15px;}
@@ -217,9 +252,6 @@ nav.active ul li:nth-child(4) a, nav ul li:nth-child(4).current-menu-ancestor a{
 nav ul li:nth-child(4) ul {border-top:3px solid #e66601; margin-top:8px; width:96%; margin-bottom:15px}
 nav ul li:nth-child(4) ul li{border-bottom:1px solid #e66601; width:100%; border-top:none; background:none }
 nav.active ul li:nth-child(4) ul li a {background:none}
-
-/* this can be removed when the site settings plugin has been updated */
-#facebookicon, #twittericon, #searchicon {float:right; margin-left:8px; margin-top:16px}
 
 .menuicon {z-index: 99999;position: fixed;display: none !important;padding: 11px;height: 22px;width: 28px;margin: 0px;top: 0;right: 0;cursor: pointer;display: none;}
 .top-menu {top: 5px;width: 25px;height: 3px;}
@@ -356,6 +388,10 @@ article h3 {font-weight:bold}
 article ol{margin-top:20px; color:#666; list-style-position:outside; list-style-type:decimal; margin-left:30px}
 article ul li, article ol li {color:#666; font-size:16px}
 
+
+.search .sidebar .widget { border-top: none; }
+.search .sidebar h3.widget-title { background-color: unset; color: #fff;padding-bottom: .8em;font-size: 21px;font-weight: bold;}
+
 .search article h6 {background-color:#53a669; width:98%; padding:1%; display:block; color:#fff}
 .search article h6 strong{display:inline-block; padding-right:5px}
 .search article{border-bottom:5px solid #53a669;}
@@ -411,6 +447,9 @@ article.type-blogs_opinions h6 {background-color:#e66601;}
 .post-type-archive-ids_documents article h6 strong, .single-ids_documents h6 strong {display:inline-block; padding-right:5px}
 .post-type-archive-ids_documents article{border-bottom:5px solid #53a669;}
 .post-type-archive-ids_documents article.entry-summary a {border-radius:5px;background-color:#53a669; padding:5px; color:#fff}
+.post-type-archive-ids_documents .sidebar .widget, .search .sidebar .widget { border-top: none; }
+.post-type-archive-ids_documents .sidebar h3.widget-title, .search .sidebar h3.widget-title { background-color: unset;color: #fff;padding-bottom: .8em;font-size: 21px;font-weight: bold;}
+
 #main .entry-summary p a { text-decoration:underline}
 #main .entry-summary p a.button { text-decoration:none}
 .post-type-archive-news_stories article h6 {background-color:#e66601; width:98%; padding:1%; display:block; color:#fff}
@@ -999,8 +1038,11 @@ font-weight:700;}
 .uwpqsf_class.-keyword { padding: 5px; font-weight: bold; }
 #uwpqsf_id {border:none; }
 .uwpqsf_submit {text-align:left}
-#text-5,
-#text-14,
+
+
+
+
+
 .widget_recent_entries {
 display:block;
 padding:0px;
@@ -1268,6 +1310,9 @@ padding-right: 13%;
 }
 
 @media all and (max-width: 480px) {
+
+	#slider .title { position: relative;}
+	#slider .lSAction >.lSNext { right: 3% !important; }
 	
 /* Generic */
 .col4 {width:100%; margin-right:0%; margin-bottom:2%}
