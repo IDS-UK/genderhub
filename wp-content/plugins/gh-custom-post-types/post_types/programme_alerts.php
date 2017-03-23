@@ -37,7 +37,7 @@ function fetch_args_programme_alerts() {
 		'show_in_nav_menus'     => true,
 		'show_in_admin_bar'     => true,
 		'menu_position'         => 6,
-		'menu_icon'             => '/wp-content/uploads/2015/06/bell-icon.png',
+		'menu_icon'             => get_stylesheet_directory_uri().'/img/icon-bell.png', // /wp-content/uploads/2015/06/bell-icon.png',
 		'can_export'            => true,
 		'has_archive'           => true,
 		'exclude_from_search'   => false,
@@ -81,7 +81,7 @@ function programme_alert_slide_details( $post ) {
 	wp_nonce_field( 'my_meta_box_nonce', 'slikkr_meta_box_nonce' ); ?>
 
     <p>
-        <label for="_pa_slide_include">Include in slider?</label>&nbsp;&nbsp;&nbsp;
+        <label for="_pa_slide_include">Include in slider?</label>&nbsp;
         <input type="checkbox" name="_pa_slide_include" id="_pa_slide_include" value="1" <?php checked(1, $pa_sinc); ?>/>
     </p>
 	<p>

@@ -26,20 +26,17 @@ class GH_Site_Settings {
 
     }
 
-	public static function gh_plugin_activated() {
-
-		delete_option('gh_custom_general_settings');
-		delete_option('gh_other_custom_settings');
-    }
+	public static function gh_plugin_activated() { }
 
 	public static function gh_plugin_deactivated() {
+    }
+
+	public static function gh_plugin_uninstalled() {
 		delete_option('gh_custom_main_settings');
 		delete_option('gh_custom_header_settings');
 		delete_option('gh_custom_footer_settings');
 		delete_option('gh_custom_misc_settings');
     }
-
-	public static function gh_plugin_uninstalled() {}
 
 	function gh_admin_menu() {
 
@@ -112,7 +109,7 @@ class GH_Site_Settings {
 
 	function gh_settings_script() {
 
-		wp_register_script( 'gh-settings-script', plugin_dir_url(__FILE__) . '/js/gh-settings-script.js', array('jquery'), '1.0', true);
+		wp_register_script( 'gh-settings-script', plugin_dir_url(__FILE__) . 'js/gh-settings-script.js', array('jquery'), '1.0', true);
 		wp_enqueue_script( 'gh-settings-script' );
 		wp_enqueue_media();
 	}

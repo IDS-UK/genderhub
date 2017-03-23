@@ -35,8 +35,6 @@ class GenderHub_2017 {
 
 	    add_filter( 'get_user_option_meta-box-order_programme_alerts', array($this, 'gh_programme_alerts_metabox_order') );
 
-	    //add_action( 'pre_get_posts', array($this, 'gh_super_search') );
-
 	    remove_action( 'wp_head','wp_generator' );
 
 	    add_editor_style( 'css/editor-style.css' );
@@ -59,7 +57,8 @@ class GenderHub_2017 {
 		add_image_size( 'carousel', 233, 140, array('center', 'top') ); // used in carousels
 		add_image_size( 'gallery-thumb', 80, 50, true ); // used as thumbnail in list beside home page slider
 		add_image_size( 'box', 237, 155, true );
-		add_image_size( 'collection', 300, 200, false);
+		add_image_size( 'collection', 300, 200, true);
+		add_image_size( 'featured-content', 297, 150, true);
 		add_image_size( 'blog_featured', 500, 300 );
 
 		register_nav_menu( 'primary', __( 'Primary Menu', 'genderhub' ) );
@@ -342,10 +341,11 @@ class GenderHub_2017 {
 
 		return array_merge( $sizes, array(
 
-			'square_220'        => 'square_220px',
-			'square_120'        => 'square_120px',
+			'square_220'        => '220px Square',
+			'square_120'        => '120px Square',
 			'gallery'           => 'Slider Image',
 			'gallery-thumb'     => 'Slider Thumbnail',
+			'featured-content'  => 'Featured Content',
 		));
 	}
 
@@ -473,21 +473,6 @@ class GenderHub_2017 {
 
 	}
 
-	public function gh_super_search($query) {
-
-	    if(is_search()) {
-			$post_types = get_post_types(array('public' => true, 'exclude_from_search' => false), 'objects');
-			$searchable_types = array();
-			if($post_types) {
-				foreach( $post_types as $type) {
-					$searchable_types[] = $type->name;
-				}
-			}
-			$query->set('post_type', $searchable_types);
-		}
-		return $query;
-	}
-
 	function nyasro_terms_sort( $terms, $taxname ) {
 
 	    if($taxname === 'bridge_countries') {
@@ -539,6 +524,8 @@ class GenderHub_2017 {
 		$args = array(
 			'post_type'		    => $type,
 			'post_status'       => 'publish',
+			'order'             => 'DESC',
+			'orderby'           => 'date',
 
 			'meta_query'        => array(
 				array(
@@ -825,98 +812,6 @@ function process_found_posts($posts) {
 add_filter('the_posts', 'process_found_posts');
 
 
-/**
-* This function modifies the main WordPress query to include an array of post types instead of the default 'post' post type.
-*
-* @param mixed $query The original query
-* @return $query The amended query
-*/
-function genderhub_cpt_search( $query ) {
-  if ( !is_admin() && $query->is_search() )
-  $query->set('post_type', array( 'post', 'blogs_opinions', 'contact_point', 'events', 'interviews', 'news_stories', 'other_training', 'practical_tools', 'programme_alerts' ));
-  return $query;
-};
-//add_filter( 'pre_get_posts', 'genderhub_cpt_search' );
-
-
-
-// Add IDS Import categories in the edit.php post columns
-add_filter('manage_events_posts_columns', 'idsimport_posts_columns');
-add_action('manage_events_posts_custom_column', 'idsimport_populate_posts_columns');
-
-add_filter('manage_news_stories_posts_columns', 'idsimport_posts_columns');
-add_action('manage_news_stories_posts_custom_column', 'idsimport_populate_posts_columns');
-
-add_filter('manage_contact_point_posts_columns', 'idsimport_posts_columns');
-add_action('manage_contact_point_posts_custom_column', 'idsimport_populate_posts_columns');
-
-add_filter('manage_programme_alerts_posts_columns', 'idsimport_posts_columns');
-add_action('manage_programme_alerts_posts_custom_column', 'idsimport_populate_posts_columns');
-
-add_filter('manage_blogs_opinions_posts_columns', 'idsimport_posts_columns');
-add_action('manage_blogs_opinions_posts_custom_column', 'idsimport_populate_posts_columns');
-
-add_filter('manage_other_training_posts_columns', 'idsimport_posts_columns');
-add_action('manage_other_training_posts_custom_column', 'idsimport_populate_posts_columns');
-
-add_filter('manage_practical_tools_posts_columns', 'idsimport_posts_columns');
-add_action('manage_practical_tools_posts_custom_column', 'idsimport_populate_posts_columns');
-
-// Ultimate WP Query Search Filter heirarchy in drop downs + POST COUNT
-//Display parent categories only
-
-add_filter('uwpqsf_taxonomy_arg', 'custom_term_output','',1);
-function custom_term_output($args){
-  $args['parent'] = '0';
-  return $args;
-}
-
-//MODIFY TAXFIELD DROPDOWN OUTPUT TO IDENTIFY AND STYLE CHILD CATEGORIES
-// TODO ADDS COUNT BESIDE TERMS LIST
-function custom_dropdown_output($html,$type,$exc,$hide,$taxname,$taxlabel,$taxall,$opt,$c,$defaultclass,$formid,$divclass,$eid=''){
-  $args = array('hide_empty'=>$hide,'exclude'=>$eid );
-  $taxoargs = apply_filters('uwpqsf_taxonomy_arg',$args,$taxname,$formid);
-  $terms = get_terms($taxname,$taxoargs); $count = count($terms);
-  if($type == 'dropdown'){
-    $html  = '<div class="'.$defaultclass.' '.$divclass.' tax-select-'.$c.'"><span class="taxolabel-'.$c.'">'.$taxlabel.'</span>';
-    $html .= '<input  type="hidden" name="taxo['.$c.'][name]" value="'.$taxname.'">';
-    $html .= '<input  type="hidden" name="taxo['.$c.'][opt]" value="'.$opt.'">';
-    $html .=  '<select id="tdp-'.$c.'" name="taxo['.$c.'][term]">';
-    if(!empty($taxall)){
-      $html .= '<option selected value="uwpqsftaxoall">'.$taxall.'</option>';
-    }
-    if ( $count > 0 ){
-      $terms = apply_filters('nyasro_dropdown_sort', $terms, $taxname ); //nyasro added filter
-      foreach ( $terms as $term ) {
-$term_obj = get_term( $term->term_id, $taxname );
-				$selected = (isset($_GET['taxo'][$c]['term']) && $_GET['taxo'][$c]['term'] == $term->slug) ? 'selected="selected"' : '';
-  			$html .= '<option value="'.$term->slug.'" '.$selected.'>'.$term->name.' ('.$term_obj->count.' documents)</option>';
-
-$args = array(
-'hide_empty'    => true,
-'hierarchical'  => true,
-'parent'=> $term->term_id
-);
-$childterms = get_terms($taxname, $args);
-
-foreach ( $childterms as $childterm ) {
-  $selected = (isset($_GET['taxo'][$c]['term']) && $_GET['taxo'][$c]['term'] == $childterm->slug) ? 'selected="selected"' : '';
-  $term_obj = get_term( $childterm->term_id, $taxname );
-  $html .= '<option value="'.$childterm->slug.'" '.$selected.'> &nbsp;&nbsp; - &nbsp;'  . $childterm->name . ' ('.$term_obj->count.' documents)</option>';
-
-}}
-    }
-    $html .= '</select>';
-    $html .= '</div>';
-    return $html;
-  }
-
-}
-//add_filter('uwpqsf_tax_field_dropdown','custom_dropdown_output','',12);
-
-
-
-
 
 
 /**
@@ -939,37 +834,6 @@ echo $sep . $category->cat_name; $sep = ', ';
 
 
 
-
-// add query terms to search results - Ultimate WP Query Search Filter
-// outputs terms searched for on search template
-// todo feb 2017 - on inspection, this *seems* to output filters that have been selected in the search box, but NOT actioned by the plugin. Need to ascertain whether it's an EITHER/OR kinda thang
-function uwpqsf_var($s){
-	if(is_search() && isset($_GET['s']) && $_GET['s'] == 'uwpsfsearchtrg' && isset($_GET['uformid']) ){
-		if(isset($_GET['taxo'])){
-			foreach($_GET['taxo'] as $v){
-				if(isset($v['term'])){
-					if($v['term'] == 'uwpqsftaxoall'){
-
-					}else{
-						$termname = get_term_by('slug',$v['term'],$v['name']);
-						$var[] = $termname->name;
-					}
-				}
-			}
-			if(!empty($_GET['skeyword'])){
-				$var[] = $_GET['skeyword'];
-			}
-			$return = '';
-			if(!empty($var)){
-				$return = implode(' | ', $var);
-			}
-			return $return;
-		}
-	}else{
-		return $s;
-	}
-}
-//add_filter( 'get_search_query', 'uwpqsf_var', 20, 1 );
 
 /// place RSS Aggregator Images to Custom Field ///
 add_filter( 'wprss_ftp_featured_image_meta', 'save_url_custom_field' );
@@ -1188,32 +1052,7 @@ function ids_pretty_date( $start, $end = NULL, $fmt = NULL ) {
 
 
 
-
 // POSSIBLY CAN DELETE EVERYTHING UNDER HERE
-
-
-function whole_words_search( $search, $wp_query ) {
-	global $wpdb;
-	if ( empty( $search ) )
-		return $search;
-	$q = $wp_query->query_vars;
-	$n = !empty( $q['exact'] ) ? '' : '%';
-	$search = $searchand = '';
-	foreach ( (array) $q['search_terms'] as $term ) {
-		$term = esc_sql( like_escape( $term ) );
-		$search .= "{$searchand}($wpdb->posts.post_title REGEXP '[[:<:]]{$term}[[:>:]]') OR ($wpdb->posts.post_content REGEXP '[[:<:]]{$term}[[:>:]]')";
-		$searchand = ' AND ';
-	}
-	if ( ! empty( $search ) ) {
-		$search = " AND ({$search}) ";
-		if ( ! is_user_logged_in() )
-			$search .= " AND ($wpdb->posts.post_password = '') ";
-	}
-	return $search;
-}
-add_filter( 'posts_search', 'whole_words_search', 20, 2 );
-
-
 
 function twentytwelve_wp_title( $title, $sep ) {
 	global $paged, $page;
@@ -1236,85 +1075,6 @@ function twentytwelve_wp_title( $title, $sep ) {
 	return $title;
 }
 add_filter( 'wp_title', 'twentytwelve_wp_title', 10, 2 );
-
-
-
-function twentytwelve_page_menu_args( $args ) {
-	if ( ! isset( $args['show_home'] ) )
-		$args['show_home'] = true;
-	return $args;
-}
-add_filter( 'wp_page_menu_args', 'twentytwelve_page_menu_args' );
-
-
-// paging nav
-if ( ! function_exists( 'twentythirteen_paging_nav' ) ) :
-	/**
-	 * Display navigation to next/previous set of posts when applicable.
-	 *
-	 * @since Twenty Thirteen 1.0
-	 */
-	function twentythirteen_paging_nav() {
-		global $wp_query;
-
-		// Don't print empty markup if there's only one page.
-		if ( $wp_query->max_num_pages < 2 )
-			return;
-		?>
-        <nav class="navigation paging-navigation" role="navigation">
-            <h1 class="screen-reader-text"><?php _e( 'Posts navigation', 'twentythirteen' ); ?></h1>
-            <div class="nav-links">
-
-				<?php if ( get_next_posts_link() ) : ?>
-                    <div class="nav-previous"><?php next_posts_link( __( '<img class="prev_next_arrows" alt="Previous Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowL.png" /><br />  Older posts', 'twentythirteen' ) ); ?></div>
-				<?php endif; ?>
-
-				<?php if ( get_previous_posts_link() ) : ?>
-                    <div class="nav-next"><?php previous_posts_link( __( '<img class="prev_next_arrows" alt="Next Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowR.png" /><br />Newer posts', 'twentythirteen' ) ); ?></div>
-				<?php endif; ?>
-
-            </div><!-- .nav-links -->
-        </nav><!-- .navigation -->
-		<?php
-	}
-endif;
-
-if ( ! function_exists( 'twentythirteen_post_nav' ) ) :
-	/**
-	 * Display navigation to next/previous post when applicable.
-	 ** @since Twenty Thirteen 1.0
-	 */
-	function twentythirteen_post_nav() {
-		global $post;
-
-		// Don't print empty markup if there's nowhere to navigate.
-		$previous = ( is_attachment() ) ? get_post( $post->post_parent ) : get_adjacent_post( false, '', true );
-		$next     = get_adjacent_post( false, '', false );
-
-		if ( ! $next && ! $previous )
-			return;
-		?>
-        <nav class="navigation post-navigation" role="navigation">
-            <h1 class="screen-reader-text"><?php _e( 'Post navigation', 'twentythirteen' ); ?></h1>
-            <div class="nav-links">
-
-				<?php previous_post_link( '%link', _x( '<img class="prev_next_arrows" alt="Previous Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowL.png" /><br /> %title', 'Previous post link', 'twentythirteen' ) ); ?>
-				<?php next_post_link( '%link', _x( '<img class="prev_next_arrows" alt="Next Post" src="http://genderhub.org/wp-content/themes/genderhub/images/arrowR.png" /><br />%title ', 'Next post link', 'twentythirteen' ) ); ?>
-
-            </div><!-- .nav-links -->
-        </nav><!-- .navigation -->
-		<?php
-	}
-endif;
-
-
-global $wp_taxonomies;
-if( isset( $wp_taxonomies[ 'collections' ] ) ) {
-
-	unset( $wp_taxonomies[ 'collections' ] );
-}
-
-
 
 function enable_custom_fields_per_default( $hidden ) {
 

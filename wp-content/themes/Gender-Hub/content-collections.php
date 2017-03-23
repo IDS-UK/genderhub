@@ -127,7 +127,6 @@ else : ?>
 			$docs_post_types = array('ids_documents', 'practical_tools','programme_alerts','other_training');
 			$topic_list = wp_get_post_terms($post->ID, 'topics', array(
 				'fields' => 'all',
-				'orderby' => 't.term_id'
 			));
 			?>
 
@@ -298,7 +297,16 @@ else : ?>
 
 								</header><!-- .entry-header -->
 
-								<?php the_post_thumbnail('thumbnail');?>
+                                <?php if(has_post_thumbnail('featured-content')) :
+
+	                                the_post_thumbnail('featured-content');
+
+                                else :
+
+	                                the_post_thumbnail(array(297,150));
+
+                                endif; ?>
+
 								<?php the_excerpt();?>
 								<p><a class="button" href="<?php the_permalink();?>">Read more</a></p>
 							</article>

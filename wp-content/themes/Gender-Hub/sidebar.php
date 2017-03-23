@@ -1,22 +1,17 @@
 <?php
 /**
- * The sidebar containing the secondary widget area
- *
- * Displays on posts and pages.
- *
- * If no active widgets are in this sidebar, hide it completely.
- *
- * @package WordPress
- * @subpackage Twenty_Thirteen
- * @since Twenty Thirteen 1.0
+ * The sidebar containing the widget area
  */
 
-if ( is_active_sidebar( 'knowledge-sidebar' ) ) : ?>
+if ( !is_active_sidebar( 'knowledge-sidebar' ) ) {
+	return;
+}
+?>
+
 	<div id="tertiary" class="sidebar-container" role="complementary">
 		<div class="sidebar-inner">
 			<div class="widget-area">
 				<?php dynamic_sidebar( 'knowledge-sidebar' ); ?>
-			</div><!-- .widget-area -->
-		</div><!-- .sidebar-inner -->
-	</div><!-- #tertiary -->
-<?php endif; ?>
+			</div>
+		</div>
+	</div>

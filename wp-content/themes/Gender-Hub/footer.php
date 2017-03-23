@@ -14,14 +14,14 @@ $delivered_by = method_exists('GH_Site_Settings', 'gh_delivered_by') ? GH_Site_S
 $social_media_links = method_exists('GH_Site_Settings', 'gh_social_media_links') ? '<h5>Connect</h5>'.GH_Site_Settings::gh_social_media_links() : NULL;
 
 ?>
-<?php if(!is_front_page()):?>
+<?php if(!is_front_page()) : ?>
 
     </div>
 
     </div>
 
     </section>
-<?php endif;?>
+<?php endif; ?>
 <footer>
 
     <div class="paddingleftright inner outer">
@@ -52,11 +52,6 @@ $social_media_links = method_exists('GH_Site_Settings', 'gh_social_media_links')
 
 </footer>
 
-
-
-<?php
-wp_footer();?>
-
 <?php
 
 if(is_front_page()) { ?>
@@ -86,46 +81,66 @@ if(is_front_page()) { ?>
 
 <script type="text/javascript">
 jQuery( "nav li a" ).not( "nav li li a" ).each(function( index ) {
-jQuery( this ).attr('href','#');
+    jQuery( this ).attr('href','#');
 });
+
 jQuery('#searchicon').click(function(){
-jQuery('#searchform	').toggleClass('active');
+    jQuery('header.site [id=searchform]').toggleClass('active');
 });
+
 jQuery('.menuicon').click(function(){
-jQuery('nav').toggleClass('active');
-jQuery('nav').toggleClass('mobnav');
+    jQuery('nav').toggleClass('active');
+    jQuery('nav').toggleClass('mobnav');
 });
 
 jQuery( "nav li a" ).not( "nav li li a" ).click(function( event ) {
-  event.preventDefault();
-  
- 
-
+    event.preventDefault();
 });
 
 
 jQuery( "#arealinks .col4" ).click(function(){
 	jQuery(this).toggleClass('active');
 });
+
 jQuery( "nav.mobnav li" ).click(function(){
 	jQuery(this).toggleClass('active');
 });
-jQuery( "header" ).hover(function(){
-jQuery( "nav li" ).removeClass('active');
-});
-jQuery( "nav li" ).not( "nav li li, nav.mobnav li" ).hover(function(){
-     jQuery(this).addClass('active');
-    }, function(){
-    
- jQuery(this).removeClass('active');
-    });
 
-       jQuery( "nav" ).not( "nav.mobnav" ).hover(function(){
-      jQuery('nav').toggleClass('active');
-    }, function(){
+jQuery( "header" ).hover(function(){
+    jQuery( "nav li" ).removeClass('active');
+});
+
+jQuery( "nav li" ).not( "nav li li, nav.mobnav li" ).hover(function(){
+    jQuery(this).addClass('active');
+}, function(){
     
- jQuery('nav').toggleClass('active');
-    });
+    jQuery(this).removeClass('active');
+});
+
+jQuery( "nav" ).not( "nav.mobnav" ).hover(function(){
+    jQuery('nav').toggleClass('active');
+}, function(){
+    
+    jQuery('nav').toggleClass('active');
+});
 </script>
+<script type="text/javascript">
+
+    jQuery( "form.searchandfilter li.sf-level-0").children('ul').before('<div class="expand-arrow"></div>');
+
+    var listparent = document.getElementsByClassName("expand-arrow");
+    var i;
+
+    for (i = 0; i < listparent.length; i++) {
+        listparent[i].onclick = function() {
+            jQuery(this).parent().toggleClass("active");
+
+        }
+    }
+</script>
+
+
+<?php
+wp_footer();?>
 </body>
 </html>
