@@ -67,7 +67,12 @@ class PMXI_Handler extends PMXI_Session {
 	 * @return array
 	 */
 	public function get_session_data() {
-		return (array) get_option( '_wpallimport_session_' . $this->_import_id . '_', array() );
+		// return (array) get_option( '_wpallimport_session_' . $this->_import_id . '_', array() );
+		global $wpdb;
+
+		$session = $wpdb->get_row( $wpdb->prepare("SELECT option_name, option_value FROM $wpdb->options WHERE option_name = %s", '_wpallimport_session_' . $this->_import_id . '_'), ARRAY_A );				
+
+		return empty($session) ? array() : unserialize($session['option_value']);
 	}
 
     /**
@@ -82,6 +87,10 @@ class PMXI_Handler extends PMXI_Session {
 
 			$session_option        = '_wpallimport_session_' . $this->_import_id . '_';
 			$session_expiry_option = '_wpallimport_session_expires_' . $this->_import_id . '_';
+
+			wp_cache_delete( 'notoptions', 'options' );
+			wp_cache_delete( $session_option, 'options' );
+			wp_cache_delete( $session_expiry_option, 'options' );
 
 	    	if ( false === get_option( $session_option ) ) {
 	    		add_option( $session_option, $this->_data, '', 'no' );
@@ -107,6 +116,13 @@ class PMXI_Handler extends PMXI_Session {
 		$this->_dirty = true;
 
 		$this->save_data();
+
+		$parser_type = get_option('wpai_parser_type_0');
+
+		if ( ! empty($parser_type) ){
+			update_option('wpai_parser_type_' . $import_id, $parser_type);
+			delete_option('wpai_parser_type_0');
+		}
     }
 
     public function clean_session( $import_id = 'new' ){
@@ -117,22 +133,28 @@ class PMXI_Handler extends PMXI_Session {
 		$expired_sessions   = array();
 		$wpallimport_session_expires = $wpdb->get_results( $wpdb->prepare("SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE %s", "_wpallimport_session_expires_" . $import_id . "_%") );			
 		
+		$expired_sessions[] = "_wpallimport_session_{$import_id}_"; // Session key
+
 		foreach ( $wpallimport_session_expires as $wpallimport_session_expire ) {
 			//if ( $now > intval( $wpallimport_session_expire->option_value ) ) {
-				$session_id         = substr( $wpallimport_session_expire->option_name, 29 );
+				//$session_id         = substr( $wpallimport_session_expire->option_name, 29 );
 				$expired_sessions[] = $wpallimport_session_expire->option_name;  // Expires key
-				$expired_sessions[] = "_wpallimport_session_$session_id"; // Session key
+				//$expired_sessions[] = "_wpallimport_session_$session_id"; // Session key
 			//}
 		}
 
 		if ( ! empty( $expired_sessions ) ) {
+			wp_cache_delete( 'notoptions', 'options' );
+			foreach ($expired_sessions as $expired) {				
+				wp_cache_delete( $expired, 'options' );		
+				delete_option($expired);
+			}
 			$expired_sessions_chunked = array_chunk( $expired_sessions, 100 );
-
-			foreach ( $expired_sessions_chunked as $chunk ) {
+			
+			foreach ( $expired_sessions_chunked as $chunk ) {								
 				$option_names = implode( "','", $chunk );
 				$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name IN ('$option_names')" );
-			}
+			}			
 		}
-
     }
 }

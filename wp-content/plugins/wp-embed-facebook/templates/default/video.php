@@ -1,13 +1,10 @@
 <?php
-/*
- * You can create your own template by placing a copy of this file on yourtheme/plugins/wp-embed-fb/
- * to access all fb data print_r($fb_data)
- *
- */
+$use_ratio = (WP_Embed_FB_Plugin::get_option('video_ratio') == 'true');
 ?>
-<div style="width: <?php echo $width ?>px">
-    <div class="wpemfb-video">
+<div class="wef-default" style="max-width: <?php echo $width ?>px">
+    <?php echo $use_ratio ? '<div class="relative-container video">' : '' ?>
     <?php
+    /** @noinspection PhpUndefinedVariableInspection */
     $url = $fb_data['source'];
     $file_array = explode('/',parse_url($url, PHP_URL_PATH));
     $file = end($file_array);
@@ -15,7 +12,7 @@
     $type = end($type_array);
     $clean_type = strtolower($type);
 
-    if( get_site_option('wpemfb_raw_video_fb') == 'false' && $clean_type == 'mp4' ) : ?>
+    if( WP_Embed_FB::is_raw('video') && $clean_type == 'mp4' ) : ?>
         <?php $end = isset($fb_data['format']) ? end($fb_data['format']) : $fb_data;  ?>
 
         <video controls poster="<?php echo $end['picture'] ?>" >
@@ -29,5 +26,5 @@
         </div>
 
     <?php endif; ?>
-</div>
+    <?php echo $use_ratio ? '</div>' : '' ?>
 </div>

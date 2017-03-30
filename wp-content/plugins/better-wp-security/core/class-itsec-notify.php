@@ -8,42 +8,28 @@
  */
 class ITSEC_Notify {
 
-	private
-		$queue;
+	public function __construct() {
 
-	function __construct() {
+		if ( ! ITSEC_Modules::get_setting( 'global', 'digest_email' ) ) {
+			return;
+		}
 
-		global $itsec_globals;
+		if ( defined( 'ITSEC_NOTIFY_USE_CRON' ) && true === ITSEC_NOTIFY_USE_CRON ) {
 
-		$this->queue = get_site_option( 'itsec_message_queue' );
+			add_action( 'itsec_digest_email', array( $this, 'init' ) ); //Action to execute during a cron run.
 
-		if ( isset( $itsec_globals['settings']['digest_email'] ) && $itsec_globals['settings']['digest_email'] === true ) {
+			//schedule digest email
+			if ( false === wp_next_scheduled( 'itsec_digest_email' ) ) {
+				wp_schedule_event( time(), 'daily', 'itsec_digest_email' );
+			}
 
-			if ( defined( 'ITSEC_NOTIFY_USE_CRON' ) && true === ITSEC_NOTIFY_USE_CRON ) {
+		} else {
+			$last_sent = ITSEC_Modules::get_setting( 'global', 'digest_last_sent' );
+			$yesterday = ITSEC_Core::get_current_time_gmt() - DAY_IN_SECONDS;
 
-				add_action( 'itsec_digest_email', array( $this, 'init' ) ); //Action to execute during a cron run.
-
-				//schedule digest email
-				if ( false === wp_next_scheduled( 'itsec_digest_email' ) ) {
-					wp_schedule_event( time(), 'daily', 'itsec_digest_email' );
-				}
-
-			} else {
-
-				//Send digest if it has been 24 hours
-				if (
-					get_site_transient( 'itsec_notification_running' ) === false && (
-						$this->queue === false ||
-						(
-							is_array( $this->queue ) &&
-							isset( $this->queue['last_sent'] ) &&
-							$this->queue['last_sent'] < ( $itsec_globals['current_time_gmt'] - 86400 )
-						)
-					)
-				) {
-					add_action( 'init', array( $this, 'init' ) );
-				}
-
+			// Send digest if it has been 24 hours
+			if ( $last_sent < $yesterday && false === get_site_transient( 'itsec_notification_running' ) ) {
+				add_action( 'init', array( $this, 'init' ) );
 			}
 
 		}
@@ -58,9 +44,6 @@ class ITSEC_Notify {
 	 * @return void
 	 */
 	public function init() {
-
-		global $itsec_globals, $itsec_lockout;
-
 		if ( is_404() || ( ( ! defined( 'ITSEC_NOTIFY_USE_CRON' ) || false === ITSEC_NOTIFY_USE_CRON ) && get_site_transient( 'itsec_notification_running' ) !== false ) ) {
 			return;
 		}
@@ -69,120 +52,119 @@ class ITSEC_Notify {
 			set_site_transient( 'itsec_notification_running', true, 3600 );
 		}
 
-		$messages     = false;
-		$has_lockouts = true; //assume a lockout has occured by default
 
-		if ( isset( $this->queue['messages'] ) && sizeof( $this->queue['messages'] ) > 0 ) {
-			$messages = $this->queue['messages'];
-		}
+		$result = $this->send_daily_digest();
 
-		$host_count = sizeof( $itsec_lockout->get_lockouts( 'host', true ) );
+		delete_site_transient( 'itsec_notification_running' );
+
+		return $result;
+	}
+
+	/**
+	 * Send the daily digest email.
+	 *
+	 * @since 2.6.0
+	 *
+	 * @return
+	 */
+	public function send_daily_digest() {
+		global $itsec_lockout;
+
+
+		$send_email = false;
+
+
+		require_once( ITSEC_Core::get_core_dir() . 'lib/class-itsec-mail.php' );
+		$mail = new ITSEC_Mail();
+		$mail->add_header( esc_html__( 'Daily Security Digest', 'better-wp-security' ), sprintf( wp_kses( __( 'Your Daily Security Digest for <b>%s</b>', 'better-wp-security' ), array( 'b' => array() ) ), date_i18n( get_option( 'date_format' ) ) ) );
+		$mail->add_info_box( sprintf( wp_kses( __( 'The following is a summary of security related activity on your site: <b>%s</b>', 'better-wp-security' ), array( 'b' => array() ) ), get_option( 'siteurl' ) ) );
+
+
+		$mail->add_section_heading( esc_html__( 'Lockouts', 'better-wp-security' ), 'lock' );
+
 		$user_count = sizeof( $itsec_lockout->get_lockouts( 'user', true ) );
+		$host_count = sizeof( $itsec_lockout->get_lockouts( 'host', true ) );
 
-		if ( $host_count == 0 && $user_count == 0 ) {
-
-			$has_lockouts    = false;
-			$lockout_message = __( 'There have been no lockouts since the last email check.', 'it-l10n-better-wp-security' );
-
-		} elseif ( $host_count === 0 && $user_count > 1 ) {
-
-			$lockout_message = sprintf(
-				'%s %s %s',
-				__( 'There have been', 'it-l10n-better-wp-security' ),
-				$user_count,
-				__( 'users or usernames locked out for attempting to log in with incorrect credentials.', 'it-l10n-better-wp-security' )
-			);
-
-		} elseif ( $host_count === 0 && $user_count == 1 ) {
-
-			$lockout_message = sprintf(
-				'%s %s %s',
-				__( 'There has been', 'it-l10n-better-wp-security' ),
-				$user_count,
-				__( 'user or username locked out for attempting to log in with incorrect credentials.', 'it-l10n-better-wp-security' )
-			);
-
-		} elseif ( $host_count == 1 && $user_count === 0 ) {
-
-			$lockout_message = sprintf(
-				'%s %s %s',
-				__( 'There has been', 'it-l10n-better-wp-security' ),
-				$host_count,
-				__( 'host locked out.', 'it-l10n-better-wp-security' )
-			);
-
-		} elseif ( $host_count > 1 && $user_count === 0 ) {
-
-			$lockout_message = sprintf(
-				'%s %s %s',
-				__( 'There have been', 'it-l10n-better-wp-security' ),
-				$host_count,
-				__( 'hosts locked out.', 'it-l10n-better-wp-security' )
-			);
-
+		if ( $host_count > 0 || $user_count > 0 ) {
+			$mail->add_lockouts_summary( $user_count, $host_count );
+			$send_email = true;
 		} else {
-
-			$lockout_message = sprintf(
-				'%s %s %s %s %s %s %s',
-				__( 'There have been', 'it-l10n-better-wp-security' ),
-				$user_count + $host_count,
-				__( 'lockout(s) including', 'it-l10n-better-wp-security' ),
-				$user_count,
-				__( 'user(s) and', 'it-l10n-better-wp-security' ),
-				$host_count,
-				__( 'host(s) locked out of your site.', 'it-l10n-better-wp-security' )
-			);
-
+			$mail->add_text( esc_html__( 'No lockouts since the last email check.', 'better-wp-security' ) );
 		}
 
-		if ( $has_lockouts !== false || $messages !== false ) {
 
-			$module_message = '';
+		$messages = ITSEC_Modules::get_setting( 'global', 'digest_messages' );
 
-			if ( is_array( $messages ) ) {
+		if ( in_array( 'file-change', $messages ) ) {
+			$mail->add_section_heading( esc_html__( 'File Changes', 'better-wp-security' ), 'folder' );
+			$mail->add_text( esc_html__( 'File changes detected on the site.', 'better-wp-security' ) );
+			$send_email = true;
 
-				foreach ( $messages as $message ) {
-
-					if ( is_string( $message ) ) {
-						$module_message .= '<p>' . $message . '</p>';
-					}
-
+			foreach ( $messages as $index => $message ) {
+				if ( 'file-change' === $message ) {
+					unset( $messages[$index] );
 				}
+			}
+		}
 
+		if ( ! empty( $messages ) ) {
+			$mail->add_section_heading( esc_html__( 'Messages', 'better-wp-security' ), 'message' );
+
+			foreach ( $messages as $message ) {
+				$mail->add_text( $message );
 			}
 
-			$body = sprintf(
-				'<p>%s,</p><p>%s <a href="%s">%s</a></p><p><strong>%s: </strong>%s</p>%s<p>%s %s</p><p>%s <a href="%s">%s</a>.</p>',
-				__( 'Dear Site Admin', 'it-l10n-better-wp-security' ),
-				__( 'The following is a summary of security related activity on your site. For details please visit', 'it-l10n-better-wp-security' ),
-				wp_login_url( get_admin_url( '', 'admin.php?page=toplevel_page_itsec_logs' ) ),
-				__( 'the security logs', 'it-l10n-better-wp-security' ),
-				__( 'Lockouts', 'it-l10n-better-wp-security' ),
-				$lockout_message,
-				$module_message,
-				__( 'This email was generated automatically by' ),
-				$itsec_globals['plugin_name'],
-				__( 'To change your email preferences please visit', 'it-l10n-better-wp-security' ),
-				wp_login_url( get_admin_url( '', 'admin.php?page=toplevel_page_itsec_settings' ) ),
-				__( 'the plugin settings', 'it-l10n-better-wp-security' )
-			);
-
-			//Setup the remainder of the email
-			$subject = '[' . get_option( 'siteurl' ) . '] ' . __( 'Daily Security Digest', 'it-l10n-better-wp-security' );
-			$subject = apply_filters( 'itsec_lockout_email_subject', $subject );
-			$headers = 'From: ' . get_bloginfo( 'name' ) . ' <' . get_option( 'admin_email' ) . '>' . "\r\n";
-
-			$this->send_mail( $subject, $body, $headers );
-
+			$send_email = true;
 		}
 
-		$this->queue = array(
-			'last_sent' => $itsec_globals['current_time_gmt'],
-			'messages'  => array(),
-		);
 
-		update_site_option( 'itsec_message_queue', $this->queue );
+		if ( ! $send_email ) {
+			return;
+		}
 
+
+		$mail->add_details_box( sprintf( wp_kses( __( 'For more details, <a href="%s"><b>visit your security logs</b></a>', 'better-wp-security' ), array( 'a' => array( 'href' => array() ), 'b' => array() ) ), ITSEC_Core::get_logs_page_url() ) );
+		$mail->add_divider();
+		$mail->add_large_text( esc_html__( 'Is your site as secure as it could be?', 'better-wp-security' ) );
+		$mail->add_text( esc_html__( 'Ensure your site is using recommended settings and features with a security check.', 'better-wp-security' ) );
+		$mail->add_button( esc_html__( 'Run a Security Check ✓', 'better-wp-security' ), ITSEC_Core::get_security_check_page_url() );
+
+		if ( defined( 'ITSEC_DEBUG' ) && true === ITSEC_DEBUG ) {
+			$mail->add_text( sprintf( esc_html__( 'Debug info (source page): %s', 'better-wp-security' ), esc_url( $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"] ) ) );
+		}
+
+		$mail->add_footer();
+
+
+		ITSEC_Modules::set_setting( 'global', 'digest_last_sent', ITSEC_Core::get_current_time_gmt() );
+		ITSEC_Modules::set_setting( 'global', 'digest_messages', array() );
+
+
+		$subject = esc_html__( 'Daily Security Digest', 'better-wp-security' );
+		$mail->set_subject( $subject );
+
+		return $mail->send();
+	}
+
+	/**
+	 * Used by the File Change Detection module to tell the notification system about found file changes.
+	 *
+	 * @since 2.6.0
+	 *
+	 * @return null
+	 */
+	public function register_file_change() {
+		// Until a better system can be devised, use the message queue to store this flag.
+
+		$messages = ITSEC_Modules::get_setting( 'global', 'digest_messages' );
+
+		if ( in_array( 'file-change', $messages ) ) {
+			return;
+		}
+
+		$messages[] = 'file-change';
+
+		ITSEC_Modules::set_setting( 'global', 'digest_messages', $messages );
 	}
 
 	/**
@@ -190,14 +172,11 @@ class ITSEC_Notify {
 	 *
 	 * @since 4.5
 	 *
-	 * @param int        $type 1 for lockout or 2 for custom message
 	 * @param null|array $body Custom message information to send
 	 *
 	 * @return bool whether the message was successfully enqueue or sent
 	 */
 	public function notify( $body = null ) {
-
-		global $itsec_globals;
 
 		$allowed_tags = array(
 			'a'      => array(
@@ -219,19 +198,21 @@ class ITSEC_Notify {
 			'h4'     => array(),
 		);
 
-		if ( isset( $itsec_globals['settings']['digest_email'] ) && $itsec_globals['settings']['digest_email'] === true ) {
+		if ( ITSEC_Modules::get_setting( 'global', 'digest_email' ) ) {
 
-			if ( ! in_array( wp_kses( $body, $allowed_tags ), $this->queue['messages'] ) ) {
+			$messages = ITSEC_Modules::get_setting( 'global', 'digest_messages' );
 
-				$this->queue['messages'][] = wp_kses( $body, $allowed_tags );
+			if ( ! in_array( wp_kses( $body, $allowed_tags ), $messages ) ) {
 
-				update_site_option( 'itsec_message_queue', $this->queue );
+				$messages[] = wp_kses( $body, $allowed_tags );
+
+				ITSEC_Modules::set_setting( 'global', 'digest_messages', $messages );
 
 			}
 
 			return true;
 
-		} elseif ( isset( $itsec_globals['settings']['email_notifications'] ) && $itsec_globals['settings']['email_notifications'] === true ) {
+		} else if ( ITSEC_Modules::get_setting( 'global', 'email_notifications', true ) ) {
 
 			$subject = trim( sanitize_text_field( $body['subject'] ) );
 			$message = wp_kses( $body['message'], $allowed_tags );
@@ -270,9 +251,7 @@ class ITSEC_Notify {
 	 */
 	private function send_mail( $subject, $message, $headers = '', $attachments = array() ) {
 
-		global $itsec_globals;
-
-		$recipients  = $itsec_globals['settings']['notification_email'];
+		$recipients  = ITSEC_Modules::get_setting( 'global', 'notification_email' );
 		$all_success = true;
 
 		add_filter( 'wp_mail_content_type', array( $this, 'wp_mail_content_type' ) );

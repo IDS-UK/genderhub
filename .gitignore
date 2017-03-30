@@ -45,3 +45,15 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+/wp-content/themes/twenty*
+/wp-content/plugins/ids*
+/wp-content/upgrade
+#/wp-content/uploads
+sitemap.*
+wp-config.php
+*.sql
+
+# Hidden files
+*.sass-cache*
+*~imageoptim*

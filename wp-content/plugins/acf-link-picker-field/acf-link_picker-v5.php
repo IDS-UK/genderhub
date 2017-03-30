@@ -43,9 +43,14 @@ class acf_field_link_picker extends acf_field {
 		*  defaults (array) Array of default settings which are merged into the field object. These are used later in settings
 		*/
 		
-		$this->defaults = array(
-			//'font_size'	=> 14,
-		);
+		// $this->defaults = array(
+		// 	'value' => array(
+		// 		'url' => '',
+		// 		'title' => '',
+		// 		'target' => '',
+		// 		'postid' => 0,
+		// 	),
+		// );
 		
 		
 		/*
@@ -120,16 +125,22 @@ class acf_field_link_picker extends acf_field {
 	*/
 	
 	function render_field( $field ) {
-		
-		
+
+		// add wysiwyg assets to page
+		// Per https://www.advancedcustomfields.com/resources/acf_form/: "This will create a 
+		// hidden WYSIWYG field and enqueue the required JS templates for the WP media popups."
+		if (function_exists('acf_enqueue_uploader')) {
+			acf_enqueue_uploader();
+		}
+
 		/*
 		*  Review the data of $field.
 		*  This will show what data is available
 		*/
 		
-		/*echo '<pre>';
-			print_r( $field );
-		echo '</pre>';*/
+		// echo '<pre>';
+		// 	print_r( $field );
+		// echo '</pre>';
 		
 		$exists = true;
         if ( !$field['value'] || $field['value'] === FALSE || (isset($field['value']['url']) && $field['value']['url'] == '') )
@@ -149,6 +160,7 @@ class acf_field_link_picker extends acf_field {
                 <input type="hidden" name="<?php echo $field['name']; ?>[url]" id="link-picker-<?php echo $field['id']; ?>-url" value="<?php echo $field['value']['url']; ?>">
                 <input type="hidden" name="<?php echo $field['name']; ?>[title]" id="link-picker-<?php echo $field['id']; ?>-title" value="<?php echo $field['value']['title']; ?>">
                 <input type="hidden" name="<?php echo $field['name']; ?>[target]" id="link-picker-<?php echo $field['id']; ?>-target" value="<?php echo $field['value']['target']; ?>">
+                <input type="hidden" name="<?php echo $field['name']; ?>[postid]" id="link-picker-<?php echo $field['id']; ?>-postid" value="<?php echo $field['value']['postid']; ?>">
                 
                 <div id="link-picker-<?php echo $field['id']; ?>-exists"<?php if (!$exists) { echo ' style="display:none;"'; } ?>>
                     <?php _e('URL', 'acf-link_picker'); ?>: 
@@ -169,16 +181,22 @@ class acf_field_link_picker extends acf_field {
                     	<em id="link-picker-<?php echo $field['id']; ?>-target-label">
                     		<?php if ($field['value']['target'] == '_blank') { _e('Yes', 'acf-link_picker'); } else { _e('No', 'acf-link_picker'); } ?>
                     	</em>
+                    	<br>
+
+                    <?php _e('Post ID', 'acf-link_picker'); ?>: 
+                    	<em id="link-picker-<?php echo $field['id']; ?>-postid-label">
+                    		<?php print $field['value']['postid']; ?>
+                    	</em>
                 </div>
                 <div id="link-picker-<?php echo $field['id']; ?>-none"<?php if ($exists) { echo ' style="display:none;"'; } ?>>
                     <em><?php _e('No link selected yet', 'acf-link_picker'); ?></em>
                 </div>
             </div>
             <p>
-                <a href="" class="link-btn acf-button grey" id="link-picker-<?php echo $field['id']; ?>">
+                <a href="" class="acf-lp-link-btn acf-button grey" id="link-picker-<?php echo $field['id']; ?>">
                 	<?php if (!$exists) { _e('Insert Link', 'acf-link_picker'); }else{ _e('Edit Link', 'acf-link_picker'); } ?>
                 </a>
-                <a href="" class="link-remove-btn acf-button grey" id="link-picker-<?php echo $field['id']; ?>-remove"<?php if (!$exists) { echo ' style="display:none;"'; } ?>>
+                <a href="" class="acf-lp-link-remove-btn acf-button grey" id="link-picker-<?php echo $field['id']; ?>-remove"<?php if (!$exists) { echo ' style="display:none;"'; } ?>>
                 	<?php _e('Remove Link', 'acf-link_picker'); ?>
                 </a>
             </p>

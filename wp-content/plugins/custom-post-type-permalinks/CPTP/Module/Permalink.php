@@ -6,17 +6,38 @@
  * CPTP_Permalink
  *
  * Override Permalinks
+ *
  * @package Custom_Post_Type_Permalinks
  * @since 0.9.4
- *
  * */
 class CPTP_Module_Permalink extends CPTP_Module {
 
 
+	/**
+	 * Add Filter Hooks.
+	 */
 	public function add_hook() {
-		add_filter( 'post_type_link', array( $this, 'post_type_link' ), 10, 4 );
-		add_filter( 'term_link', array( $this, 'term_link' ), 10, 3 );
-		add_filter( 'attachment_link', array( $this, 'attachment_link' ), 20, 2 );
+
+		add_filter(
+			'post_type_link',
+			array( $this, 'post_type_link' ),
+			apply_filters( 'cptp_post_type_link_priority', 0 ),
+			4
+		);
+
+		add_filter(
+			'term_link',
+			array( $this, 'term_link' ),
+			apply_filters( 'cptp_term_link_priority', 0 ),
+			3
+		);
+
+		add_filter(
+			'attachment_link',
+			array( $this, 'attachment_link' ),
+			apply_filters( 'cptp_attachment_link_priority', 20 ),
+			2
+		);
 	}
 
 
@@ -24,9 +45,9 @@ class CPTP_Module_Permalink extends CPTP_Module {
 	 *
 	 * Fix permalinks output.
 	 *
-	 * @param String $post_link
-	 * @param Object $post 投稿情報
-	 * @param String $leavename 記事編集画面でのみ渡される
+	 * @param String  $post_link
+	 * @param WP_Post $post
+	 * @param String  $leavename for edit.php
 	 *
 	 * @version 2.0
 	 *
@@ -44,19 +65,24 @@ class CPTP_Module_Permalink extends CPTP_Module {
 				'draft',
 				'pending',
 				'auto-draft',
-			) );
+		) );
 		if ( $draft_or_pending and ! $leavename ) {
 			return $post_link;
 		}
 
 		$post_type = $post->post_type;
-		$permalink = $wp_rewrite->get_extra_permastruct( $post_type );
 		$pt_object = get_post_type_object( $post_type );
+
+		if ( false === $pt_object->rewrite ) {
+			return $post_link;
+		}
+
+		$permalink = $wp_rewrite->get_extra_permastruct( $post_type );
 
 		$permalink = str_replace( '%post_id%', $post->ID, $permalink );
 		$permalink = str_replace( '%' . $post_type . '_slug%', $pt_object->rewrite['slug'], $permalink );
 
-		//親ページが有るとき。
+		// has parent.
 		$parentsDirs = '';
 		if ( $pt_object->hierarchical ) {
 			if ( ! $leavename ) {
@@ -74,8 +100,7 @@ class CPTP_Module_Permalink extends CPTP_Module {
 			$permalink = str_replace( '%' . $post_type . '%', $post->post_name, $permalink );
 		}
 
-		//%post_id%/attachment/%attachement_name%;
-		//画像の編集ページでのリンク
+		// %post_id%/attachment/%attachement_name%;
 		if ( isset( $_GET['post'] ) && $_GET['post'] != $post->ID ) {
 			$parent_structure = trim( CPTP_Util::get_permalink_structure( $post->post_type ), '/' );
 			$parent_dirs      = explode( '/', $parent_structure );
@@ -97,12 +122,13 @@ class CPTP_Module_Permalink extends CPTP_Module {
 		$search      = $search + $replace_tag['search'];
 		$replace     = $replace + $replace_tag['replace'];
 
-		//from get_permalink.
+		// from get_permalink.
 		$category = '';
 		if ( false !== strpos( $permalink, '%category%' ) ) {
 			$categories = get_the_category( $post->ID );
 			if ( $categories ) {
-				usort( $categories, '_usort_terms_by_ID' ); // order by ID
+				$categories = CPTP_Util::sort_terms( $categories );
+
 				$category_object = apply_filters( 'post_link_category', $categories[0], $categories, $post );
 				$category_object = get_term( $category_object, 'category' );
 				$category        = $category_object->slug;
@@ -149,8 +175,7 @@ class CPTP_Module_Permalink extends CPTP_Module {
 			$permalink
 		);
 		$permalink = str_replace( $search, $replace, $permalink );
-		$permalink = rtrim( home_url(), '/' ) . '/' . ltrim( $permalink, '/' );
-
+		$permalink = home_url( $permalink );
 		return $permalink;
 	}
 
@@ -159,7 +184,7 @@ class CPTP_Module_Permalink extends CPTP_Module {
 	 *
 	 * create %tax% -> term
 	 *
-	 * @param int $post_id
+	 * @param int    $post_id
 	 * @param string $permalink
 	 *
 	 * @return array
@@ -170,16 +195,15 @@ class CPTP_Module_Permalink extends CPTP_Module {
 
 		$taxonomies = CPTP_Util::get_taxonomies( true );
 
-		//%taxnomomy% -> parent/child
-		//運用でケアすべきかも。
-
+		// %taxnomomy% -> parent/child
+		// 運用でケアすべきかも。
 		foreach ( $taxonomies as $taxonomy => $objects ) {
 
 			if ( false !== strpos( $permalink, '%' . $taxonomy . '%' ) ) {
-				$terms = wp_get_post_terms( $post_id, $taxonomy, array( 'orderby' => 'term_id' ) );
+				$terms = get_the_terms( $post_id, $taxonomy );
 
 				if ( $terms and ! is_wp_error( $terms ) ) {
-					$parents  = array_map( array( __CLASS__, 'get_term_parent' ), $terms ); //親の一覧
+					$parents  = array_map( array( __CLASS__, 'get_term_parent' ), $terms ); // 親の一覧
 					$newTerms = array();
 					foreach ( $terms as $key => $term ) {
 						if ( ! in_array( $term->term_id, $parents ) ) {
@@ -187,12 +211,12 @@ class CPTP_Module_Permalink extends CPTP_Module {
 						}
 					}
 
-					//このブロックだけで良いはず。
-					$term_obj  = reset( $newTerms ); //最初のOBjectのみを対象。
+					// このブロックだけで良いはず。
+					$term_obj  = reset( $newTerms ); // 最初のOBjectのみを対象。
 					$term_slug = $term_obj->slug;
 
 					if ( isset( $term_obj->parent ) and 0 != $term_obj->parent ) {
-						$term_slug = CPTP_Util::get_taxonomy_parents( $term_obj->parent, $taxonomy, false, '/', true ) . $term_slug;
+						$term_slug = CPTP_Util::get_taxonomy_parents_slug( $term_obj->parent, $taxonomy, '/', true ) . $term_slug;
 					}
 				}
 
@@ -206,6 +230,14 @@ class CPTP_Module_Permalink extends CPTP_Module {
 		return array( 'search' => $search, 'replace' => $replace );
 	}
 
+	/**
+	 *
+	 * get parent from term Object
+	 *
+	 * @param WP_Term|stdClass $term
+	 *
+	 * @return mixed
+	 */
 	private static function get_term_parent( $term ) {
 		if ( isset( $term->parent ) and $term->parent > 0 ) {
 			return $term->parent;
@@ -221,12 +253,12 @@ class CPTP_Module_Permalink extends CPTP_Module {
 	 * @since 0.8.2
 	 *
 	 * @param string $link
-	 * @param int $postID
+	 * @param int    $post_id
 	 *
 	 * @return string
 	 */
 
-	public function attachment_link( $link, $postID ) {
+	public function attachment_link( $link, $post_id ) {
 		/** @var WP_Rewrite $wp_rewrite */
 		global $wp_rewrite;
 
@@ -234,11 +266,22 @@ class CPTP_Module_Permalink extends CPTP_Module {
 			return $link;
 		}
 
-		$post = get_post( $postID );
+		$post = get_post( $post_id );
 		if ( ! $post->post_parent ) {
 			return $link;
 		}
+
 		$post_parent = get_post( $post->post_parent );
+		if ( ! $post_parent ) {
+			return $link;
+		}
+
+		$pt_object = get_post_type_object( $post_parent->post_type );
+
+		if ( false === $pt_object->rewrite ) {
+			return $link;
+		}
+
 		$permalink   = CPTP_Util::get_permalink_structure( $post_parent->post_type );
 		$post_type   = get_post_type_object( $post_parent->post_type );
 
@@ -254,6 +297,7 @@ class CPTP_Module_Permalink extends CPTP_Module {
 	/**
 	 *
 	 * Fix taxonomy link outputs.
+	 *
 	 * @since 0.6
 	 * @version 1.0
 	 *
@@ -271,7 +315,7 @@ class CPTP_Module_Permalink extends CPTP_Module {
 			return $termlink;
 		}
 
-		if ( get_option( 'no_taxonomy_structure' ) ) {
+		if ( CPTP_Util::get_no_taxonomy_structure() ) {
 			return $termlink;
 		}
 
@@ -291,23 +335,31 @@ class CPTP_Module_Permalink extends CPTP_Module {
 		} else {
 			$post_type = $taxonomy->object_type[0];
 		}
+
+		$front         = substr( $wp_rewrite->front, 1 );
+		$termlink      = str_replace( $front, '', $termlink );// remove front.
+
 		$post_type_obj = get_post_type_object( $post_type );
+
+		if ( empty( $post_type_obj ) ) {
+			return $termlink;
+		}
+
 		$slug          = $post_type_obj->rewrite['slug'];
 		$with_front    = $post_type_obj->rewrite['with_front'];
-		$front         = substr( $wp_rewrite->front, 1 );
-		$termlink      = str_replace( $front, '', $termlink );
 
 		if ( $with_front ) {
 			$slug = $front . $slug;
 		}
 
-		$termlink = str_replace( $wp_home, $wp_home . '/' . $slug, $termlink );
+		if ( ! empty( $slug ) ) {
+			$termlink = str_replace( $wp_home, $wp_home . '/' . $slug, $termlink );
+		}
 
 		if ( ! $taxonomy->rewrite['hierarchical'] ) {
-			$termlink = str_replace( $term->slug . '/', CPTP_Util::get_taxonomy_parents( $term->term_id, $taxonomy->name, false, '/', true ), $termlink );
+			$termlink = str_replace( $term->slug . '/', CPTP_Util::get_taxonomy_parents_slug( $term->term_id, $taxonomy->name, '/', true ), $termlink );
 		}
 
 		return $termlink;
 	}
-
 }

@@ -1,8 +1,8 @@
 === Import any XML or CSV File to WordPress ===
 Contributors: soflyy, wpallimport 
-Requires at least: 3.6.1
-Tested up to: 4.1
-Stable tag: 3.2.7
+Requires at least: 4.1
+Tested up to: 4.7.2
+Stable tag: 3.4.2
 Tags: wordpress csv import, wordpress xml import, xml, csv, datafeed, import, migrate, import csv to wordpress, import xml to wordpress, advanced xml import, advanced csv import, bulk csv import, bulk xml import, bulk data import, xml to custom post type, csv to custom post type, woocommerce csv import, woocommerce xml import, csv import, import csv, xml import, import xml, csv importer
 
 WP All Import is an extremely powerful importer that makes it easy to import any XML or CSV file to WordPress.
@@ -21,6 +21,8 @@ There are no special requirements that the elements in your file must be laid ou
 WP All Import can be used for everything from migrating content from a legacy CMS to WordPress to building a store with an affiliate datafeed to displaying live stock quotes or sports scores to building a real estate portal.
 
 Check out our [documentation and video tutorials](http://www.wpallimport.com/documentation/?utm_source=free-plugin&utm_medium=dot-org&utm_campaign=docs) to make the most of WP All Import.
+
+WP All Import integrates with our companion plugin, [WP All Export](https://wordpress.org/plugins/wp-all-export/). You can export posts, WooCommerce products, orders, users, or anything else with WP All Export. Then you can edit in Excel and re-import to the same site or migrate the data to another site with WP All Import.
 
 For technical support from the developers, please consider purchasing WP All Import Pro.
 
@@ -41,7 +43,7 @@ For technical support from the developers, please consider purchasing WP All Imp
 
 * Guaranteed technical support via e-mail.
 
-[Upgrade to the professional edition of WP All Import.](http://www.wpallimport.com/documentation/?utm_source=free-plugin&utm_medium=dot-org&utm_campaign=upgrade)
+[Upgrade to the Pro edition of WP All Import.](http://www.wpallimport.com/upgrade-to-pro/?utm_source=free-plugin&utm_medium=dot-org&utm_campaign=upgrade)
 
 Need to [import XML and CSV to WooCommerce?](http://wordpress.org/plugins/woocommerce-xml-csv-product-import/) Check out our WooCommerce add-on.
 
@@ -71,7 +73,7 @@ Learn more about our add-ons at [http://www.wpallimport.com/add-ons](http://www.
 A [developer API](http://www.wpallimport.com/documentation/developers/action-reference/?utm_source=free-plugin&utm_medium=dot-org&utm_campaign=documentation) (action hooks) is also available.
 
 == Premium Support ==
-Upgrade to the professional edition of WP All Import for premium support.
+Upgrade to the Pro edition of WP All Import for premium support.
 
 E-mail: support@wpallimport.com
 
@@ -102,6 +104,112 @@ Does it work with special character encoding like Hebrew, Arabic, Chinese, etc?
 4. Manage imports.
 
 == Changelog ==
+
+= 3.4.2 =
+* bug fix: conflict with the event calendar plugin
+* bug fix: import images for newly created products
+
+= 3.4.1 =
+* improvement: Stop parsing data which is not going to be updated
+* improvement: added new filter wp_all_import_phpexcel_object to modify excel data before import
+* bug fix: search for images ending with underscores in media
+* bug fix: import hierarchical posts/pages
+* bug fix: import cpt page templates
+
+= 3.4.0 =
+* improvement: compatibility with PHP 7.x
+
+= 3.3.9 =
+* improvement: new re-import option 'is update post type'
+* bug fix: hierarchy taxonomies preview
+* bug fix: empty logs folder generation
+* bug fix: 'Keep images currently in Media Library' option for add-ons
+* bug fix: import bundles with gz files
+* bug fix: custom functions for attachments
+
+= 3.3.8 =
+* improvement: 'Force Stream Reader' setting
+* improvement: new filter 'wp_all_import_auto_create_csv_headers'
+* improvement: new filter 'wp_all_import_is_base64_images_allowed'
+* improvement: new filter 'wp_all_import_set_post_terms' to leave a specific category alone when a post is being updated
+* bug fix: nodes navigation for xpath like /news/item
+* bug fix: frozen import template screen for cyrillic XML feeds
+* bug fix: conflict between taxonomies & user import
+* bug fix: creating users with the same email
+* bug fix: enable keep line breaks option by default
+* bug fix: composer namespace conflict
+* bug fix: images preview when wp is in subdirectory
+* bug fix: 'Instead of deletion, set Custom Field' option for users import
+
+= 3.3.7 =
+* added new option 'Use StreamReader instead of XMLReader to parse import file' to fix issue with libxml 2.9.3
+* execute 'pmxi_article_data' filter for all posts ( new & existing )
+
+= 3.3.6 =
+* added de_CH translation
+* added support for .svg images
+* added possibility for import excerpts for pages
+* added new filter 'wp_all_import_specified_records'
+* added new filter 'wp_all_import_is_post_to_delete'
+* disable XMLReader stream filter for HHVM
+* improve search for existing images in media gallery
+
+= 3.3.5 =
+* fixed 'Use images currently in Media Library' option
+
+= 3.3.4 =
+* fixed error messages on step 1 in case when server throws fatal error e.q. time limit exception
+* fixed option "Delete posts that are no longer present in your file", now it works with empty CSV files which has only one header row
+* fixed custom php functions in images preview
+* fixed detecting root nodes with colons in names
+* added es_ES translation
+* added de_DE translation
+* added iterative ajax delete process ( deleting associated posts )
+* added feature to download template/bundle from import settings
+* added new option for importing images "Use images currently in Media Library"
+* added new action 'pmxi_missing_post'
+
+= 3.3.3 =
+* fixed duplicate matching by custom field
+* fixed converting image filenames to lowercase
+* fixed import html to image description
+* fixed import _wp_old_slug
+* added Post ID to manual record matching
+* added 'Comment status' to 'Choose data to update' section
+
+= 3.3.2 =
+* fixed fatal error on saving settings
+
+= 3.3.1 =
+* fixed parsing CSV with empty lines
+* fixed parsing multiple IF statements
+* fixed preview in case when ‘Disable the visual editor when writing’ is enabled
+* fixed conflict with WooCommerce - Store Exporter Deluxe
+* added notifications for required addons
+* added support for wp all export bundle
+* added support for manual import bundle
+* added feature 'click to download import file'
+* added validation for excerpt and images sections
+* added auto-detect a broken Unique ID notification
+* added import template notifications
+* removed support for importing WooCommerce Orders
+* changed absolute paths to relative in db
+
+= 3.3.0 =
+* added new options to taxonomies import 'Try to match terms to existing child Product Categories' & 'Only assign Products to the imported Product Category, not the entire hierarchy'
+* added support for Excel files ( .xls, .xlsx ) 
+
+= 3.2.9 =
+* load ini_set only on plugin pages
+* fixed saving import template
+
+= 3.2.8 =
+* fixed Apply mapping rules before splitting via separator symbol for manual hierarchy
+* fixed path equal or less than
+* fixed changing unique key when moving back from confirm screen
+* fixed override page template
+* updated wp_all_import_is_post_to_update filter with second argument XML node as array
+* added a second argument to pmxi_saved_post action ( SimpleXML object ) of current record
 
 = 3.2.7 =
 * fixed enum fields mapping rules feature

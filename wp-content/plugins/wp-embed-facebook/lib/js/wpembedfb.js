@@ -1,16 +1,5 @@
-jQuery(document).ready(function() {
-	resize_cover();
-  	var v_width = jQuery(".wpemfb-container").outerWidth();
-	jQuery(".fb-post").attr("data-width",v_width+"px");   	
+jQuery(document).ready(function () {
+    jQuery(".wef-measure").each(function () {
+        jQuery(this).next().attr("data-width", jQuery(this).outerWidth() + "px")
+    })
 });
-jQuery(window).resize(function(){
-	resize_cover();	
-});
-function resize_cover(){
-    var cover = jQuery(".wpemfb-cover");
-	var v_width = cover.width();
-  	var v_height = 0.368 * v_width;
-    cover.css("height",v_height );
-  	//console.log(v_height);
-  	//console.log(jQuery(".wpemfb-cover").height());
-}

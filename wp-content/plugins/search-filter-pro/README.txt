@@ -1,10 +1,10 @@
 === Search & Filter Pro ===
 Contributors: DesignsAndCode
-Donate link: 
+Donate link:
 Tags: posts, custom posts, products, category, filter, taxonomy, post meta, custom fields, search, wordpress, post type, post date, author
 Requires at least: 3.5
-Tested up to: 3.9.1
-Stable tag: 1.2.4
+Tested up to: 4.7
+Stable tag: 2.3.3
 
 Search and Filtering for posts, products and custom posts. Allow your users to Search & Filter by taxonomies, custom fields and more.
 
@@ -56,6 +56,308 @@ Great for searching in your online shop, tested with: WooCommerce and WP eCommer
 
 
 == Changelog ==
+
+= 2.3.3 =
+* New - added action `search_filter_api_header`, to allow for modification of the headers that are sent with our ajax requests
+* New - added offset for activation of infinite scroll in the display results tab
+* New - added new shortcode action `filter_next_query` - this will apply filtering to the next `WP_Query` found
+* Fix - an issue with infinite scroll activating multiple times, if you have multiple instances of a search form on a page
+* Fix - speed issues with WPML when using media library grid view (and S&F is set to search media)
+* Fix - incorrect type cast of a settings variable causing settings not to be loaded correctly in some circumstances
+
+= 2.3.2 =
+* Fix - PHP warnings & errors when using WooCommerce & Taxonomy Archive display mode
+* Fix - Some issues with the correct fields appearing in the "display results" tab
+
+= 2.3.1 =
+* New - Plugin data (such as saved search forms & cache) will no longer be deleted when uninstalling - to remove all data use the new option in the settings page
+* New - Search & Filter can now be used to filter your taxonomy archives - currently only works with "Post Type Archive" and "WooCommerce" display methods
+* Fix - WPML issue was re-introduced in 2.3.0
+* Fix - A Polylang issue when using the shortcode display method & ajax
+* Fix - `sf-option-active` class was not updating when using ajax, with autocount off (as the form no longer gets refreshed)
+* Fix - issue with "include children in parents" for taxonomy fields
+* Fix - an issue with `?sf_data` being appended to pagination in ajax requests
+* Fix - issue with Visual Composer plugin only working after first interaction (ajax)
+* Fix - an issue with infinite scroll triggering on incorrect pages
+* Fix - an issue where the `sf_results_url` filter was not being applied to pagination
+* Fix - an issue with Archive display method & polylang
+* Compatibility - store the results URL in its own custom field for better compatibility with migration tools which search/replace urls. *Notice*, you will need to edit and hit "save" in your search forms before migrating your sites (so the url can be copied in to the correct custom field)
+
+= 2.3.0 =
+* New - Added support for visual composer post grids (free addon plugin required) - create results layouts using visual composer!
+* New - Infinite scroll for all display methods - how to setup - https://www.designsandcode.com/documentation/search-filter-pro/search-results/infinite-scroll/
+* New - Added support for ACF relationship fields
+* New - added `none` sort order option for choice meta fields, allowing preservation of the order of options (if set from external plugins)
+* New - added option to specify decimal seperator for number range fields
+* Update - Select2 JS library to 4.0.3
+* Update - Chosen JS library to 1.6.2
+* Update - noUiSlider JS library to 8.5.1
+* Performance - improvements when generating forms with many options
+* Performance - do not reload the S&F form (ajax) if auto count is not enabled - speed improvement
+* Performance - store search related data in transients so that search forms are rendered quickly when used outside of Results Pages (enable via settings page)
+* Performance - improved cache building speeds
+* Fix - combobox issues on touch devices
+* Fix - thousands seperator was not displaying for certain input types
+* Fix - some issues with Polylang plugin after Polylang updates
+* Fix - issues with the post type field not being set
+* Fix - IDs for input fields are now generated randomly based on current timestamp - using the same search form multiple times on a page caused errors with labels & IDs (clicking a label in one form would update the other instance)
+* Fix - an issue when using `update_post_cache` filter on already deleted posts
+* Fix - PHP notices when using Woocommerce with a static homepage
+* Fix - variatons not working correctly in woocommerce, S&F was returning matches for attribute combinations (of variations) which did not exist, but did exist within a particular product
+* Fix - potential infinite loop when results contain results shortcodes :/
+* Fix - "Only use Ajax on the results page" was not working correctly on post type archives when the taxonomy archives were based of the post type archive URL
+* Fix - S&F pagination was taking over taxonomy archive pagination when the display method was set to `post type archive` and the taxonomy archives path had the post type as base rewrite
+* Fix - `hide empty` and `show count` options no longer have any effect when auto count is disabled.
+* Fix - default sorting by numeric meta keys was not working when they were decimals / floating point numbers.. all numeric sorting is now converted to decimal sorting to 4 decimal places which also works for standard numeric sorting
+* Fix - an issue where numerical ranges using the "overlap" comparison were not returning  the correct results
+* Fix - an issue where numerical ranges were not auto detecing the max value correctly, when using different start/end meta keys
+* Fix - issues with WPML & PolyLang
+* Fix - some issues with Ajax when using ajax in certain display modes
+* Fix - issues when search forms are within the results area, and replaced with an ajax request
+* Removed - help tab on admin screens as it was unused
+
+= 2.2.0 =
+* New - field - posts per page
+* New - added system status screen
+* New - Added Select2 JS as an alternative to Chosen for comboboxes - seems to have better mobile support - change this in main S&F settings screen
+* New - added support for custom post stati (statuses)
+* New - use slugs instead of IDs in shortcodes (check the shortcodes metabox)
+* Improved - allow post meta keys and values to contain spaces & special characters
+* Improved - updated Chosen JS to - v1.5.2
+* Improved - reset button - choose if the reset button submits the form after resetting it
+* Improved - new admin notices for settings that can potentially cause errors
+* Improved - admin UI tweaks
+* Improved - added `stop()` to scrolling animations before starting to scroll the page
+* Fix - issues with PHP 7
+* Fix - properly escape some input fields
+* Fix - S&F incorrectly warning network activated plugins are not enabled
+* Fix - refocus input fields after the form has been auto submitted
+* Fix - an error with the range slider and decimals
+* Fix - JS event "sf:ajaxfinish" now fired after all S&F process have completed (such as updating the search form)
+* Fix - various pagination issues
+* Fix - an issue with pagination and the new `custom` display method
+* Fix - renamed a global function to prevent conflicts
+* Fix - Display problems when using WooCommerce shop on the homepage with S&F
+* Fix - Issues with the woocommerce orderby dropdown
+* Fix - an issue with the action `search_filter_query_posts` not working correctly
+* Fix - a bug sometimes causing tag and category fields to be detected as undefined causing search issues
+* Fix - issues with detecting when attachments were updated and rebuilding the cache
+* Fix - pressing enter in the search box reset the timer for autosubmit
+* Fix - added EDD prep_query shortcode to shortcodes box
+* Fix - fix some compatibility issues with WPML where WPML was converting taxonomy term IDs into the current language rather than post language
+* Fix - use global function `get_queried_object` rather than `$wp_query->queried_object` for consistency
+* Fix - issues with the author field and detecting defaults
+* Notice - WP 4.6 tested & compatible + PHP 7
+
+= 2.1.2 =
+* New - Sort order can be displayed as radio buttons
+* New - filters for all URLs used in S&F - this allows for dynamically changing the various URLs for example to force https or similar - http://www.designsandcode.com/documentation/search-filter-pro/action-filter-reference/
+* Fix - an issue with `include_children` and allowing the AND operator to be used
+* Fix - an issue with hierarchical lists not being display correctly
+
+= 2.1.1 =
+* New - added `data-sf-count` attributes to inputs which have count variables
+* Improvement - default cache speed is set to slow
+* Fix - an issue with pagination filters
+* Fix - issues with PolyLang - should now be working again with PolyLang v1.7.12
+* Fix - minify issues with CSS & JS files
+* Fix - issues with depth in hierarchical fields
+* Fix - an issue where S&F was hijacking pagination when it wasn't supposed to
+* Fix - a couple of minor issues with the author field
+* Fix - S&F `sf:init` was incorrectly firing after each ajax request, it is now fired only on page load & once initialised
+* Fix - An issue where post date fields were not being set correctly in the front end
+* Fix - a PHP/pass by reference overload issue
+* Fix - an issue with `number_format` & PHP warnings in admin
+* Fix - an issue with undefined taxonomy slugs in the S&F cache
+* Fix - an issue with `wp_json_encode`
+
+= 2.1.0 =
+* Notice - depth classes for hierarchical fields fields have renamed to avoid conflicts - from `.level-0` to `.sf-level-0`
+* Notice - properly prefix range & min / max classes = from `.range-min`, `.range-max` and `.meta-range`  to `.sf-range-min`, `.sf-range-max` and `.sf-meta-range`
+* New - sync meta fields - when using "number" or "choice" type meta fields, the values can now be auto detected - values can also be sorted
+* New - sync ACF fields - use above in choice fields with auto detection - S&F can now retreive built in ACF labels for values too
+* New - added support for ordering by multiple fields (the default posts order)
+* New - added support for ordering posts by Post Type
+* New - lots of improvements to post meta fields (number) more UI options and input types
+* New - added support for decimals and number formatting in post meta (number) fields
+* New - new compare options for date range and number fields - great for date ranges and bookings/promotional systems
+* New - added sort by relevance option for Relevanssi under the Advanced tab
+* New - added options to control the display of sticky posts (under the Posts tab)
+* New - Settings page
+* New - Settings - control caching speed & background processes
+* New - Settings - added settings to lazyload JS and an option to load jQuery language files for the datepicker
+* New - accessibility - WCAG 2.0 compliant - some html restructuring (mostly adding in labels) and added screen reader text option to all text/number input fields and selects
+* New - filter - allows users to filter any field in the search form and most of the options
+* New - added counts to the active query class
+* Improvement - authors now use slugs instead of IDs in the URL
+* Improvement - updated Chosen & noUiSlider to their latest versions
+* Improvement - show internal taxonomy names as well as labels throughout admin UI
+* Improvement - support for WooCommerce shop when it is set to category display
+* Improvement - speed updates/optimisations to the cache and auto count
+* Improvement - better admin notices & warnings
+* Fix - issues with WPML and loading the correct taxonomies etc
+* Fix - issues with caching and the attachment post type
+* Fix - an issue where getting counts for taxonomies was occuring twice
+* Fix - URL Encoding issue with meta fields
+* Fix - an issue when using multiple search forms on a single page & pagination not working correctly
+* Fix - removed an error message which was showing whenever the cache was restarting - it was unnecessary
+* Fix - whitespace being trimmed from textareas in certain field types
+* Fix - some pagination issues when using post type archive
+* Fix - do not enable auto count by default
+* Fix - Post Type archive display method now properly uses the Posts Page (as defined under `settings` -> `reading`) where applicable when the post type is set to `post`
+* Fix - a bug where html entities were matched when searching in chosen comboboxes such as `nbsp`
+* Fix - an admin bug where selecting Post Type Archive as the results method would show the wrong options after saving
+* Fix - a few admin UI bugs
+* Fix - a bug with the ajax start/end events
+* WP 4.4 compat - tested with 2016 theme
+
+= 2.0.3 =
+* New - update search form (auto count) without submitting the form
+* New - added variable `search_filter_id` to all queries to easily identify which S&F form your queries are being modified by - use `$query['search_filter_id'];`
+* New - added RTL support for all JS plugins - chosen comboxbox, jQuery datepicker and noUiSlider
+* New - added action to trigger the rebuild of the cache for a specific post (`do_action('search_filter_update_post_cache', 1984);` where 1984 is the post ID)
+* Fix - issue with Firefox "rembering" disabled state on soft refresh - now a soft page refresh in FF also forces all inputs to be enabled to overcome this issue
+* Fix - issue with comboboxes finding child terms (hierarchical enabled)
+* Fix - issue with URI encoding in search field
+* Fix - issues with multiple results shortcodes when meta data defaults are set
+* Fix - issues with WP Types plugin and nested post meta values
+* Fix - caching issues with post meta when there are multiple values
+* Fix - issue with search term & stripslashes
+* Fix - compatibility issue with Relevanssi
+* Fix - correctly show count numbers when "detect defaults from current page" is selected
+* Fix - re-implement `save_post` filter outside of `is_admin` for rebuilding the cache from the front end
+
+= 2.0.2 =
+* New - use S&F with even more templates (Archive Mode) by adding a shortcode/action before your loop
+* Fix - set priority of Ajax (with results shortcode) search to `200` on `init` hook - it was being fired sometimes before taxonomies had been declared
+* Fix - `array_merge` errors when using hierarchical taxonomies and including children in parents
+* Fix - JS errors with multiple search forms on the same page at the same time
+* Fix - JS error error in Firefox where refreshing the page sometimes caused a disabled state on the search form
+* Fix - an issue in Avada + woocommerce, when setting up the query, and only using 1 post type S&F now passes a string instead of an array
+* Fix - a PHP error and delimiters in the Active Query class
+* Fix - an issue with maintain search form state passing `page_id` when permalinks are disabled
+* Fix - undefined variable notice in author walker
+* Fix - undefined variable notice in edit search form screen
+
+= 2.0.1 =
+* NOTICE - DO NOT UPDATE UNTIL YOU HAVE READ THE RELEASE NOTES: http://www.designsandcode.com/documentation/search-filter-pro/2-0-upgrade-notes/
+* Version bump so all beta testers get the latest update via the dashboard
+
+= 2.0 =
+* New - caching of results for fast speeds even on large databases
+* New - direct support for the WooCommerce shop page
+* New - direct support for WooCommerce product variations
+* New - integration with Easy Digital Downloads (EDD) shortcodes - just add the S&F prep_query shortcode directly before the EDD shortcode ie - `[searchandfilter id="14" action="prep_query"]`
+* New - use post type archives to display your results (single post type only)
+* New - huge speed and accuracy improvements for meta queries - no more `%like%` queries for serialised meta
+* New - auto count - dynamically display counts next to field options based on the current search & settings
+* New - auto count - drill down fields - hide options which yield no results
+* New - allow for multiple meta keys to be queried when doing ranges
+* New - prepolutate search form based on current archive - works for post types, tags, categories, taxonomies and authors
+* New - datepicker - supports jQuery UI i18n, dropdown for years & months option, placeholder text customisation
+* New - methods for accessing what has been searched
+* Improvement - moved all Ajax logic to front end for better compatibility with other plugins (esp shortcode based)
+* Improvement - huge amount of refactoring - some parts completely rewritten and optimized, JS rewrite
+* Improvement - show which meta keys are selected in widget title
+* Improvement - change labels on checkbox and radio fields - don't wrap the inputs inside the labels
+* Fix - some problems with pagination links sometimes pointing to the ajax URL
+* Fix - Fix an issue with `include_children` now working
+* New - relationships can now be defined across taxonomy and meta fields
+* Fix - Issues with pagination
+* fix - removed references to CSS images that were not being used
+* Fix - localised some sloppy CSS rules for compatibility
+* Fix - some issues with currencies and decimals when using number ranges
+* Fix - an issue with exclude post IDs not working correctly
+* Fix - UTF characters in taxonomy term names
+* Fix - `orderby` getting added to the URL on non WooCommerce search forms
+* Fix - IE8 JS error - Object.keys() compatibility
+* Fix - IE10 JS error / reload error - the `input` event was triggering when it was not supposed to causing an ajax request to be performed
+* Fix - Admin - function definition in wrong scope causing errors in strict mode on some browsers
+* Removed - .postform classes that have crept back into build - but added classes and IDs on every input element
+* Removed - the global $sf_form_data - changed to $searchandfilter
+* Notice - you should no longer use `pre_get_posts` to modify queries, there is a new filter which takes an array of arguments `sf_edit_query_args` which must be used to also update count number and other non main queries
+* In progress - support for PolyLang - testing so far seems good
+
+= 1.4.3.1 =
+* Fix - add serialised tick box to post meta fields
+* Fix - added a "data is serialised" checkbox to meta fields
+* Dropped - built in pagination functions - `sf_pagination_numbers` and `sf_pagination_prev_next` are now redundant
+
+= 1.4.1 =
+* New - Added IDs to search forms for easy css targeting - also renamed ID on results container to keep in line with naming conventions
+* New - added reset button
+* New - dropdown number range
+* New - added options to use timestamps in post meta
+* fix - a bug when sanitizing keys from post meta
+* fix - a bug with autosuggest & encoding
+* fix - issues with searching serialised post meta
+* fix - throwing an error when trying to access the `all_items` label of a taxonomy when it does not exist
+* fix - some dependencies with JS/CSS allowing them to be removed more easily
+* fix - some tweaks to automatic updates
+* fix - layout issues with search form UI and WP 4.1
+* fix - various fixes and improvements with compatibility and WPML
+
+= 1.4.0 =
+* New - search media/attachments
+* New - added post meta defaults - now you can add constraints for meta data such as searching only products in stock, excluding featured posts or restricting all searches to specific meta data values
+* New - scroll to top of page when updating results with ajax
+* New - use the shortcode to display results without ajax too (results shortcode only worked with ajax setups previously)
+* New - allow regular pagination when using a shortcode for results - (use wp next_posts_link & previous_posts_link, plus added support for wp_pagenavi plugin)
+* New - added AND / OR operator to define relationships between tag, category and taxonomy fields
+* New - optionally include children in parent searches (categories, hierarchical taxonomies)
+* New - improvded UI - add taxonomy browser to help find IDs easily
+* New - improved ajax/template UI
+* New - minify CSS & JS - finally integrated grunt ;) - non minified versions still available
+* New - duplicate search form - a link has been added to the main S&F admin screen underneath each form for easy duplicating!
+* New - added support for Relevanssi when using shortcodes to display results
+* New - add "today" for date comparisons in meta queries in post meta defaults
+* Updated - the default results template (shortcode) to include new pagination options
+* Fixed - an error when users are not using permalinks, and submitting the search form
+* Fixed - "OR" operator for checkboxes with taxonomies was broken
+* Fixed - a JS error when no terms were being shown for a checkbox/radio field
+* Fixed - an error when using `maintain state` and getting 404 on results
+* Fixed - an error when detecting if a meta field was serialised or not
+* Fixed - an error when saving a post meta field with a poorly formatted name
+* Fixed - ajax pagination without shortcode
+* Fixed - meta fields with the value `0` being ignored
+* Fixed - some updates to the plugin auto updater - some users weren't seeing udpates in the dashboard even when activated
+
+= 1.3.0 =
+* New - JavaScript rewrite - refactored - faster cleaner code
+* New - add setting to allow the default sort order of results - check settings panel -> posts
+* New - Speed improvements - searching usually caused 2 header requests (a POST and a redirect) - now uses only a single GET request
+* New - play nice with other scripts - can now initialise the search form via JS if the form/html is loaded in dynamically
+* New - mulitple search forms on the same page!
+* New - add data to JS events for targeting individual forms on the same page
+* New - maintain search state - keep user search settings while looking at results pages
+* New - for Ajax w/ Shortcodes - Added results URL - this allows the widget to be placed anywhere in your site
+* New - shortcode meta box - for easier access to shortcodes within the Search Form editor
+* New - allow auto submit when ajax is not enabled
+* New - shareable/bookmarkable URLs when using shortcodes (this was already available without)
+* Fixed - an issue with auto submit
+* Fixed - an issue with a significant delay to fetch initial results when using ajax (with shortcode) - initial results are now loaded server side on page load
+* Fixed - bad html and "hide_empty" was not working as expected - it was disabling inputs rather than hiding them
+* Fixed - i18n for "prev" and "next" in pagination
+* Fixed - post date field was not working correctly when using ajax w/ shortcodes
+* Improved - integration with WPML - better URLs and works fully with shortcodes
+* Removed - *Beta* Auto Count - this feature is likely to be even more broken (it had plenty of bugs already) - it is recommended you disable this for now.  The next major update will inlcude a revised & working version of this.
+
+= 1.2.7 =
+* Fixed an issue with array_replace_recursive for older PHP version
+
+= 1.2.6 =
+* Fixed an issue with headers in admin when publishing a post
+
+= 1.2.5 =
+* Fixed a JS error in IE8
+* Added new settings panel - set defaults search parameters
+* Settings Panel - include/exclude categories
+* Settings Panel - exclude posts by ID
+* Settings Panel - choose to search by Post Status
+* Settings Panel - Added Results Per Page for controlling the number of results you see
+* Settings Panel - UI refinements
+* Settings Panel - more to come (meta)!
+* Category, Tag & Taxonomy fields - new option (advanced) to sync included/excluded posts with new settings parameters
 
 = 1.2.4 =
 * DO NOT UPGRADE IF YOU WERE HAVING ISSUES WITH AJAX FUNCTIONALITY AND WAITING FOR A PATCH, ONLY THE TWO UPDATES BELOW ARE INCLUDED IN THIS UPDATE:
@@ -148,4 +450,3 @@ Great for searching in your online shop, tested with: WooCommerce and WP eCommer
 
 = 1.0 =
 Initial release
-

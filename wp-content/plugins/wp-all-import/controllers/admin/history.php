@@ -27,6 +27,10 @@ class PMXI_Admin_History extends PMXI_Controller_Admin {
 		$get['pagenum'] = absint($get['pagenum']);
 		$get['id'] = absint($get['id']);
 		extract($get);
+		if (empty($id)){ 
+			wp_redirect(add_query_arg(array('page' => 'pmxi-admin-manage', 'pmxi_nt' => urlencode(__('Import is not specified.', 'wp_all_import_plugin'))), $this->baseUrl)); die();
+		}
+		$this->data += $get;
 
 		if ( ! in_array($order_by, array('date', 'id', 'run_time', 'type'))){
 			$order_by = 'date';
@@ -34,12 +38,8 @@ class PMXI_Admin_History extends PMXI_Controller_Admin {
 
 		if ( ! in_array($order, array('DESC', 'ASC'))){
 			$order = 'DESC';
-		}
+		}		
 
-		if (empty($id)){ 
-			wp_redirect(add_query_arg(array('page' => 'pmxi-admin-manage', 'pmxi_nt' => urlencode(__('Import is not specified.', 'wp_all_import_plugin'))), $this->baseUrl)); die();
-		}
-		$this->data += $get;
 		$by = array('import_id' => $id);
 
 		$this->data['import'] = new PMXI_Import_Record();
@@ -99,7 +99,7 @@ class PMXI_Admin_History extends PMXI_Controller_Admin {
 	 */
 	public function delete() {
 
-		if ( ! get_current_user_id() or ! current_user_can('manage_options')) {
+		if ( ! get_current_user_id() or ! current_user_can( PMXI_Plugin::$capabilities )) {
 		    // This nonce is not valid.
 		    die( 'Security check' ); 
 		} else {
@@ -136,7 +136,7 @@ class PMXI_Admin_History extends PMXI_Controller_Admin {
 		
 		$id = $this->input->get('id');
 
-		wp_redirect(add_query_arg(array('id' => $id, 'pmxi_nt' => urlencode(sprintf(__('<strong>%d</strong> %s deleted', 'wp_all_import_plugin'), $items->count(), _n('history', 'histories', $items->count(), 'wp_all_import_plugin')))), $this->baseUrl)); die();		
+		wp_redirect(add_query_arg(array('id' => $id, 'pmxi_nt' => urlencode(sprintf(__('%d %s deleted', 'wp_all_import_plugin'), $items->count(), _n('history', 'histories', $items->count(), 'wp_all_import_plugin')))), $this->baseUrl)); die();		
 				
 	}
 }

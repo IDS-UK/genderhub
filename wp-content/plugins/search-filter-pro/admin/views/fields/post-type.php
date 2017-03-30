@@ -55,8 +55,8 @@
 							
 							foreach ( $post_types as $post_type )
 							{
-								if($post_type->name!="attachment")
-								{
+								//if($post_type->name!="attachment")
+								//{
 									if($is_default)
 									{
 										$values['post_types'][$post_type->name] = "1";
@@ -72,7 +72,7 @@
 									<label for="{0}[{1}][post_types][<?php echo $post_type->name; ?>]"><?php _e($post_type->labels->name, $this->plugin_slug); ?></label>
 									
 									<?php
-								}
+								//}
 							}
 						?>
 						
@@ -102,55 +102,13 @@
 						<label for="{0}[{1}][all_items_label]"><?php _e("Change All Items Label?", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("override the default - e.g. &quot;All Post Types&quot;", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span><br />
 						<input class="" id="{0}[{1}][all_items_label]" name="{0}[{1}][all_items_label]" type="text" value="<?php echo esc_attr($values['all_items_label']); ?>"></label>
 					</p>
-					
-					<p class="sf_operator">
-					<!--	<label for="{0}[{1}][operator]"><?php _e("Search Operator", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("AND - posts must be in each tag, OR - posts must be in any tag", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span><br />
-							<select name="{0}[{1}][operator]" id="{0}[{1}][operator]">
-								<option value="and"<?php $this->set_selected($values['operator'], "and"); ?>><?php _e("AND", $this->plugin_slug); ?></option>
-								<option value="or"<?php $this->set_selected($values['operator'], "or"); ?>><?php _e("OR", $this->plugin_slug); ?></option>
-							</select>
-						</label>-->
+					<p class="sf_accessibility_label">
+						<label for="{0}[{1}][accessibility_label]"><?php _e("Add screen reader text?", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("adds hidden text that will be read by screen readers - complies with WCAG 2.0", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span><br />
+						<input class="" id="{0}[{1}][accessibility_label]" name="{0}[{1}][accessibility_label]" type="text" value="<?php echo esc_attr($values['accessibility_label']); ?>"></label>
 					</p>
-					
 				</fieldset>
-				
-				
-				<!--<fieldset class="item-container">
-					<br />
-					<p>
-						<input class="checkbox" type="checkbox" id="{0}[{1}][show_count]" name="{0}[{1}][show_count]"<?php $this->set_checked($values['show_count']); ?>>
-						<label for="{0}[{1}][show_count]"><?php _e("Display count?", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("display the number of posts in each category", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span></label>
-					</p>
-				</fieldset>-->
 				
 				<div class="clear"></div>
-				
-				<!--<fieldset class="advanced-settings">
-					<hr />
-					
-					<p class="item-container">
-						<label for="{0}[{1}][order_by]"><?php _e("Order terms by: ", $this->plugin_slug); ?><br />
-							<select name="{0}[{1}][order_by]" id="{0}[{1}][order_by]">
-								<option value="default"<?php $this->set_selected($values['order_by'], "default"); ?>><?php _e("Default", $this->plugin_slug); ?></option>
-								<option value="id"<?php $this->set_selected($values['order_by'], "id"); ?>><?php _e("ID", $this->plugin_slug); ?></option>
-								<option value="name"<?php $this->set_selected($values['order_by'], "name"); ?>><?php _e("Name", $this->plugin_slug); ?></option>
-								<option value="slug"<?php $this->set_selected($values['order_by'], "slug"); ?>><?php _e("Slug", $this->plugin_slug); ?></option>
-								<option value="count"<?php $this->set_selected($values['order_by'], "count"); ?>><?php _e("Count", $this->plugin_slug); ?></option>
-								<option value="term_group"<?php $this->set_selected($values['order_by'], "term_group"); ?>><?php _e("Term Group", $this->plugin_slug); ?></option>
-							</select>
-							
-							<select name="{0}[{1}][order_dir]" id="{0}[{1}][order_dir]">
-								<option value="asc"<?php $this->set_selected($values['order_dir'], "asc"); ?>><?php _e("ASC", $this->plugin_slug); ?></option>
-								<option value="desc"<?php $this->set_selected($values['order_dir'], "desc"); ?>><?php _e("DESC", $this->plugin_slug); ?></option>
-							</select>
-							
-						</label>
-					</p>
-										
-				</fieldset>
-				
-				<div class="clear"></div>-->
-				
 			</div>
 			<br class="clear" />
 			

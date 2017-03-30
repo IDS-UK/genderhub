@@ -62,7 +62,7 @@
 										</div>
 									</div>						
 
-									<?php if ($post_type != 'page'):?>														
+									<?php if ( post_type_supports( $post_type, 'excerpt' ) ):?>														
 									<div class="template_input">
 										<input type="text" name="post_excerpt" style="width:100%; line-height: 25px;" value="<?php echo esc_attr($post['post_excerpt']) ?>" placeholder="<?php echo ($post_type == 'product' and class_exists('PMWI_Plugin')) ? __('WooCommerce Short Description', 'wp_all_import_plugin') : __('Excerpt', 'wp_all_import_plugin'); ?>"/>
 									</div>
@@ -104,26 +104,30 @@
 					
 				<?php									
 
-					if ( in_array('main', $visible_sections) ) do_action('pmxi_extend_options_main', $post_type);
+					if ( in_array('main', $visible_sections) ) do_action('pmxi_extend_options_main', $post_type, $post);
 
 					if ( in_array('featured', $visible_sections) ) {
-						include( 'template/_featured_template.php' );
-						do_action('pmxi_extend_options_featured', $post_type);						
+						$is_images_section_enabled = apply_filters('wp_all_import_is_images_section_enabled', true, $post_type);						
+						if ( $is_images_section_enabled ) {
+							PMXI_API::add_additional_images_section(__('Images', 'wp_all_import_plugin'), '', $post, $post_type, true, true);
+						}
+							
+						do_action('pmxi_extend_options_featured', $post_type, $post);
 					}
 
 					if ( in_array('cf', $visible_sections) ){ 
 						include( 'template/_custom_fields_template.php' );
-						do_action('pmxi_extend_options_custom_fields', $post_type);																								
+						do_action('pmxi_extend_options_custom_fields', $post_type, $post);																								
 					}
 
 					if ( in_array('taxonomies', $visible_sections) ) {
 						include( 'template/_taxonomies_template.php' );					
-						do_action('pmxi_extend_options_taxonomies', $post_type);												
+						do_action('pmxi_extend_options_taxonomies', $post_type, $post);												
 					}									
 
 					if ( in_array('other', $visible_sections) ){ 
 						include( 'template/_other_template.php' );
-						do_action('pmxi_extend_options_other', $post_type);
+						do_action('pmxi_extend_options_other', $post_type, $post);
 					}
 
 					/*if ( in_array('nested', $visible_sections) ){ 
@@ -131,17 +135,57 @@
 						do_action('pmxi_extend_options_nested', $post_type);
 					}*/
 
-				?>																
+					$uploads = wp_upload_dir();
+					$functions = $uploads['basedir'] . DIRECTORY_SEPARATOR . WP_ALL_IMPORT_UPLOADS_BASE_DIRECTORY . DIRECTORY_SEPARATOR . 'functions.php';					
+					
+					?>
+
+					<div class="wpallimport-collapsed closed wpallimport-section">
+						<div class="wpallimport-content-section">
+							<div class="wpallimport-collapsed-header">
+								<h3><?php _e('Function Editor', 'wp_all_import_plugin'); ?></h3>	
+							</div>
+							<div class="wpallimport-collapsed-content" style="padding: 0;">
+								<div class="wpallimport-collapsed-content-inner">									
+									<div class="wpallimport-free-edition-notice" style="text-align:center; margin-top:0; margin-bottom: 40px;">
+										<a href="https://www.wpallimport.com/checkout/?edd_action=add_to_cart&download_id=1748&edd_options%5Bprice_id%5D=0&utm_source=free-plugin&utm_medium=in-plugin&utm_campaign=custom-fields" target="_blank" class="upgrade_link"><?php _e('Upgrade to the Pro edition of WP All Import to use the Function Editor', 'wp_all_import_plugin');?></a>
+										<p><?php _e('If you already own it, remove the free edition and install the Pro edition.', 'wp_all_import_plugin'); ?></p>
+									</div>
+									
+									<textarea id="wp_all_import_code" name="wp_all_import_code"><?php echo "<?php\n\n?>";?></textarea>						
+
+									<div class="input" style="margin-top: 10px;">
+
+										<div class="input" style="display:inline-block; margin-right: 20px;">
+											<input type="button" class="button-primary wp_all_import_save_functions" disabled="disabled" value="<?php _e("Save Functions", 'wp_all_import_plugin'); ?>"/>
+											<a href="#help" class="wpallimport-help" title="<?php printf(__("Add functions here for use during your import. You can access this file at %s", "wp_all_import_plugin"), preg_replace("%.*wp-content%", "wp-content", $functions));?>" style="top: 0;">?</a>
+											<div class="wp_all_import_functions_preloader"></div>
+										</div>						
+										<div class="input wp_all_import_saving_status" style="display:inline-block;">
+
+										</div>
+
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>															
 				
 				<hr>
 				
 				<div class="input wpallimport-section" style="padding-bottom: 8px; padding-left: 8px;">
+
+					<?php 
+						wp_all_import_template_notifications( $post, 'notice' );							
+					?>					
 										
 					<p style="margin: 11px; float: left;">
+						<input type="hidden" name="save_template_as" value="0" />
 						<input type="checkbox" id="save_template_as" name="save_template_as" class="switcher-horizontal fix_checkbox" value="1" <?php echo ( ! empty($post['save_template_as'])) ? 'checked="checked"' : '' ?> /> 
 						<label for="save_template_as"><?php _e('Save settings as a template','wp_all_import_plugin');?></label>
 					</p>
-					<div class="switcher-target-save_template_as" style="float: left;">
+					<div class="switcher-target-save_template_as" style="float: left; overflow: hidden;">
 						<input type="text" name="name" placeholder="<?php _e('Template name...', 'wp_all_import_plugin') ?>" style="vertical-align:middle; line-height: 26px;" value="<?php echo esc_attr($post['name']) ?>" />		
 					</div>				
 					<?php $templates = new PMXI_Template_List(); ?>
@@ -161,6 +205,15 @@
 				<div class="wpallimport-submit-buttons">
 					
 					<div style="text-align:center; width:100%;">
+
+						<div class="wpallimport-free-edition-notice wpallimport-dynamic-notice" style="text-align:center; margin-top:0; margin-bottom: 40px;">
+							<input type="hidden" value="<?php _e('Upgrade to the Pro edition of WP All Import to Import Custom Fields', 'wp_all_import_plugin');?>" class="wpallimport-dynamic-notice-cf-text"/>
+							<input type="hidden" value="<?php _e('Upgrade to the Pro edition of WP All Import to Import Images', 'wp_all_import_plugin');?>" class="wpallimport-dynamic-notice-images-text"/>
+							<input type="hidden" value="<?php _e('Upgrade to the Pro edition of WP All Import to Import Images and Custom Fields', 'wp_all_import_plugin');?>" class="wpallimport-dynamic-notice-cf-image-text"/>
+							<a href="https://www.wpallimport.com/checkout/?edd_action=add_to_cart&download_id=1748&edd_options%5Bprice_id%5D=0&utm_source=free-plugin&utm_medium=in-plugin&utm_campaign=custom-fields" target="_blank" class="upgrade_link"></a>
+							<p><?php _e('If you already own it, remove the free edition and install the Pro edition.', 'wp_all_import_plugin'); ?></p>
+						</div>
+
 						<?php wp_nonce_field('template', '_wpnonce_template'); ?>
 
 						<input type="hidden" name="is_submitted" value="1" />									

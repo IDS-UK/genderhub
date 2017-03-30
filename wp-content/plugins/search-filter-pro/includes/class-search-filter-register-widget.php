@@ -2,10 +2,10 @@
 /**
  * Search & Filter Pro
  * 
- * @package   Search_Filter_Register_Widget
+ * @package   Search_Filter_Widget
  * @author    Ross Morsali
  * @link      http://www.designsandcode.com/
- * @copyright 2014 Designs & Code
+ * @copyright 2015 Designs & Code
  */
 
 /**
@@ -32,12 +32,12 @@ class Search_Filter_Register_Widget extends WP_Widget
 		//register_widget('search_filter_widget');
 	}*/
 	
-	function Search_Filter_Register_Widget() {
+	function __construct() {
 		// Instantiate the parent object
 		parent::__construct( false, 'Search & Filter Form' );
 		
-		$plugin = Search_Filter::get_instance();
-		$this->plugin_slug = $plugin->get_plugin_slug();
+		//$plugin = Search_Filter::get_instance();
+		$this->plugin_slug = "search-filter";
 	}
 	function widget( $args, $instance )
 	{
@@ -88,25 +88,34 @@ class Search_Filter_Register_Widget extends WP_Widget
 		}
 		
 		?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></label></p>
-		<p>
-			<label for="<?php echo $this->get_field_id( 'formid' ); ?>">Choose a Search Form: 
-				<select class="widefat" name="<?php echo $this->get_field_name( 'formid' ); ?>" id="<?php echo $this->get_field_id( 'formid' ); ?>">
-					<option value="0"><?php _e('Please choose'); ?></option>
-					<?php //
-						$custom_posts = new WP_Query();
-						$custom_posts->query('post_type=search-filter-widget&post_status=publish');
-						while ($custom_posts->have_posts()) : $custom_posts->the_post();
-					?>
-						<option value="<?php the_ID(); ?>" <?php if($formid==get_the_ID()){ echo ' selected="selected"'; } ?>><?php the_title(); ?></option>
-					<?php endwhile; ?>
+		<div class="sf-widget-content">
+			<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></label></p>
+			<p>
+				<label for="<?php echo $this->get_field_id( 'formid' ); ?>">Choose a Search Form: 
+					<select class="widefat" name="<?php echo $this->get_field_name( 'formid' ); ?>" id="<?php echo $this->get_field_id( 'formid' ); ?>">
+						<option value="0"><?php _e('Please choose'); ?></option>
+						<?php //
+							$custom_posts = new WP_Query('post_type=search-filter-widget&post_status=publish&posts_per_page=-1');
+							
+							if ( Search_Filter_Helper::has_wpml() )
+							{
+								$formid = Search_Filter_Helper::wpml_object_id($formid, 'search-filter-widget', true, ICL_LANGUAGE_CODE);
+							}
+							
+							//var_dump($custom_posts);
+							while ($custom_posts->have_posts()) : $custom_posts->the_post();
+						?>
+							<option value="<?php the_ID(); ?>" <?php if($formid==get_the_ID()){ echo ' selected="selected"'; } ?>><?php the_title(); ?></option>
+						<?php endwhile; ?>
 
-				</select>
-			</label>
-		</p>
-		<p>
-			<?php _e('Don\'t see a Search Form you want to use? <a href="#">Create a new Search Form</a>.'); ?>
-		</p>
+					</select>
+				</label>
+			</p>
+			<!--<p class="sf-widget-text-last">
+				<?php _e('Don\'t see a Search Form you want to use? <a href="'.admin_url( 'post-new.php?post_type=search-filter-widget' ).'">Create a new Search Form</a>.'); ?>
+				
+			</p>-->
+		</div>
 		<?php
 	}
 }

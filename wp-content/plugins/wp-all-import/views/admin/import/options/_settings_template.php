@@ -34,7 +34,8 @@
 							<div class="input">
 								<input type="hidden" name="is_fast_mode" value="0" />
 								<input type="checkbox" id="is_fast_mode" name="is_fast_mode" value="1" class="fix_checkbox" <?php echo $post['is_fast_mode'] ? 'checked="checked"': '' ?>/>
-								<label for="is_fast_mode"><?php _e('Increase speed by disabling do_action calls in wp_insert_post during import.', 'wp_all_import_plugin') ?> <a href="#help" class="wpallimport-help" style="position: relative; top: -2px;" title="<?php _e('This option is for advanced users with knowledge of WordPress development. Your theme or plugins may require these calls when posts are created. Verify your created posts work properly if you check this box.', 'wp_all_import_plugin') ?>">?</a></label>
+								<label for="is_fast_mode"><?php _e('Increase speed by disabling do_action calls in wp_insert_post during import.', 'wp_all_import_plugin') ?> 
+									<a href="#help" class="wpallimport-help" style="position: relative; top: -2px;" title="<?php _e('This option is for advanced users with knowledge of WordPress development. Your theme or plugins may require these calls when posts are created. Next action will be disabled: \'transition_post_status\', \'save_post\', \'pre_post_update\', \'add_attachment\', \'edit_attachment\', \'edit_post\', \'post_updated\', \'wp_insert_post\'. Verify your created posts work properly if you check this box.', 'wp_all_import_plugin') ?>">?</a></label>
 							</div>					
 							<?php if ( ! $this->isWizard ): ?>
 
@@ -48,9 +49,35 @@
 								
 									$custom_types = get_post_types(array('_builtin' => true), 'objects') + get_post_types(array('_builtin' => false, 'show_ui' => true), 'objects'); 
 									foreach ($custom_types as $key => $ct) {
-										if (in_array($key, array('attachment', 'revision', 'nav_menu_item'))) unset($custom_types[$key]);
+										if (in_array($key, array('attachment', 'revision', 'nav_menu_item', 'shop_webhook', 'import_users'))) unset($custom_types[$key]);
 									}
 									$custom_types = apply_filters( 'pmxi_custom_types', $custom_types );
+
+									$sorted_cpt = array();
+									foreach ($custom_types as $key => $cpt){
+
+										$sorted_cpt[$key] = $cpt;
+
+										// Put users & comments & taxonomies after Pages
+										if ( ! empty($custom_types['page']) && $key == 'page' || empty($custom_types['page']) && $key == 'post' ){
+											$sorted_cpt['import_users'] = new stdClass();
+											$sorted_cpt['import_users']->labels = new stdClass();
+											$sorted_cpt['import_users']->labels->name = __('Users','wp_all_export_plugin');
+											break;
+										}
+									}
+									$order = array('shop_order', 'shop_coupon', 'shop_customer', 'product');
+									foreach ($order as $cpt){
+										if (!empty($custom_types[$cpt])) $sorted_cpt[$cpt] = $custom_types[$cpt];
+									}
+
+									uasort($custom_types, "wp_all_import_cmp_custom_types");
+
+									foreach ($custom_types as $key => $cpt) {
+										if (empty($sorted_cpt[$key])){
+											$sorted_cpt[$key] = $cpt;
+										}
+									}
 
 									$hidden_post_types = get_post_types(array('_builtin' => false, 'show_ui' => false), 'objects');
 									foreach ($hidden_post_types as $key => $ct) {
@@ -61,15 +88,35 @@
 								?>	
 								<div class="wpallimport-change-custom-type">
 									<select name="custom_type_selector" id="custom_type_selector" class="wpallimport-post-types">									
-										<?php if ( ! empty($custom_types)): ?>							
-											<?php foreach ($custom_types as $key => $cpt) :?>	
+										<?php if ( ! empty($sorted_cpt)): $unknown_cpt = array(); ?>
+											<?php foreach ($sorted_cpt as $key => $ct) :?>
 												<?php 
 													$image_src = 'dashicon-cpt';
-													if (  in_array($key, array('post', 'page', 'product') ) )
-														$image_src = 'dashicon-' . $key;										
+
+													$cpt = $key;
+													$cpt_label = $ct->labels->name;
+
+													if (  in_array($cpt, array('post', 'page', 'product', 'import_users', 'shop_order', 'shop_coupon', 'shop_customer', 'users', 'comments', 'taxonomies') ) )
+													{
+														$image_src = 'dashicon-' . $cpt;										
+													}
+													else
+													{
+														$unknown_cpt[$key] = $ct;
+														continue;
+													}														
 												?>
-											<option value="<?php echo $key; ?>" data-imagesrc="dashicon <?php echo $image_src; ?>" <?php if ( $key == $post['custom_type'] ) echo 'selected="selected"';?>><?php echo $cpt->labels->name; ?></option>
+											<option value="<?php echo $cpt; ?>" data-imagesrc="dashicon <?php echo $image_src; ?>" <?php if ( $cpt == $post['custom_type'] ) echo 'selected="selected"';?>><?php echo $cpt_label; ?></option>
 											<?php endforeach; ?>
+											<?php if ( ! empty($unknown_cpt)):  ?>
+												<?php foreach ($unknown_cpt as $key => $ct):?>
+													<?php
+													$image_src = 'dashicon-cpt';																								
+													$cpt_label = $ct->labels->name;												
+													?>
+													<option value="<?php echo $key;?>" data-imagesrc="dashicon <?php echo $image_src; ?>" <?php if ($key == $post['custom_type']) echo 'selected="selected"'; ?>><?php echo $cpt_label; ?></option>
+												<?php endforeach ?>
+											<?php endif;?>
 										<?php endif; ?>
 										<?php if ( ! empty($hidden_post_types)): ?>							
 											<?php foreach ($hidden_post_types as $key => $cpt) :?>	
@@ -82,6 +129,42 @@
 											<?php endforeach; ?>
 										<?php endif; ?>			
 									</select>
+
+									<?php if ( ! class_exists('PMUI_Plugin') ): ?>
+										<div class="wpallimport-upgrade-notice" rel="import_users">
+											<p><?php _e('The User Import Add-On is Required to Import Users', 'wp_all_import_plugin'); ?></p>
+											<a href="http://www.wpallimport.com/checkout/?edd_action=add_to_cart&download_id=1921&edd_options%5Bprice_id%5D=1" target="_blank" class="upgrade_link"><?php _e('Purchase the User Import Add-On', 'wp_all_import_plugin');?></a>
+										</div>
+									<?php endif; ?>
+									<?php if ( class_exists('WooCommerce') && ! class_exists('PMWI_Plugin') ): ?>
+										<div class="wpallimport-upgrade-notice" rel="product">
+											<p><?php _e('The WooCommerce Add-On is Required to Import Products', 'wp_all_import_plugin'); ?></p>
+											<a href="http://www.wpallimport.com/order-now/?utm_source=free-plugin&utm_campaign=wooco-products&utm_medium=in-plugin" target="_blank" class="upgrade_link"><?php _e('Get the WooCommerce Add-On', 'wp_all_import_plugin');?></a>
+										</div>
+									<?php endif; ?>
+									<?php if ( class_exists('WooCommerce') &&  ( ! class_exists('PMWI_Plugin') || class_exists('PMWI_Plugin') && PMWI_EDITION == 'free') ): ?>
+										<div class="wpallimport-upgrade-notice" rel="shop_order">
+											<?php if (class_exists('PMWI_Plugin') && PMWI_EDITION == 'free'): ?>
+												<p><?php _e('The Pro version of the WooCommerce Add-On is required to Import Orders, but you have the free version installed.', 'wp_all_import_plugin'); ?></p>
+											<?php else: ?>
+												<p><?php _e('The WooCommerce Add-On Pro is Required to Import Orders', 'wp_all_import_plugin'); ?></p>
+											<?php endif; ?>
+											<a href="http://www.wpallimport.com/order-now/?utm_source=free-plugin&utm_campaign=wooco-orders&utm_medium=in-plugin" target="_blank" class="upgrade_link"><?php _e('Purchase the WooCommerce Add-On Pro', 'wp_all_import_plugin');?></a>
+										</div>
+										<div class="wpallimport-upgrade-notice" rel="shop_coupon">
+											<?php if (class_exists('PMWI_Plugin') && PMWI_EDITION == 'free'): ?>
+												<p><?php _e('The Pro version of the WooCommerce Add-On is required to Import Coupons, but you have the free version installed.', 'wp_all_import_plugin'); ?></p>
+											<?php else: ?>
+												<p><?php _e('The WooCommerce Add-On Pro is Required to Import Coupons', 'wp_all_import_plugin'); ?></p>
+											<?php endif; ?>
+											<a href="http://www.wpallimport.com/order-now/?utm_source=free-plugin&utm_campaign=wooco-coupons&utm_medium=in-plugin" target="_blank" class="upgrade_link"><?php _e('Purchase the WooCommerce Add-On Pro', 'wp_all_import_plugin');?></a>
+										</div>
+									<?php endif; ?>
+									<div class="wpallimport-upgrade-notice" rel="taxonomies">
+										<p><?php _e('WP All Import Pro is Required to Import Taxonomies', 'wp_all_import_plugin'); ?></p>
+										<a href="http://www.wpallimport.com/order-now/?utm_source=free-plugin&utm_campaign=taxonomies&utm_medium=in-plugin" target="_blank" class="upgrade_link"><?php _e('Purchase WP All Import Pro', 'wp_all_import_plugin');?></a>
+									</div>
+
 								</div>
 
 								<h4><?php _e('XPath', 'wp_all_import_plugin'); ?></h4>
@@ -90,6 +173,12 @@
 									<input type="text" name="xpath" value="<?php echo esc_attr($import->xpath) ?>" style="width: 50%; font-size: 18px; color: #555; height: 50px; padding: 10px;"/>
 								</div>														
 								
+								<h4><?php _e('Downloads', 'wp_all_import_plugin'); ?></h4>
+
+								<div class="input">
+									<button class="button button-primary download_import_template" rel="<?php echo add_query_arg(array('page' => 'pmxi-admin-manage', 'id' => $_GET['id'], 'action' => 'get_template', '_wpnonce' => wp_create_nonce( '_wpnonce-download_template' )), $this->baseUrl); ?>" style="background-image: none;"><?php _e('Import Template', 'wp_all_import_plugin'); ?></button>
+									<button class="button button-primary download_import_bundle" rel="<?php echo add_query_arg(array('page' => 'pmxi-admin-manage', 'id' => $_GET['id'], 'action' => 'bundle', '_wpnonce' => wp_create_nonce( '_wpnonce-download_bundle' )), $this->baseUrl); ?>" style="background-image: none;"><?php _e('Import Bundle', 'wp_all_import_plugin'); ?></button>
+								</div>
 							<?php endif; ?>
 							<h4><?php _e('Other', 'wp_all_import_plugin'); ?></h4>
 							<div class="input">
@@ -115,7 +204,18 @@
 									<input type="checkbox" id="is_cloak" class="fix_checkbox" name="is_cloak" value="1" <?php echo $post['is_cloak'] ? 'checked="checked"': '' ?>/>
 									<label for="is_cloak"><?php _e('Auto-Cloak Links', 'wp_all_import_plugin') ?> <a href="#help" class="wpallimport-help" style="position:relative; top:0;" title="<?php printf(__('Automatically process all links present in body of created post or page with <b>%s</b> plugin', 'wp_all_import_plugin'), PMLC_Plugin::getInstance()->getName()) ?>">?</a></label>
 								</div> 						
-							<?php endif; ?>							
+							<?php endif; ?>	
+							<div class="input">
+								<input type="hidden" name="xml_reader_engine" value="0" />
+								
+								<?php if ( PMXI_Plugin::getInstance()->getOption('force_stream_reader') ): ?>
+									<input type="checkbox" id="xml_reader_engine" class="fix_checkbox" name="xml_reader_engine" value="1" checked="checked" disabled="disabled"/>
+									<label for="xml_reader_engine"><?php _e('Use StreamReader instead of XMLReader to parse import file', 'wp_all_import_plugin') ?> <a href="#help" class="wpallimport-help" style="position:relative; top:0;" title="<?php _e('WP All Import is being forced to use Stream Reader for all imports. Go to WP All Import ▸ Settings to modify this setting.', 'wp_all_import_plugin'); ?>">?</a></label>
+								<?php else : ?>
+									<input type="checkbox" id="xml_reader_engine" class="fix_checkbox" name="xml_reader_engine" value="1" <?php echo $post['xml_reader_engine'] ? 'checked="checked"': '' ?>/>
+									<label for="xml_reader_engine"><?php _e('Use StreamReader instead of XMLReader to parse import file', 'wp_all_import_plugin') ?> <a href="#help" class="wpallimport-help" style="position:relative; top:0;" title="<?php _e('XMLReader is much faster, but has a bug that sometimes prevents certain records from being imported with import files that contain special cases.', 'wp_all_import_plugin'); ?>">?</a></label>
+								<?php endif; ?>																	
+							</div>						
 							
 							<div class="input" style="margin-top: 15px;">
 								<p><?php _e('Friendly Name','wp_all_import_plugin');?></p> <br>

@@ -5,7 +5,7 @@
  * @package   Search_Filter
  * @author    Ross Morsali
  * @link      http://www.designsandcode.com/
- * @copyright 2014 Designs & Code
+ * @copyright 2015 Designs & Code
  */
  
 ?>
@@ -25,10 +25,11 @@
 		$this->display_meta_box_field("post_meta");
 		$this->display_meta_box_field("author");
 		$this->display_meta_box_field("sort_order");
+		$this->display_meta_box_field("posts_per_page");
 		$this->display_meta_box_field("submit");
+		$this->display_meta_box_field("reset");
 		
 	?>
-		
 </div>
 
 

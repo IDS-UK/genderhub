@@ -98,17 +98,20 @@ if ( ! class_exists('PMXI_Render')){
 			//$newtext = preg_replace('%(?<!\s)\b(?!\s|\W[\w\s])|\w{20}%', '$0&#8203;', $newtext); // put explicit breaks for xml content to wrap
 			echo '<div class="xml-content textonly' . ($is_short ? ' short' : '') . ($is_render_collapsed ? ' collapsed' : '') . ' '. (is_numeric($text) ? 'is_numeric' : '') .'">' . $newtext . $more . '</div>';
 		}
-
-		public static function render_xml_elements_for_filtring(DOMElement $el, $path ='', $lvl = 0){	
-		
+		public static $option_paths = array();
+		public static function render_xml_elements_for_filtring(DOMElement $el, $path ='', $lvl = 0){			
 			if ("" != $path){ 
 				if ($lvl > 1) $path .= "->" . $el->nodeName; else $path = $el->nodeName; 
-				echo '<option value="'.$path.'">' .$path . '</option>';
+				if (empty(self::$option_paths[$path])) 
+					self::$option_paths[$path] = 1;
+				else
+					self::$option_paths[$path]++;
+				echo '<option value="'.$path.'['. self::$option_paths[$path] .']">' .$path . '['. self::$option_paths[$path] .']</option>';
 			}
 			else $path = $el->nodeName;		
 					
 			foreach ($el->attributes as $attr) {
-				echo '<option value="'.$path . '@' . $attr->nodeName.'">'. $path . '@' . $attr->nodeName . '</option>';
+				echo '<option value="'.$path . '/@' . $attr->nodeName.'">'. $path . '@' . $attr->nodeName . '</option>';
 			}
 			if ($el->hasChildNodes()) {
 				foreach ($el->childNodes as $child) {
@@ -219,7 +222,7 @@ if ( ! class_exists('PMXI_Render')){
 
 		protected static function render_element_xpaths(DOMElement $el, $path = '/', $ind = 1, $lvl = 0){						
 			?>
-			<ul id="menu-<?php echo sanitize_title(esc_attr($path)); ?>" class="ui-helper-hidden">
+			<ul id="menu-<?php echo str_replace('/', '-', esc_attr($path)); ?>" class="ui-helper-hidden">
 				<?php foreach ($el->attributes as $attr) : if ( empty($attr->value) ) continue; ?>
 			    <li data-command="action1" title="<?php echo esc_attr($path . '[@'. $attr->nodeName .' = "' . esc_attr($attr->value) . '"]'); ?>">
 			    	<a href="#"><?php echo $path . '[@'. $attr->nodeName .' = "' . esc_attr($attr->value) . '"]'; ?></a>

@@ -3,7 +3,7 @@
 Plugin Name: WebEngage
 Plugin URI: http://webengage.com
 Description: WebEngage lets you collect feedback from your website visitors. With WebEngage, you can also conduct in-site surveys to gather realtime insights from your customers. Oh, did we tell you that you can also use WebEngage to push notification messages to visitors on your website? Yes, we made throwing discount codes to visitors on your site real easy! To get started: 1) Click the "Activate" link to the left of this description, 2) You'll be taken to the <a href="options-general.php?page=webengage">WebEngage configuration</a> page; sign-up to create your account. That's it! Get an end-to-end feedback, survey management and push notification solution in less than 5 minutes.
-Version: 2.0.2
+Version: 2.0.4
 Author: WebEngage
 Author URI: http://webengage.com/about-us
 */
@@ -13,21 +13,13 @@ function render_webengage() {
   // render the widget if license code is present
   if ($webengage_license_code && $webengage_license_code !== '') {
   ?>
-	<!-- Added via WebEngage Wordpress Plugin 2.0.1 -->
-	<script id="_webengage_script_tag" type="text/javascript">
-	  var _weq = _weq || {};
-	  _weq['webengage.licenseCode'] = '<?php echo $webengage_license_code; ?>';
-	  _weq['webengage.widgetVersion'] = "4.0";
-	  
-	  (function(d){
-		var _we = d.createElement('script');
-		_we.type = 'text/javascript';
-		_we.async = true;
-		_we.src = (d.location.protocol == 'https:' ? "//ssl.widgets.webengage.com" : "//cdn.widgets.webengage.com") +  "/js/widget/webengage-min-v-4.0.js";
-		var _sNode = d.getElementById('_webengage_script_tag');
-		_sNode.parentNode.insertBefore(_we, _sNode);
-	  })(document);
-	</script>
+	<!-- Added via WebEngage Wordpress Plugin 2.0.4 -->
+    <script id="_webengage_script_tag" type="text/javascript">
+        var webengage; !function(e,t,n){function o(e,t){e[t[t.length-1]]=function(){r.__queue.push([t.join("."),arguments])}}var i,s,r=e[n],g=" ",l="init options track screen onReady".split(g),a="feedback survey notification".split(g),c="options render clear abort".split(g),p="Open Close Submit Complete View Click".split(g),u="identify login logout setAttribute".split(g);if(!r||!r.__v){for(e[n]=r={__queue:[],__v:"6.0",user:{}},i=0;i<l.length;i++)o(r,[l[i]]);for(i=0;i<a.length;i++){for(r[a[i]]={},s=0;s<c.length;s++)o(r[a[i]],[a[i],c[s]]);for(s=0;s<p.length;s++)o(r[a[i]],[a[i],"on"+p[s]])}for(i=0;i<u.length;i++)o(r.user,["user",u[i]]);setTimeout(function(){var f=t.createElement("script"),d=t.getElementById("_webengage_script_tag");f.type="text/javascript",f.async=!0,f.src=("https:"==t.location.protocol?"https://ssl.widgets.webengage.com":"http://cdn.widgets.webengage.com")+"/js/webengage-min-v-6.0.js",d.parentNode.insertBefore(f,d)})}}(window,document,"webengage");
+        webengage.ixP = "WordPress";
+
+        webengage.init("<?php echo $webengage_license_code; ?>");
+    </script>
 <?php
   }
 }

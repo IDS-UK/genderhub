@@ -37,6 +37,7 @@
 					<p class="sf_input_type">
 						<label for="{0}[{1}][input_type]"><?php _e("Input type: ", $this->plugin_slug); ?><br />
 							<select name="{0}[{1}][input_type]" class="" id="{0}[{1}][input_type]">
+								<!--<option value="list"<?php $this->set_selected($values['input_type'], "list"); ?>><?php _e("List", $this->plugin_slug); ?></option>-->
 								<option value="select"<?php $this->set_selected($values['input_type'], "select"); ?>><?php _e("Dropdown", $this->plugin_slug); ?></option>
 								<option value="checkbox"<?php $this->set_selected($values['input_type'], "checkbox"); ?>><?php _e("Checkbox", $this->plugin_slug); ?></option>
 								<option value="radio"<?php $this->set_selected($values['input_type'], "radio"); ?>><?php _e("Radio", $this->plugin_slug); ?></option>
@@ -55,7 +56,10 @@
 						<label for="{0}[{1}][all_items_label]"><?php _e("Change All Items Label?", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("override the default - e.g. &quot;All Categories&quot;", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span><br />
 						<input class="" id="{0}[{1}][all_items_label]" name="{0}[{1}][all_items_label]" type="text" value="<?php echo esc_attr($values['all_items_label']); ?>"></label>
 					</p>
-					
+					<p class="sf_accessibility_label">
+						<label for="{0}[{1}][accessibility_label]"><?php _e("Add screen reader text?", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("adds hidden text that will be read by screen readers - complies with WCAG 2.0", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span><br />
+						<input class="" id="{0}[{1}][accessibility_label]" name="{0}[{1}][accessibility_label]" type="text" value="<?php echo esc_attr($values['accessibility_label']); ?>"></label>
+					</p>
 					<p class="sf_operator">
 						<label for="{0}[{1}][operator]"><?php _e("Search Operator", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("AND - posts must be in each category, OR - posts must be in any category", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span><br />
 							<select name="{0}[{1}][operator]" id="{0}[{1}][operator]">
@@ -79,6 +83,10 @@
 					<p>
 						<input class="checkbox" type="checkbox" id="{0}[{1}][hierarchical]" name="{0}[{1}][hierarchical]"<?php $this->set_checked($values['hierarchical']); ?>>
 						<label for="{0}[{1}][hierarchical]"><?php _e("Hierarchical?", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("show child categories underneath their parents", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span></label>
+					</p>
+					<p class="sf_include_children">
+						<input class="checkbox" type="checkbox" id="{0}[{1}][include_children]" name="{0}[{1}][include_children]"<?php $this->set_checked($values['include_children']); ?>>
+						<label for="{0}[{1}][include_children]"><?php _e("Include Children in Parents?", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("results in child categories will also be returned when a user searches its parent", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span></label>
 					</p>
 					<!--<p class="sf_drill_down">
 						<input class="checkbox" type="checkbox" id="{0}[{1}][drill_down]" name="{0}[{1}][drill_down]"<?php $this->set_checked($values['drill_down']); ?>>
@@ -111,8 +119,20 @@
 					</p>
 					
 					<p class="item-container">
-						<label for="{0}[{1}][exclude_ids]"><?php _e("Exclude IDs", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("comma seperated list of category IDs to exclude", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span><br />
-						<input class="" id="{0}[{1}][exclude_ids]" name="{0}[{1}][exclude_ids]" type="text" value="<?php echo esc_attr($values['exclude_ids']); ?>"></label>
+						
+						<label for="{0}[{1}][exclude_ids]"><?php _e("Exclude IDs", $this->plugin_slug); ?>
+							<span class="hint--top hint--info" data-hint="<?php _e("comma seperated list of category IDs to exclude", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span><br />
+							<input class="exclude_ids settings_exclude_ids" id="{0}[{1}][exclude_ids]" name="{0}[{1}][exclude_ids]" type="text" value="<?php echo esc_attr($values['exclude_ids']); ?>">
+							<input class="exclude_ids_hidden" id="{0}[{1}][exclude_ids_hidden]" name="{0}[{1}][exclude_ids]" type="hidden" value="<?php echo esc_attr($values['exclude_ids']); ?>" disabled="disabled">
+						</label>
+						<?php
+							$tax_obj = get_taxonomy('category');
+						?>
+						<a href="#" class="dashicons-search search-tax-button button-secondary sfmodal" data-taxonomy-name="<?php echo esc_attr($tax_obj->name); ?>" data-taxonomy-label="<?php echo esc_attr($tax_obj->label); ?>"></a>
+						<br />
+						<input class="checkbox sync_include_exclude" type="checkbox" id="{0}[{1}][sync_include_exclude]" name="{0}[{1}][sync_include_exclude]"<?php $this->set_checked($values['sync_include_exclude']); ?>>
+						<label for="{0}[{1}][sync_include_exclude]"><?php _e("Sync with Settings?", $this->plugin_slug); ?><span class="hint--top hint--info" data-hint="<?php _e("This will show / hide categories for this field based upon the settings from the &quot;Settings &amp; Defaults&quot;", $this->plugin_slug); ?>"><i class="dashicons dashicons-info"></i></span></label>
+						
 					</p>
 					
 				</fieldset>

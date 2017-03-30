@@ -38,7 +38,7 @@ $featured=maybe_unserialize(get_post_meta(get_the_ID(),'featured_content',true))
 
 					<h3>More on this topic</h3>
 
-                    <?php echo GenderHub_2017::gh_get_carousel($post_types=null, $topics, $exclude=$featured, false); ?>
+					<?php echo GenderHub_2017::gh_get_carousel($post_types=null, $topic_list, $exclude=$featured, false); ?>
 
 				</div>
 			</div>

@@ -1,40 +1,37 @@
 <?php
-/*
- * You can create your own template by placing a copy of this file on yourtheme/plugins/wp-embed-fb/
- * to access all fb data print_r($fb_data)
- */
-$height = $width * $prop;
-$start_time_format = !empty($fb_data['is_date_only']) ? 'l, j F Y' : 'l, j F Y g:s a';
-$start_time = strtotime($fb_data['start_time']);
-if (get_site_option('wpemfb_ev_local_tz', 'true') == 'true') {
-    $start_time = $start_time + get_option('gmt_offset') * 3600; //shows event date on local time
+$start_time_format = WP_Embed_FB_Plugin::get_option('event_start_time_format');
+$old_time_zone = date_default_timezone_get();
+if(WP_Embed_FB_Plugin::get_option('ev_local_tz') == 'true'){
+	$timezone = WP_Embed_FB_Plugin::get_timezone();
+} else {
+	$timezone = isset( $fb_data['timezone'] ) ? $fb_data['timezone'] : WP_Embed_FB_Plugin::get_timezone();
 }
+date_default_timezone_set( $timezone );
+/** @noinspection PhpUndefinedVariableInspection */
+$start_time = date_i18n( $start_time_format, strtotime( $fb_data['start_time'] ) );
+date_default_timezone_set( $old_time_zone );
 ?>
-<div class="wpemfb-container" style="max-width: <?php echo $width ?>px">
-    <div class="wpemfb-row wpemfb-pad-top">
-        <div class="wpemfb-col-3 wpemfb-text-center">
-            <a href="http://www.facebook.com/<?php echo $fb_data['id'] ?>" target="_blank" rel="nofollow">
-                <img src="http://graph.facebook.com/<?php echo $fb_data['id'] ?>/picture/large"/>
-            </a>
-        </div>
-        <div class="wpemfb-col-9 wpemfb-pl-none">
-            <a class="wpemfb-title" href="http://www.facebook.com/<?php echo $fb_data['id'] ?>" target="_blank"
-               rel="nofollow">
-                <?php echo $fb_data['name'] ?>
-            </a>
-            <br>
-            <?php echo date_i18n($start_time_format, $start_time) ?>
-            <br>
-            <?php
-            if(isset($fb_data['place']['id'])){
-                _e('@ ', 'wp-embed-facebook');
-                echo '<a href="http://www.facebook.com/'.$fb_data['place']['id'].'" target="_blank">'.$fb_data['place']['name'].'</a>';
-            } else {
-                echo isset($fb_data['place']['name']) ? __('@ ', 'wp-embed-facebook') . $fb_data['place']['name'] : '';
-            }
-            ?>
-            <br>
-            <?php echo __('Creator: ', 'wp-embed-facebook') . '<a href="http://www.facebook.com/' . $fb_data['owner']['id'] . '" target="_blank">' . $fb_data['owner']['name'] . '</a>' ?>
-        </div>
-    </div>
+<div class="wef-default" style="max-width: <?php echo $width ?>px">
+	<?php if(isset($fb_data['cover'])) : ?>
+		<div class="relative-container cover"><div class="relative" style="background-image: url('<?php echo $fb_data['cover']['source'] ?>'); background-position-y: <?php echo $fb_data['cover']['offset_y'] ?>%" onclick="window.open('https://www.facebook.com/<?php echo $fb_data['id'] ?>', '_blank')"></div></div>
+	<?php endif; ?>
+	<div class="row pad-top">
+		<div class="col-12">
+			<a href="https://www.facebook.com/<?php echo $fb_data['id'] ?>" target="_blank" rel="nofollow">
+				<span class="title"><?php echo $fb_data['name'] ?></span>
+			</a>
+			<p><?php echo $start_time ?></p>
+			<p>
+				<?php
+				if ( isset( $fb_data['place']['id'] ) ) {
+					_e( '@ ', 'wp-embed-facebook' );
+					echo '<a href="https://www.facebook.com/' . $fb_data['place']['id'] . '" target="_blank">' . $fb_data['place']['name'] . '</a>';
+				} else {
+					echo isset( $fb_data['place']['name'] ) ? __( '@ ', 'wp-embed-facebook' ) . $fb_data['place']['name'] : '';
+				}
+				?>
+			</p>
+			<p><?php echo __( 'Creator: ', 'wp-embed-facebook' ) . '<a href="https://www.facebook.com/' . $fb_data['owner']['id'] . '" target="_blank">' . $fb_data['owner']['name'] . '</a>' ?></p>
+		</div>
+	</div>
 </div>

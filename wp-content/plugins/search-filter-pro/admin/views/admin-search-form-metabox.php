@@ -5,7 +5,7 @@
  * @package   Search_Filter
  * @author    Ross Morsali
  * @link      http://www.designsandcode.com/
- * @copyright 2014 Designs & Code
+ * @copyright 2015 Designs & Code
  */
 ?>
 <?php wp_nonce_field( 'search_form_nonce', $this->plugin_slug.'_nonce', true, true ); ?>
@@ -25,7 +25,7 @@
 				{
 					if(isset($widget['type']))
 					{
-						$this->display_meta_box_field($widget['type'], $widget);
+						$this->display_meta_box_field($widget['type'], $widget, $object);
 					}
 				}
 			}

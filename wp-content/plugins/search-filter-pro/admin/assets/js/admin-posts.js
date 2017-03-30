@@ -5,7 +5,7 @@
 		/* metabox processing :) */
 		
 		//thickbox mods
-		jQuery.fn.SfPopup = function(options)
+		jQuery.fn.SfPopupMeta = function(options)
 		{
 			var defaults = {
 				startOpened: false
@@ -43,14 +43,9 @@
 					var $the_field = $this.closest(".widget");
 					var $meta_key_manual_toggle  = $the_field.find(".meta_key_manual_toggle");
 					var $meta_key_manual  = $the_field.find(".meta_key_manual");
-					var $meta_key = $the_field.find(".meta_key");
+					var $meta_key = $the_field.find(".choice_meta_key");
 					
 					var meta_key_value = $meta_key.val();
-					
-					if($meta_key_manual_toggle.is(":checked"))
-					{
-						meta_key_value = $meta_key_manual.val();
-					}
 					
 					if(meta_key_value!="")
 					{
@@ -77,7 +72,7 @@
 					
 					var popup_hd_str = "";
 					popup_hd_str += '<div class="sf-thickbox-title">';
-					popup_hd_str += '<div class=".sf-ajax-window-title"></div>';
+					popup_hd_str += '<div class="sf-ajax-window-title"></div>';
 					popup_hd_str += '<div class="sf-thickbox-title-inner">Add Options</div>';
 					popup_hd_str += '<div class="sf-close-ajax-window">';
 					popup_hd_str += '<a href="#" id="TB_closeWindowButton" name="TB_closeWindowButton"></a>';
@@ -122,7 +117,7 @@
 					var $select_none_button = $popup_footer.find(".sf-meta-select-none");
 					$select_none_button.click(function()
 					{
-						$popup_content.find(".sf-thickbox-content input[type=checkbox]").each(function(){
+						$popup_content.find('.sf-thickbox-content input[type="checkbox"]').each(function(){
 						
 							this.checked = false;							
 						});
@@ -134,7 +129,7 @@
 					var $select_all_button = $popup_footer.find(".sf-meta-select-all");
 					$select_all_button.click(function()
 					{
-						$popup_content.find(".sf-thickbox-content input[type=checkbox]").each(function(){
+						$popup_content.find('.sf-thickbox-content input[type="checkbox"]').each(function(){
 						
 							this.checked = true;							
 						});
@@ -148,7 +143,7 @@
 					{
 						var $no_sort_label = $widget_ref.find(".no_sort_label");
 						var $replace_options_checkbox = $popup_footer.find('.replace-options-checkbox');
-						var $checked_options = $popup_content.find(".sf-thickbox-content input[type=checkbox]:checked");
+						var $checked_options = $popup_content.find('.sf-thickbox-content input[type="checkbox"]:checked');
 						
 						if($checked_options.length>0)
 						{
@@ -183,7 +178,7 @@
 								$meta_options_list.append($meta_option);
 								$meta_option.slideDown("fast");
 								
-								$meta_option.find("input[type=text]").val($(this).val());
+								$meta_option.find('input[type="text"]').val($(this).val());
 								
 								initMetaOptionControls($meta_option, $meta_options_list, $no_sort_label);
 								
@@ -213,6 +208,168 @@
 			});
 		}
 		
+		jQuery.fn.SfPopupTax = function(options)
+		{
+			var defaults = {
+				startOpened: false
+			};
+			var opts = jQuery.extend(defaults, options);
+			
+			//loop through each item matched
+			$(this).each(function()
+			{
+				function getTaxonomyTerms(taxonomy_name, taxonomy_ids, $target)
+				{
+					var action_name = "get_taxonomy_terms";
+					
+					$.get( ajaxurl+"?action="+action_name+"&taxonomy_name="+taxonomy_name+"&taxonomy_ids="+taxonomy_ids ).done(function(data)
+					{//don't do anything
+						
+						if(data)
+						{
+							$target.html(data);
+						}
+					});
+				}
+				
+				var item = $(this);
+				
+				if(item.attr("data-init-popup") != 1)
+				{
+					item.attr("data-init-popup", 1);
+										
+					item.click(function()
+					{
+						if(!item.hasClass("disabled"))
+						{
+							//add overlay
+							var $overlay = jQuery('<div/>', {
+								id: 'foo',
+								'class': 'sf-thickbox-overlay',
+							}).appendTo('body');
+							
+							//add popup div
+							var $popup = jQuery('<div/>', {
+								'class': 'sf-thickbox',
+							}).appendTo('body');
+							
+							var popup_hd_str = "";
+							popup_hd_str += '<div class="sf-thickbox-title">';
+							popup_hd_str += '<div class=".sf-ajax-window-title"></div>';
+							popup_hd_str += '<div class="sf-thickbox-title-inner">Update Terms</div>';
+							popup_hd_str += '<div class="sf-close-ajax-window">';
+							popup_hd_str += '<a href="#" id="TB_closeWindowButton" name="TB_closeWindowButton"></a>';
+							popup_hd_str += '<div class="sf-close-icon"></div>';
+							popup_hd_str += '</div>';
+							popup_hd_str += '</div>';
+							
+							/* init content */
+							var taxonomy_name = $(this).attr("data-taxonomy-name");
+							var taxonomy_label = $(this).attr("data-taxonomy-label");
+							var taxonomy_ids = $(this).parent().find(".settings_exclude_ids").val();
+							var $this = $(this);
+							
+							var popup_content_str = "";
+							popup_content_str += '<div class="sf-ajax-content">';
+							popup_content_str += '<p>Choose the terms to include/exclude for `<strong>'+taxonomy_label+'</strong>`</p>';
+							popup_content_str += '<p class="sf-thickbox-content">';
+							popup_content_str += '<span class="spinner" style="display: block; float:left; text-align:left;"></span>';
+							popup_content_str += '</p>';
+							popup_content_str += '</div>';
+							
+							var popup_ft_str = "";
+							popup_ft_str += '<div class="sf-thickbox-frame-toolbar">';
+							popup_ft_str += '<div class="sf-thickbox-toolbar">';
+							popup_ft_str += '<p><a href="#" class="button-secondary sf-meta-select-none">Select None</a> <a href="#" class="button-secondary sf-meta-select-all">Select All</a> <a href="#" class="button-primary sf-thickbox-action-right sf-update-button">Update</a></p>';
+							popup_ft_str += '</div>';
+							popup_ft_str += '</div>';
+							
+							var $popup_header = $(popup_hd_str);
+							var $popup_content = $(popup_content_str);
+							var $popup_footer = $(popup_ft_str);
+							
+							$popup.append($popup_header);
+							$popup.append($popup_content);
+							$popup.append($popup_footer);
+							
+							var $close_button = $popup_header.find(".sf-close-ajax-window");
+							$close_button.click(function()
+							{
+								$('.sf-thickbox-overlay').remove();
+								$popup.remove();
+								
+							});
+							
+							var $select_none_button = $popup_footer.find(".sf-meta-select-none");
+							$select_none_button.click(function()
+							{
+								$popup_content.find('.sf-thickbox-content input[type="checkbox"]').each(function(){
+								
+									this.checked = false;							
+								});
+								
+								return false;
+								
+							});
+							
+							var $select_all_button = $popup_footer.find(".sf-meta-select-all");
+							$select_all_button.click(function()
+							{
+								$popup_content.find('.sf-thickbox-content input[type="checkbox"]').each(function(){
+								
+									this.checked = true;							
+								});
+								
+								return false;
+								
+							});
+							
+							var $update_button = $popup_footer.find(".sf-update-button");
+							
+							$update_button.click(function()
+							{
+								var $replace_options_checkbox = $popup_footer.find('.replace-options-checkbox');
+								var $checked_options = $popup_content.find('.sf-thickbox-content input[type="checkbox"]:checked');
+								
+								var checkedIds = [];
+														
+								if($checked_options.length>0)
+								{
+									$checked_options.each(function(){
+										
+										checkedIds.push($(this).val());
+									});
+								}
+								
+								var checkedStr = "";
+								
+								if(checkedIds.length>0)
+								{
+									checkedStr = checkedIds.join(',');
+								}
+								
+								$this.parent().find(".settings_exclude_ids").val(checkedStr);
+								
+								//hide popup
+								$('.sf-thickbox-overlay').remove();
+								$popup.remove();
+								
+								return false;
+								
+							});
+							
+							getTaxonomyTerms(taxonomy_name, taxonomy_ids, $popup_content.find(".sf-thickbox-content"));
+							
+						}
+						
+						return false;
+						
+						
+					});
+				}
+			});
+		}
+		
 		String.prototype.parseArray = function (arr) {
 			return this.replace(/\{([0-9]+)\}/g, function (_, index) { return arr[index]; });
 		};
@@ -223,6 +380,9 @@
 		$.fn.hasAttr = function(name) {  
 		   return this.attr(name) !== undefined;
 		};
+		
+		var $search_tax_button = $('#search-filter-settings-box .search-tax-button');
+		$search_tax_button.SfPopupTax();
 		
 		
 		$("#search-filter-search-form").addClass("widgets-search-filter-sortables").addClass("ui-search-filter-sortable");
@@ -348,6 +508,64 @@
 						}
 					});
 					
+					var $tax_button = null;
+					
+					if(field_type!="post_type")
+					{
+						var $sync_include_exclude = item.find(".sync_include_exclude");
+						
+						$sync_include_exclude.on("change", function(){
+							
+							init_sync_checkbox($(this));
+							
+						});
+						
+						init_sync_checkbox($sync_include_exclude);
+						
+						$tax_button = item.find(".search-tax-button");
+						
+						if(field_type!="post_tag")
+						{
+							//include children
+							var $operator_select = item.find(".sf_operator select");
+							
+						}
+					}
+					
+					if(field_type=="taxonomy")
+					{
+						
+						var $tsel = item.find('.sf_taxonomy_name select');
+						var current_tax_name = $tsel.find("option[value='"+$tsel.val()+"']").html();
+						
+						
+						$tax_button.attr('data-taxonomy-name', $tsel.val());
+						$tax_button.attr('data-taxonomy-label', current_tax_name);
+					}
+					
+					if(field_type!="post_type")
+					{
+						$tax_button.SfPopupTax();
+					}
+					
+				}
+				
+				function init_sync_checkbox($this)
+				{
+					if($this.is(":checked"))
+					{
+						item.find(".exclude_ids").attr("disabled", "disabled");
+						item.find(".exclude_ids_hidden").removeAttr("disabled");
+						item.find(".exclude_ids_hidden").val(item.find(".exclude_ids").val());
+						item.find(".search-tax-button").addClass("disabled");
+						
+					}
+					else
+					{
+						item.find(".exclude_ids").removeAttr("disabled");
+						item.find(".exclude_ids_hidden").attr("disabled", "disabled");
+						item.find(".search-tax-button").removeClass("disabled");
+					}
 				}
 				
 				if(field_type=="author")
@@ -393,12 +611,15 @@
 					$taxonomy_select.on("change",function()
 					{
 						var current_tax_name = $taxonomy_select.find("option[value='"+$taxonomy_select.val()+"']").html();
-						item.find('.in-widget-title').html(": "+current_tax_name);
-					
+						item.find('.in-widget-title').html(": &nbsp;"+current_tax_name);
+						
+						var $tax_button = item.find(".search-tax-button");
+						$tax_button.attr('data-taxonomy-name', $(this).val());
+						$tax_button.attr('data-taxonomy-label', current_tax_name);
 					});
 					
 					var current_tax_name = $taxonomy_select.find("option[value='"+$taxonomy_select.val()+"']").html();
-					item.find('.in-widget-title').html(": "+current_tax_name);
+					item.find('.in-widget-title').html(": &nbsp;"+current_tax_name);
 					
 				}
 				
@@ -429,9 +650,76 @@
 				
 				if(field_type=="post_meta")
 				{
-					setPostMetaManualFields();
+					/* */
 					
-					var $meta_key_manual_toggle = item.find('.meta_key_manual_toggle');
+					var $use_same_toggle = item.find('.use_same_toggle');
+					var $start_meta_key = item.find('.start_meta_key');
+					
+					$use_same_toggle.each(function(){
+						
+						setPostMetaUseSameFields($(this));
+					});
+					
+					$use_same_toggle.change(function(e)
+					{
+						setPostMetaUseSameFields($(this));
+					});
+					$start_meta_key.change(function(e)
+					{
+						setPostMetaStartKey($(this));
+					});
+					
+					
+					/* number */
+					
+					// start off by showing/hiding correct fields
+					
+					//decimals toggle
+					var $number_is_decimal = item.find('.number_is_decimal');
+					var $number_decimal_places = item.find('.number_decimal_places');
+					checkboxToggleDeps($number_is_decimal, $number_decimal_places);
+					
+					$number_is_decimal.on("change",function(){
+						checkboxToggleDeps($(this), $number_decimal_places);
+					});
+					
+					//min range toggle
+					var $range_min_detect = item.find('.range_min_detect');
+					var $range_min = item.find('.range_min');
+					checkboxToggleDeps($range_min_detect, $range_min, true);
+					
+					$range_min_detect.on("change",function(){
+						checkboxToggleDeps($(this), $range_min, true);
+					});
+					
+					//max range toggle
+					var $range_max_detect = item.find('.range_max_detect');
+					var $range_max = item.find('.range_max');
+					checkboxToggleDeps($range_max_detect, $range_max, true);
+					
+					$range_max_detect.on("change",function(){
+						checkboxToggleDeps($(this), $range_max, true);
+					});
+					
+					//input type field
+					var $number_input_type_field = item.find('.sf_number_input_type select');
+					
+					showHideFieldsMetaNumber($number_input_type_field.val());
+					$number_input_type_field.change(function(e)
+					{
+						var input_type = $(this).val();
+						showHideFieldsMetaNumber(input_type);
+					});
+					
+					var $sf_display_input_as = item.find('.sf_display_input_as select');
+					showHideFieldsMetaNumberDisplayInputAs($sf_display_input_as.val());
+					$sf_display_input_as.change(function(e)
+					{
+						var display_input_as = $(this).val();
+						showHideFieldsMetaNumberDisplayInputAs(display_input_as);
+					});
+					
+					/* choice */
 					
 					var $input_type_field = item.find('.sf_input_type select');
 					
@@ -443,6 +731,49 @@
 						var input_type = $(this).val();
 						showHideFields(input_type);
 					});
+					
+					var $input_type_field = item.find('.sf_input_type select');
+					
+					// start off by showing/hiding correct fields
+					showHideFields($input_type_field.val());
+					
+					$input_type_field.change(function(e)
+					{
+						var input_type = $(this).val();
+						showHideFields(input_type);
+					});
+					
+					var $choice_get_options_field = item.find('.sf_choice_get_options select');
+					var $choice_order_options_by_field = item.find('.sf_choice_order_options select.sf_choice_order_option_by');
+
+					// start off by showing/hiding correct fields
+					showHideFieldsMetaChoiceOptions($choice_get_options_field.val());
+					$choice_get_options_field.change(function(e)
+					{
+						var input_type = $(this).val();
+						showHideFieldsMetaChoiceOptions(input_type);
+					});
+					// start off by showing/hiding correct fields
+					showHideFieldsMetaChoiceOrderBy($choice_order_options_by_field.val());
+					$choice_order_options_by_field.change(function(e)
+					{
+						var input_type = $(this).val();
+						showHideFieldsMetaChoiceOrderBy(input_type);
+					});
+
+					/* date */
+					var $date_input_type = item.find('.sf_date_input select');
+					
+					// start off by showing/hiding correct fields
+					showHideFields($date_input_type.val());
+					
+					$date_input_type.change(function(e)
+					{
+						var input_type = $(this).val();
+						showHideFields(input_type);
+					});
+					
+					
 					
 					
 					var $combobox = item.find(".sf_make_combobox input");
@@ -464,11 +795,9 @@
 						}
 					});
 					
+					
 					//grab the input type
-					$meta_key_manual_toggle.change(function(e)
-					{
-						setPostMetaManualFields();
-					});
+					
 				}
 				
 				if(field_type=="sort_order")
@@ -495,7 +824,8 @@
 					
 					$sort_options_list.sortable({
 						opacity: 0.6,
-						revert: 200,
+						//revert: 200,
+						revert: false,
 						cursor: 'move',
 						handle: '.slimmove',
 						//cancel: '.widget-title-action,h3,.sidebar-description',
@@ -607,9 +937,9 @@
 				{
 					/* init meta type radios */
 					/* set up meta type radios */
-					var $meta_type_radio = item.find('.sf_meta_type input[type=radio]');
+					var $meta_type_radio = item.find('.sf_meta_type input[type="radio"]');
 					var $meta_type_labels = item.find('.sf_meta_type label');
-					var $checked_radio = item.find(".sf_meta_type input[data-radio-checked='1']");
+					var $checked_radio = item.find('.sf_meta_type input[data-radio-checked="1"]');
 					
 					$meta_type_radio.each(function(){
 						this.checked = false;
@@ -626,7 +956,6 @@
 					$checked_radio.attr("data-radio-checked", 1);
 					$checked_radio.prop('checked',true);
 					var meta_type_val = $checked_radio.val();
-					//alert("checked val: "+meta_type_val);
 					
 					metaTypeChange($checked_radio);
 					
@@ -652,7 +981,8 @@
 					
 					$meta_options_list.sortable({
 						opacity: 0.6,
-						revert: 200,
+						//revert: 200,
+						revert: false,
 						cursor: 'move',
 						handle: '.slimmove',
 						//cancel: '.widget-title-action,h3,.sidebar-description',
@@ -719,7 +1049,7 @@
 					});
 					
 					
-					$detect_option_button.SfPopup();
+					$detect_option_button.SfPopupMeta();
 					
 					$clear_option_button.click(function(){
 					
@@ -743,8 +1073,71 @@
 						return false;
 					
 					});
+					
+					/* adding meta keys to widget header */
+					
+					//item.find(".sf_field_data").hide();
+					var $widget_title_triggers = item.find(".sf_meta_keys .start_meta_key, .sf_meta_keys .end_meta_key, .sf_meta_keys .choice_meta_key, .sf_meta_type input, .use_same_toggle, .sf_date_input select");
+					$widget_title_triggers.on("change", function(){
+						
+						set_meta_widget_title(item);
+						
+					});
+					
+					set_meta_widget_title(item);
+					
+					
+					
 				}
 				
+				function set_meta_widget_title(item)
+				{
+					
+					var $radio = item.find('.sf_meta_type input[data-radio-checked="1"]');
+					var radio_val = $radio.val();
+					
+					var meta_string = "";
+					var $meta_container = item.find(".sf_field_data.sf_"+radio_val);
+					
+					var $use_same_toggle = $meta_container.find('.use_same_toggle');
+					
+					if(radio_val=="choice")
+					{
+						meta_string = $meta_container.find(".sf_meta_keys .choice_meta_key").val();
+					}
+					else if(radio_val=="number")
+					{//then there is only 1 meta key
+						if($use_same_toggle.prop("checked")==true)
+						{
+							meta_string = $meta_container.find(".sf_meta_keys .start_meta_key").val();
+						}
+						else
+						{
+							var start_meta_val = $meta_container.find(".sf_meta_keys .start_meta_key").val();
+							var end_meta_val = $meta_container.find(".sf_meta_keys .end_meta_key").val();
+							meta_string = start_meta_val + " - " + end_meta_val;
+						}
+					}
+					else if(radio_val=="date")
+					{
+						var dateInputType = $meta_container.find(".sf_date_input select");
+						
+						if(($use_same_toggle.prop("checked")==true)||(dateInputType.val()=="date"))
+						{
+							meta_string = $meta_container.find(".sf_meta_keys .start_meta_key").val();
+						}
+						else
+						{
+							var start_meta_val = $meta_container.find(".sf_meta_keys .start_meta_key").val();
+							var end_meta_val = $meta_container.find(".sf_meta_keys .end_meta_key").val();
+							meta_string = start_meta_val + " - " + end_meta_val;
+						}
+					}
+					
+					//meta_string = " "+meta_string+" &nbsp;&nbsp;<em><small>"+radio_val+"</em></small>";
+					item.find('.in-widget-title').html(": &nbsp;"+meta_string);
+					
+				}
 				function initSortOptionControls($sort_option, $sort_options_list, $no_sort_label)
 				{
 					var $sort_by_option = $sort_option.find(".sort_by_option");
@@ -796,6 +1189,77 @@
 				}
 				
 				
+				function setPostMetaStartKey($this)
+				{
+					var $start_meta_key = $this;
+					var $use_same_parent = $this.closest(".sf_meta_keys");
+					//var $end_key_select = $use_same_parent.find(".meta_key");
+					var $end_key_select = $use_same_parent.next().find(".meta_key");
+					var $use_same_toggle = $use_same_parent.next().find(".use_same_toggle");
+					
+					//$end_key_select
+					
+					if($use_same_toggle.prop("checked")==true)
+					{
+						$end_key_select.val($start_meta_key.val());
+					}
+				
+				}
+				
+				function setPostMetaUseSameFields($this)
+				{
+					var $use_same_toggle = $this;
+					var $use_same_parent = $this.closest(".sf_meta_keys");
+					var $compare_mode = $use_same_parent.parent().find(".sf_compare_mode");
+					var $end_key_select = $use_same_parent.find(".meta_key");
+					var $start_key_select = $use_same_parent.prev().find(".start_meta_key");
+					
+					
+					//$compare_mode.css("border", "1px solid #f00");
+					//$end_key_select.css("border", "1px solid #0f0");
+					//$use_same_parent.hide();
+					
+					if($use_same_toggle.is(":checked"))
+					{
+						$end_key_select.val($start_key_select.val());
+						$end_key_select.prop("disabled", true);
+						$compare_mode.hide();
+					}
+					else
+					{
+						$end_key_select.prop("disabled", false);
+						$compare_mode.show();
+					}
+					
+					/*
+					var $meta_key_manual = item.find(".meta_key_manual");
+					var $meta_key_manual_hidden = item.find(".meta_key_manual_hidden");
+					var $meta_key = item.find(".meta_key");
+					var $meta_key_hidden = item.find(".meta_key_hidden");
+					
+					
+					if($meta_key_manual_toggle.is(":checked"))
+					{
+						$meta_key_manual.removeAttr("disabled");
+						$meta_key_manual_hidden.attr("disabled", "disabled");
+						
+						$meta_key_hidden.removeAttr("disabled");
+						$meta_key_hidden.val($meta_key.val());
+						$meta_key.attr("disabled", "disabled");
+						
+						$meta_key_manual.focus();
+					}
+					else
+					{
+						$meta_key_manual_hidden.removeAttr("disabled");
+						$meta_key_manual_hidden.val($meta_key_manual.val());
+						$meta_key_manual.attr("disabled", "disabled");
+						
+						$meta_key.removeAttr("disabled");
+						$meta_key_hidden.attr("disabled", "disabled");
+					}*/
+
+				}
 				
 				function setPostMetaManualFields()
 				{
@@ -828,14 +1292,104 @@
 
 				}
 				
+				function checkboxToggleDeps($self, $deps, reverse)
+				{
+					var reverse_dir = false;
+					if(typeof(reverse)!="undefined")
+					{
+						reverse_dir = reverse;
+					}
+					
+					var $inputs = $deps;
+					
+					if($self.is(":checked"))
+					{
+						//enable all fields
+						$inputs.each(function(){
+						
+							var $input = $(this);
+							
+							if(!reverse_dir)
+							{
+								enableInput($input);
+							}
+							else
+							{
+								disableInput($input);
+							}
+							
+						});
+					}
+					else
+					{
+						//disable all fields
+						$inputs.each(function(){
+						
+							var $input = $(this);
+							
+							if(!reverse_dir)
+							{
+								disableInput($input);
+							}
+							else
+							{
+								enableInput($input);
+							}
+							
+						});
+						
+					}
+					
+				}
+				
+				function showHideFieldsMetaNumber(input_type)
+				{
+					var $number_container = item.find(".sf_number");
+					$number_container.attr('data-number-input-type', input_type);
+				}
+				
+				function showHideFieldsMetaChoiceOptions(option_type)
+				{
+					var $choice_container = item.find(".sf_choice");
+					$choice_container.attr('data-choice-get-options', option_type);
+				}
+
+				function showHideFieldsMetaChoiceOrderBy(option_type)
+				{
+					var $choice_container = item.find(".sf_choice");
+
+                    //var $sf_choice_order_option_dir = $choice_container.find(".sf_choice_order_option_dir");
+                    //var $sf_choice_order_option_type = $choice_container.find(".sf_choice_order_option_type");
+                    var $sf_choice_order_option_dependants = $choice_container.find(".sf_choice_order_option_type, .sf_choice_order_option_dir");
+
+					//$choice_container.attr('data-choice-order-by', option_type);
+
+                    if(option_type=="none")
+                    {
+                        $sf_choice_order_option_dependants.prop("disabled", true);
+                    }
+                    else
+                    {
+                        $sf_choice_order_option_dependants.prop("disabled", false);
+                    }
+
+				}
+
+				function showHideFieldsMetaNumberDisplayInputAs(display_input_as)
+				{
+					var $number_container = item.find(".sf_number");
+					$number_container.attr('data-display-input-as', display_input_as);
+				}
+				
 				function showHideFields(input_type)
-				{					
+				{
 					if(input_type=="select")
 					{
 						item.find(".sf_operator").hide();
 						item.find(".sf_drill_down").show();
 						item.find(".sf_all_items_label").show();
 						item.find(".sf_make_combobox").show();
+						item.find(".sf_accessibility_label").show();
 					}
 					else if(input_type=="checkbox")
 					{
@@ -843,6 +1397,7 @@
 						item.find(".sf_drill_down").hide();
 						item.find(".sf_all_items_label").hide();
 						item.find(".sf_make_combobox").hide();
+						item.find(".sf_accessibility_label").hide();
 					}
 					else if(input_type=="radio")
 					{
@@ -850,6 +1405,7 @@
 						item.find(".sf_drill_down").hide();
 						item.find(".sf_make_combobox").hide();
 						item.find(".sf_all_items_label").show();
+						item.find(".sf_accessibility_label").hide();
 					}
 					else if(input_type=="multiselect")
 					{
@@ -857,55 +1413,53 @@
 						item.find(".sf_drill_down").hide();
 						item.find(".sf_all_items_label").hide();
 						item.find(".sf_make_combobox").show();
+						item.find(".sf_accessibility_label").show();
 						
 						if(item.find(".sf_make_combobox input").prop("checked"))
 						{
 							item.find(".sf_all_items_label").show();
 						}
 					}
-					else if(input_type=="range-slider")
+					else if(input_type=="date")
 					{
-
+						item.find(".sf_date_end_meta_key").hide();
+						
 					}
-					else if(input_type=="range-number")
+					else if(input_type=="daterange")
 					{
-
-					}
-					else if(input_type=="range-radio")
-					{
-
-					}
-					else if(input_type=="range-checkbox")
-					{
-
+						item.find(".sf_date_end_meta_key").show();
 					}
 					
 				}
 				function showHideFieldsAuthor(input_type)
-				{					
+				{
 					if(input_type=="select")
 					{
 						//item.find(".sf_operator").hide();
 						item.find(".sf_all_items_label").show();
 						item.find(".sf_make_combobox").show();
+						item.find(".sf_accessibility_label").show();
 					}
 					else if(input_type=="checkbox")
 					{
 						//item.find(".sf_operator").show();
 						item.find(".sf_all_items_label").hide();
 						item.find(".sf_make_combobox").hide();
+						item.find(".sf_accessibility_label").hide();
 					}
 					else if(input_type=="radio")
 					{
 						//item.find(".sf_operator").hide();
 						item.find(".sf_all_items_label").show();
 						item.find(".sf_make_combobox").hide();
+						item.find(".sf_accessibility_label").hide();
 					}
 					else if(input_type=="multiselect")
 					{
 						//item.find(".sf_operator").show();
 						item.find(".sf_all_items_label").hide();
 						item.find(".sf_make_combobox").show();
+						item.find(".sf_accessibility_label").show();
 						
 						if(item.find(".sf_make_combobox input").prop("checked"))
 						{
@@ -946,7 +1500,8 @@
 				
 				container.sortable({
 					opacity: 0.6,
-					revert: container.hasClass("closed") ? false : 200,
+					//revert: container.hasClass("closed") ? false : 200,
+					revert: false,
 					cursor: 'move',
 					handle: '.widget-top',
 					cancel: '.widget-title-action,h3,.sidebar-description',
@@ -971,9 +1526,9 @@
 						if(field_type=="post_meta")
 						{
 							/* set up meta type radios */
-							var $meta_type_radio = ui.item.find('.sf_meta_type input[type=radio]');
+							var $meta_type_radio = ui.item.find('.sf_meta_type input[type="radio"]');
 							var $meta_type_labels = ui.item.find('.sf_meta_type label');
-							var $checked_radio = ui.item.find(".sf_meta_type input[data-radio-checked='1']");
+							var $checked_radio = ui.item.find('.sf_meta_type input[data-radio-checked="1"]');
 							
 							$meta_type_radio.each(function(){
 								this.checked = false;
@@ -1041,23 +1596,23 @@
 						//if(!ui.placeholder.parent().hasClass("inside"))
 						//{//if it is getting appended to the wrong place, then force it in to the right container :)
 							ui.placeholder.appendTo(ui.placeholder.parent().find(".inside #search-form"));
-						//alert("start");
+
 					},
 					receive: function(ev, ui)
 					{
 						received = true;
 						//$emptyPlaceholder.hide();
-						//alert("receive");
+
 					},
 					change: function(e,ui){
-						//alert("change");
+
 					}
 					
 				});
 				
 				container.click(function()
 				{//prevent animation when the container is closed - no need to animate the helper to an invisible DIV.....
-					if(container.hasClass("closed"))
+					/*if(container.hasClass("closed"))
 					{
 						
 						container.sortable( "option", "revert", false );
@@ -1065,7 +1620,7 @@
 					else
 					{
 						container.sortable( "option", "revert", 200 );
-					}
+					}*/
 				});
 				
 					
@@ -1091,6 +1646,9 @@
 		{
 			//@TODO: add and remove hover effect class
 			$("#search-filter-search-form").addClass("post-box-hover");
+			/*$("#search-filter-search-form").css("border", "1px solid #f00");
+			$("#search-filter-search-form").css("width", "100%");
+			$("#search-filter-search-form").css("height", "auto");*/
 		}
 		
 		
@@ -1101,6 +1659,8 @@
 			
 			var $droppedWidget = $('.widgets-search-filter-sortables .widget:not(.widget-enabled)');
 			$droppedWidget.makeWidget();
+			$droppedWidget.css("width", "");
+			$droppedWidget.css("height", "");
 			
 
 		}
@@ -1111,7 +1671,7 @@
 			
 			var $active_widgets = $("#search-filter-search-form").find(".widget");
 			
-			/*var $widgets_radio = $active_widgets.find("input[type=radio]");
+			/*var $widgets_radio = $active_widgets.find('input[type="radio"]');
 			$widgets_radio.each(function(){
 			
 				$(this).attr("data-radio-val", $(this).prop("checked"));
@@ -1156,7 +1716,7 @@
 				widgetCount++;
 			});
 			
-			var $widgets_radio = $active_widgets.find("input[type=radio]");
+			var $widgets_radio = $active_widgets.find('input[type="radio"]');
 			
 			$widgets_radio.each(function()
 			{
@@ -1284,7 +1844,7 @@
 			
 			var radio_val = $radio_field.val();
 			
-			item.find(".sf_input_type_meta input[data-radio-checked='1']").prop('checked',true);
+			item.find('.sf_input_type_meta input[data-radio-checked="1"]').prop('checked',true);
 			
 			item.find(".sf_input_type_meta").hide();
 			item.find(".sf_field_data").hide();
@@ -1295,115 +1855,422 @@
 	
 		function initSetupField()
 		{
-			var $use_template_manual_toggle = $('.setup .use_template_manual_toggle');
-			var $use_ajax_toggle = $('.setup .use_ajax_toggle');
-			var $sf_ajax_container = $('.setup .sf_ajax');
+			var $enable_auto_count = $(".setup .sf_tab_content_settings .enable_auto_count");
 			
-			//grab the input type
-			$use_template_manual_toggle.change(function(e)
-			{
-				handleSetupTemplateToggle($(this), $sf_ajax_container, $use_ajax_toggle);
+			
+			/* display results - shortcode/archive */
+			var $results_toggle = $(".setup .display_results_as");
+			var $template_table = $('.setup .sf_tab_content_template .template_options_table');
+			var $template_sect = $('.setup .sf_tab_content_template .template_options_sect');
+			var $display_result_txt_cont = $('.setup .sf_tab_content_template .display_result_txt_cont');
+			var $tpl_archive_rows = $('.setup .sf_tab_content_template .tpl_archive_rows');
+			var $tpl_post_type_archive_rows = $('.setup .sf_tab_content_template .tpl_post_type_archive_rows');
+			var $tpl_woocommerce_rows = $('.setup .sf_tab_content_template .tpl_custom_woocommerce_rows');
+			var $tpl_custom_rows = $('.setup .sf_tab_content_template .tpl_custom_rows');
+			var $tpl_woo_tax_label = $('.setup .sf_tab_content_template .taxonomy_archive_woocommerce_label');
+
+			var $use_ajax_toggle = $('.setup .sf_tab_content_template .use_ajax_toggle');
+			var $selectors_results_div = $('#shortcode-info .results-shortcode');
+			var $selectors_edd_div = $('#shortcode-info .edd-shortcode');
+			
+			var $active_results_display = $(".setup .display_results_as");
+			
+			//var $alabels = $active_results_display.parent().parent().parent().find("label");
+			//$alabels.removeClass("active");
+			//$active_results_display.parent().addClass("active");
+			
+			$display_result_txt_cont.find(".display_result_txt").hide();
+			$display_result_txt_cont.find("#display_result_"+$active_results_display.attr("data-sf-base")+"_txt").show();
+
+
+
+            display_result_as_toggle($results_toggle);
+			/* ajax toggle */
+			$results_toggle.on("change", function(){
+                display_result_as_toggle($(this));
+            });
+
+            function display_result_as_toggle($this){
+
+				var $self = $this;
+				var val = $self.find('option[value="'+$self.val()+'"]').attr("data-sf-base");
+
+                var $labels = $self.parent().parent().parent().find("label");
+				$labels.removeClass("active");
+				$self.parent().addClass("active");
+				
+				$display_result_txt_cont.find(".display_result_txt").hide();
+				$display_result_txt_cont.find("#display_result_"+$active_results_display.val()+"_txt").show();
+                //$template_table.removeClass("tpl_custom_woocommerce_rows");
+                $tpl_woo_tax_label.hide();
+				if(val=="shortcode")
+				{
+					$template_table.removeClass("template_archive_options");
+					$template_table.removeClass("template_post_type_archive_options");
+					$template_table.removeClass("template_custom_woocommerce_options");
+					$template_table.addClass("template_shortcode_options");
+					$tpl_custom_rows.hide();
+
+                    if($self.val()=="shortcode") {
+                        $selectors_results_div.show();
+                    }
+                    else {
+                        $selectors_results_div.hide();
+                    }
+
+
+					$selectors_edd_div.hide();
+					$template_sect.show();
+					$tpl_archive_rows.hide();
+					$tpl_post_type_archive_rows.hide();
+					$tpl_woocommerce_rows.hide();
+				}
+				else if(val=="archive")
+				{
+					$template_table.removeClass("template_shortcode_options");
+					$template_table.removeClass("template_post_type_archive_options");
+					$template_table.removeClass("template_custom_woocommerce_options");
+					$template_table.addClass("template_archive_options");
+					$tpl_custom_rows.hide();
+					$selectors_results_div.hide();
+					$selectors_edd_div.hide();
+					$template_sect.show();
+
+					$tpl_post_type_archive_rows.hide();
+					$tpl_woocommerce_rows.hide();
+
+					$tpl_archive_rows.show();
+				}
+				else if((val=="post_type_archive")||(val=="custom_woocommerce_store"))
+				{
+					$template_table.removeClass("template_shortcode_options");
+					$template_table.removeClass("template_custom_woocommerce_options");
+                    $template_table.removeClass("template_archive_options");
+					$template_table.addClass("template_post_type_archive_options");
+					$tpl_custom_rows.hide();
+					$selectors_results_div.hide();
+					$selectors_edd_div.hide();
+					$template_sect.show();
+
+					$tpl_archive_rows.hide();
+					$tpl_woocommerce_rows.hide();
+					$tpl_post_type_archive_rows.show();
+
+                    if(val=="custom_woocommerce_store")
+                    {
+                        $tpl_woo_tax_label.show();
+						$tpl_woocommerce_rows.show();
+                        /*$template_table.addClass("template_custom_woocommerce_options");
+                          .addClass("template_custom_woocommerce_options");*/
+                    }
+				}
+				else if(val=="custom")
+				{
+					$template_table.removeClass("template_archive_options");
+                    $template_table.removeClass("template_post_type_archive_options");
+                    $template_table.removeClass("template_custom_woocommerce_options");
+					$template_table.addClass("template_shortcode_options");
+					$selectors_results_div.hide();
+					$template_sect.show();
+					$selectors_edd_div.hide();
+					$tpl_archive_rows.hide();
+					$tpl_woocommerce_rows.hide();
+					$tpl_post_type_archive_rows.hide();
+					$tpl_custom_rows.show();
+				}
+				else
+				{
+					$template_table.removeClass("template_shortcode_options");
+                    $template_table.removeClass("template_post_type_archive_options");
+                    $template_table.removeClass("template_custom_woocommerce_options");
+					$template_table.addClass("template_archive_options");
+					$tpl_custom_rows.hide();
+					$selectors_results_div.hide();
+					$selectors_edd_div.hide();
+					$template_sect.hide();
+					$tpl_archive_rows.show();
+					$tpl_post_type_archive_rows.hide();
+
+					if(val=="custom_woocommerce_store")
+					{
+						/*$template_sect.show();
+						$template_table.removeClass("template_archive_options");
+						$template_table.addClass("template_post_type_archive_options");*/
+						/*$tpl_woocommerce_rows.show();
+						$template_sect.show();
+						$template_table.removeClass("template_archive_options");
+						$template_table.addClass("tpl_custom_woocommerce_rows");*/
+
+						/*$template_table.removeClass("template_shortcode_options");
+						$template_table.removeClass("template_archive_options");
+						$template_table.addClass("template_post_type_archive_options");
+						$template_table.addClass("tpl_custom_woocommerce_rows");
+						$tpl_custom_rows.hide();
+						$selectors_results_div.hide();
+						$selectors_edd_div.hide();
+						$template_sect.show();
+						$tpl_archive_rows.hide();
+						$tpl_woocommerce_rows.hide();
+						$tpl_post_type_archive_rows.show();*/
+					}
+					else if(val=="custom_edd_store")
+					{
+						$template_table.removeClass("template_archive_options");
+						$template_table.addClass("template_shortcode_options");
+						$tpl_archive_rows.hide();
+						$tpl_custom_rows.show();
+						$selectors_edd_div.show();
+						$template_sect.show();
+					}
+				}
+				
+			}
+			
+			var $scroll_to_pos = $(".setup .scroll_to_pos");
+			
+			ajaxToggle($use_ajax_toggle);
+			$use_ajax_toggle.on("change",function(){
+				ajaxToggle($(this));
+				updateScrollToPos($scroll_to_pos);
 			});
 			
-			handleSetupTemplateToggle($use_template_manual_toggle, $sf_ajax_container, $use_ajax_toggle);
-			
-			//grab the input type
-			$use_ajax_toggle.change(function(e)
-			{
-				handleSetupAjaxToggle($(this));
+			autoCountToggle($enable_auto_count);
+			$enable_auto_count.on("change",function(){
+				autoCountToggle($(this));
+				updateScrollToPos($scroll_to_pos);
 			});
 			
-			handleSetupAjaxToggle($use_ajax_toggle);
+			/* scroll to pos */
+			
+			updateScrollToPos($scroll_to_pos);
+			$scroll_to_pos.on("change", function(e){
+				updateScrollToPos($(this));
+				
+			});
+			//end scroll_to_pos
+			
+			
+			/* pagination type */
+			var $pagination_type = $(".setup .pagination_type");
+			updatePaginationType($pagination_type);
+			$pagination_type.on("change", function(e){
+				updatePaginationType($(this));
+				
+			});
+			//end scroll_to_pos
+			
+			/* sort by */
+			var $default_sort_by = $('.setup .default_sort_by');
+			var $sort_by_meta_container_default = $('.setup .sort_by_meta_container_default');
+			$default_sort_by.change(function(e)
+			{
+				handleDefaultSortBy($(this), $sort_by_meta_container_default);
+			});
+			
+			handleDefaultSortBy($default_sort_by, $sort_by_meta_container_default);
+			
+			
+			var $secondary_sort_by = $('.setup .secondary_sort_by');
+			var $sort_by_meta_container_secondary = $('.setup .sort_by_meta_container_secondary');
+			$secondary_sort_by.change(function(e)
+			{
+				handleDefaultSortBy($(this), $sort_by_meta_container_secondary);
+			});
+			
+			handleDefaultSortBy($secondary_sort_by, $sort_by_meta_container_secondary);
+			
+				
+		}
+		function updatePaginationType($paginationType)
+		{
+			if($paginationType.prop("disabled")==false)
+			{
+				var pagination_type = $paginationType.val();
+				var $pagination_table = $('#search-filter-settings-box .template_pagination_table');
+				
+				$pagination_table.attr("data-sf-pagination-type", pagination_type);
+			}
+			
 			
 		}
 		
-		function handleSetupAjaxToggle($this)
+		function updateScrollToPos($scrollToObject)
 		{
-			var $ajax_target = $('.setup .ajax_target');
-			var $ajax_target_hidden = $('.setup .ajax_target_hidden');
-			
-			var $ajax_links_selector = $('.setup .ajax_links_selector');
-			var $ajax_links_selector_hidden = $('.setup .ajax_links_selector_hidden');
-			
-			var $ajax_auto_submit = $('.setup .auto_submit');
-			var $ajax_auto_submit_hidden = $('.setup .auto_submit_hidden');
-			
-			var $selectors_div = $('.setup .ajax-selectors');
-			
-			if($this.is(":checked"))
+			if($scrollToObject.prop("disabled")==false)
 			{
-				$ajax_target.removeAttr("disabled");
-				$ajax_target_hidden.attr("disabled","disabled");
+				var $custom_scroll_to = $(".setup .custom_scroll_to");
+				var $scroll_on_action = $(".setup .scroll_on_action");
 				
-				$ajax_links_selector.removeAttr("disabled");
-				$ajax_links_selector_hidden.attr("disabled","disabled");
+				if($scrollToObject.val()=="custom")
+				{
+					$custom_scroll_to.show();
+				}
+				else
+				{
+					$custom_scroll_to.hide();
+				}
 				
-				$ajax_auto_submit.removeAttr("disabled");
-				$ajax_auto_submit_hidden.attr("disabled","disabled");
 				
-				$selectors_div.css("opacity", 1);
-				//$selectors_div.slideDown("fast")
+				if($scrollToObject.val()=="0")
+				{
+					disableInput($scroll_on_action); 
+				}
+				else
+				{
+					enableInput($scroll_on_action);
+				}
+			}
+			
+			
+		}
+		function autoCountToggle($self)
+		{
+			var $inputs = $self.closest("tr").find(".auto_count_refresh_mode");
+			
+			if($self.is(":checked"))
+			{
+				//enable all fields
+				$inputs.each(function(){
 				
+					var $input = $(this);
+					enableInput($input);
+					
+				});
 			}
 			else
 			{
+				//disable all fields
+				$inputs.each(function(){
 				
-				$ajax_target.attr("disabled","disabled");
-				$ajax_target_hidden.removeAttr("disabled");
-				$ajax_target_hidden.val($ajax_target.val());
-				
-				$ajax_links_selector.attr("disabled","disabled");
-				$ajax_links_selector_hidden.removeAttr("disabled");
-				$ajax_links_selector_hidden.val($ajax_links_selector.val());
-				
-				$ajax_auto_submit.attr("disabled","disabled");
-				$ajax_auto_submit_hidden.removeAttr("disabled");
-				
-				$selectors_div.css("opacity", 0.5);
+					var $input = $(this);
+					disableInput($input);
+				});
 				
 			}
+			
+		}
+		function ajaxToggle($self)
+		{
+			var $inputs = $(".tpl_use_ajax_rows input, .tpl_use_ajax_rows select");
+			
+			if($self.is(":checked"))
+			{
+				//enable all fields
+				$inputs.each(function(){
+				
+					var $input = $(this);
+					enableInput($input);
+					
+				});
+			}
+			else
+			{
+				//disable all fields
+				$inputs.each(function(){
+				
+					var $input = $(this);
+					disableInput($input);
+				});
+				
+			}
+			
+		}
+		function disableInput($input)
+		{
+			//create a hidden version of the field, that is not disabled - so we can retain even disabled values in the DB
+			var $inputClone = $('<input/>', {
+				'type'						: 'hidden',
+				'name'						: $input.attr("name"),
+				'class'						: 'clone',
+				'data-field-template-id'	: $input.attr("data-field-template-id"),
+				'data-field-template-name'	: $input.attr("data-field-template-name"),
+				'value'						: ''
+			});
+			
+			if($input.get(0).tagName=="INPUT")
+			{
+				if(($input.attr("type")=="checkbox")||($input.attr("type")=="radio"))
+				{
+					$inputClone.val($input.prop("checked") ? 1 : "");
+				}
+				else if($input.attr("type")=="text")
+				{
+					$inputClone.val($input.val());
+				}
+				else
+				{
+					$inputClone.val($input.val());
+				}
+			}
+			else if($input.get(0).tagName=="SELECT")
+			{
+				$inputClone.val($input.val());
+			}
+			else
+			{
+				$inputClone.val($input.val());
+			}
+			
+			$input.after($inputClone);
+			$input.attr("disabled","disabled");
+		}
+		
+		function enableInput($input)
+		{
+			$input.removeAttr("disabled");
+			
+			var $inputClone = $input.parent().find(".clone");
+			
+			if($inputClone.length>0)
+			{
+				if($input.get(0).tagName=="INPUT")
+				{
+					if(($input.attr("type")=="checkbox")||($input.attr("type")=="radio"))
+					{
+						if($inputClone.val()==1)
+						{
+							$input.prop("checked", true);
+						}
+						else
+						{
+							$input.prop("checked", false);
+						}
+					}
+					else if($input.attr("type")=="text")
+					{
+						$input.val($inputClone.val());
+					}
+					else
+					{
+						$input.val($inputClone.val());
+					}
+				}
+				else if($input.get(0).tagName=="SELECT")
+				{
+					$input.val($inputClone.val());
+				}
+			
+				$inputClone.remove();
+			}
+		}
+		
+		function handleDefaultSortBy($this, $sort_by_meta_container)
+		{
+			if($this.val()=="meta_value")
+			{
+				$sort_by_meta_container.show();
+			}
+			else
+			{
+				$sort_by_meta_container.hide();
+			}
+			
 			
 		}
 		
-		function handleSetupTemplateToggle($this, $sf_ajax_container, $use_ajax_toggle)
-		{
-			var $template_name_manual = $('.setup .template_name_manual');
-			var $template_name_manual_hidden = $('.setup .template_name_manual_hidden');
-			
-			var $page_slug = $('.setup .page_slug');
-			var $page_slug_hidden = $('.setup .page_slug_hidden');
-			
-			var $template_div = $(".setup .custom_template");
-			
-			if($this.is(":checked"))
-			{
-				$template_name_manual.removeAttr("disabled");
-				$template_name_manual_hidden.attr("disabled","disabled");
-				
-				$page_slug.removeAttr("disabled");
-				$page_slug_hidden.attr("disabled","disabled");
-				
-				$template_div.css("opacity", 1);
-				
-			}
-			else
-			{
-			
-				$template_name_manual.attr("disabled","disabled");
-				$template_name_manual_hidden.removeAttr("disabled");
-				$template_name_manual_hidden.val($template_name_manual.val());
-				
-				$page_slug.attr("disabled","disabled");
-				$page_slug_hidden.removeAttr("disabled");
-				$page_slug_hidden.val($page_slug.val());
-				
-				$template_div.css("opacity", 0.5);
-				
-			}
-			
-		}
 		
 		initSetupField();
+		
 		
 		//load tooltips
 		$('[data-hint]').live('mouseover', function() {
@@ -1426,7 +2293,271 @@
 				ready: true // Needed to make it show on first mouseover event
 				}
 			});
-		})
+		});
+		
+		
+		function setMetaSettingsFields($list)
+		{
+			var itemId = 0;
+			$list.each(function(){
+			
+				if($(this).attr("data-remove")!=1)
+				{
+					
+					var $self = $(this);
+					var $inputFields = $self.find("input, select");
+					var $inputLabels = $self.find("label");
+					
+					
+					$inputFields.each(function()
+					{
+						//copy structure
+						if(!$(this).hasAttr("data-field-template-id"))
+						{
+							$(this).attr("data-field-template-id", $(this).attr("id"))
+						}
+						
+						if(!$(this).hasAttr("data-field-template-name"))
+						{
+							$(this).attr("data-field-template-name", $(this).attr("name"))
+						}
+						
+						//rename
+						$(this).attr("id",$(this).attr("data-field-template-id").parse(itemId));
+						$(this).attr("name",$(this).attr("data-field-template-name").parse(itemId));
+						
+						
+					});
+					
+					$inputLabels.each(function()
+					{
+						//copy structure
+						if(!$(this).hasAttr("data-field-template-for"))
+						{
+							$(this).attr("data-field-template-for", $(this).attr("for"))
+						}
+						
+						$(this).attr("for",$(this).attr("data-field-template-for").parse(itemId));
+						
+						
+					});
+					
+					itemId++;
+				}
+			});
+		}
+		function removeMetaOption(e){
+		
+			e.preventDefault();
+			
+			$(this).closest("li").attr("data-remove","1");
+			$(this).closest("li").slideUp("fast", function(){
+				$(this).remove();
+			});
+			
+			setMetaSettingsFields($("#search-filter-settings-box .sf_tab_content_post_meta ul.meta_list li:not(.template)"));
+					
+			return false;
+		}
+		function initSettingsMetabox()
+		{
+			/* init meta type radios */
+			/* set up meta type radios */
+			var $settings_tab_radio = $('#search-filter-settings-box .sf_settings_tabs input[type="radio"]');
+			var $settings_tab_label = $('#search-filter-settings-box .sf_settings_tabs label');
+			var $checked_radio = $('#search-filter-settings-box .sf_settings_tabs input[data-radio-checked="1"]');
+			
+			$settings_tab_radio.each(function(){
+				this.checked = false;
+				$(this).attr("data-radio-checked", 0);
+			});
+			
+			
+			$settings_tab_radio.change(function()
+			{
+				$settings_tab_radio.attr("data-radio-checked", 0);
+				$(this).attr("data-radio-checked", 1);
+				tabChange($(this));
+				
+			});
+			
+			
+			var $meta_list = $("#search-filter-settings-box .sf_tab_content_post_meta ul.meta_list");
+			var $meta_list_template = $meta_list.find(".template");
+			var $add_condition_button = $("#search-filter-settings-box .sf_tab_content_post_meta .add-option-button");
+			
+			$meta_list.find(".option-remove").click(removeMetaOption);
+			
+			$meta_list.find(".meta_date_value_current_date").each(function(){
+				metaSettingsCurrentDateChange($(this));
+			});
+			$meta_list.find(".meta_date_value_current_date").on("change", function(){
+				metaSettingsCurrentDateChange($(this));
+			});
+			
+			$meta_list.find(".meta_date_value_current_timestamp").each(function(){
+				metaSettingsCurrentTimestampChange($(this));
+			});
+			$meta_list.find(".meta_date_value_current_timestamp").on("change", function(){
+				metaSettingsCurrentTimestampChange($(this));
+			});
+			
+			$meta_list.find(".meta_type").on("change", function(){
+				metaSettingsFieldTypeChange($(this));
+			});
+			$meta_list.find(".meta_type").each(function(){
+				metaSettingsFieldTypeChange($(this));
+			});
+			
+			setMetaSettingsFields($("#search-filter-settings-box .sf_tab_content_post_meta ul.meta_list li:not(.template)"));
+			
+			$add_condition_button.click(function(){
+			
+				
+				var $meta_option = $meta_list_template.clone();
+				$meta_option.hide();
+				$meta_option.removeClass("template");
+				
+				$meta_list.append($meta_option);
+				
+				$meta_option.find(".option-remove").click(removeMetaOption);
+				
+				$meta_option.find(".meta_type").on("change", function(){
+					metaSettingsFieldTypeChange($(this));
+				});
+				
+				$meta_option.find(".meta_date_value_current_date").on("change", function(){
+					metaSettingsCurrentDateChange($(this));
+				});				
+				
+				$meta_option.find(".meta_date_value_current_timestamp").on("change", function(){
+					metaSettingsCurrentTimestampChange($(this));
+				});
+				
+				setMetaSettingsFields($("#search-filter-settings-box .sf_tab_content_post_meta ul.meta_list li:not(.template)"));
+				
+				$meta_option.slideDown("fast");
+				
+				return false;
+			
+			});
+		}
+		function metaSettingsCurrentDateChange($field){
+						
+			var $datefields = $field.parent().parent().find('input[type="text"]');
+			
+			if($field.is(":checked"))
+			{
+				$datefields.each(function(){
+			
+					var $input = $(this);
+					disableInput($input);
+				});
+			}
+			else
+			{
+				$datefields.each(function(){
+			
+				var $input = $(this);
+					enableInput($input);
+				});
+				
+			}
+			
+		}
+		function metaSettingsCurrentTimestampChange($field){
+						
+			var $datefields = $field.parent().parent().find('input[type="text"]');
+			
+			if($field.is(":checked"))
+			{
+				$datefields.each(function(){
+			
+					var $input = $(this);
+					disableInput($input);
+				});
+			}
+			else
+			{
+				$datefields.each(function(){
+			
+				var $input = $(this);
+					enableInput($input);
+				});
+				
+			}
+			
+		}
+		function metaSettingsFieldTypeChange($field)
+		{
+			var val = $field.val();
+			var $meta_value_c = $field.parent().parent().parent().find(".meta_value_c");
+			var $meta_value_date_c = $field.parent().parent().parent().find(".meta_value_date_c");
+			var $meta_value_timestamp_c = $field.parent().parent().parent().find(".meta_value_timestamp_c");
+			var $meta_compare_field = $field.parent().parent().parent().find(".meta_compare");			
+			
+			
+			if(val=="DATE")
+			{
+				$meta_value_c.hide();
+				$meta_value_timestamp_c.hide();
+				$meta_value_date_c.show();
+				$meta_compare_field.find("option:not(.date-format-supported)").hide();
+				
+				var meta_compare_val = $meta_compare_field.val();
+				var $meta_compare_option = $meta_compare_field.find(":selected");	
+				if(!$meta_compare_option.hasClass('date-format-supported'))
+				{
+					$meta_compare_field.val("e");
+				}
+			}
+			else if(val=="TIMESTAMP")
+			{
+				$meta_value_c.hide();
+				$meta_value_date_c.hide();
+				$meta_value_timestamp_c.show();
+				$meta_compare_field.find("option:not(.date-format-supported)").hide();
+				
+				var meta_compare_val = $meta_compare_field.val();
+				var $meta_compare_option = $meta_compare_field.find(":selected");	
+				if(!$meta_compare_option.hasClass('date-format-supported'))
+				{
+					$meta_compare_field.val("e");
+				}
+			}
+			else
+			{
+				if(($meta_value_date_c.is(":visible"))||($meta_value_timestamp_c.is(":visible")))
+				{
+					$meta_value_c.show();
+					//$meta_compare_field.val("e");
+					$meta_value_date_c.hide();
+					$meta_value_timestamp_c.hide();
+					$meta_compare_field.find("option").show();
+				}
+			}
+		}
+		
+		
+		function tabChange($radio_field)
+		{
+			
+			var $tab_labels = $radio_field.parent().parent().find("label");
+			var item = $radio_field.closest(".tabs-container");
+			
+			$tab_labels.removeClass("active");
+			var $meta_type_label = $radio_field.closest("label");
+			$meta_type_label.addClass("active");
+			
+			var radio_val = $radio_field.val();
+			
+			item.find(".sf_field_data").hide();
+			
+			item.find(".sf_field_data.sf_tab_content_"+radio_val).show();
+		}
+		initSettingsMetabox();
+		
+		
 		
 	});
 	

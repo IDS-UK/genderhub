@@ -1,5 +1,0 @@
-1.1 (2014-08-13)
-Fixed bug: Activating the license was deactivating the licenses for the other add-ons.
-
-1.0 (2014-08-11)
-Initial Release

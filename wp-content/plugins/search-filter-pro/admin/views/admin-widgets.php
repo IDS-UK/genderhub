@@ -5,7 +5,7 @@
  * @package   Search_Filter
  * @author    Ross Morsali
  * @link      http://www.designsandcode.com/
- * @copyright 2014 Designs & Code
+ * @copyright 2015 Designs & Code
  */
 ?>
 <div class="wrap">

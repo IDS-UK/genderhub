@@ -2,8 +2,8 @@
 Contributors: Official WebEngage Plugin
 Tags: feedback, survey, webengage, web engage, targeting, dashboard, contact, contact form, feedback form, survey form, form builder, feedback inbox, customer support, widget, feedback widget, survey widget, notification, notification widget, call-to-action message, pop-up message, push messaging, real-time messages, user messaging, exit surveys
 Requires at least: 2.7
-Tested up to: 3.9
-Stable tag: 2.0.2
+Tested up to: 4.3.1
+Stable tag: 2.0.3
 
 Get feedback and resolve support queries. Conduct short surveys. Display push notification messages. Love your customers? Get WebEngage now!
 
@@ -24,6 +24,7 @@ Here's a quick 2 minute explainer video: https://www.youtube.com/watch?v=5poyDyv
 
 More on WebEngage here - [webengage.com](http://webengage.com/)
 
+
 = Features =
 * Places a customizable "Feedback" tab to your site - customize colors and placement.
 * Receive unlimited feedback. Automatic screengrab of the page that a user submits the feedback on.
@@ -32,6 +33,7 @@ More on WebEngage here - [webengage.com](http://webengage.com/)
 * Create short surveys for all or particular pages on your site.
 * Target these surveys on multiple parameters - visitor geography, site referrals, cookies, first-time-visitors etc.
 * Collect responses for these surveys, view and download reports. See demographic distribution.
+* Collect email subscription leads and push them to MailChimp.
 * Display push notifications on your website.
 * Target these notification messages at certain audience segments on your website.
 * Get detailed stats on the performance of these push notifications including data like clickthrough rate etc.
@@ -39,12 +41,18 @@ More on WebEngage here - [webengage.com](http://webengage.com/)
 * Non-blocking, high-performance code.
 
 Details and product screenshots:
+
 Feedback - [webengage.com/feedback](http://webengage.com/feedback)
+
 Survey - [webengage.com/survey](http://webengage.com/survey)
+
 Notification - [webengage.com/notification](http://webengage.com/notification)
 
+Gallery - [webengage.com/gallery](http://webengage.com/gallery)
+
+
 = Localization =
-WebEngage is currently available in 32 languages - English, Arabic, Bahasa (Indonesian), Bulgarian, Chinese (Traditional), Czech, Danish, Dutch, Estonian, Finnish, French, Georgian, German, Greek, Hebrew, Hindi, Hungarian, Italian, Japanese, Korean, Norwegian, Polish, Portuguese, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish, Thai, Turkish and Vietnamese. If your language is missing, you can help us translate. There are just 30 odd phrases that need to be translated. [Let us know](http://webengage.com/contact) if you are interested.
+WebEngage is currently available in 42 languages - English, Albanian, Arabic, Azerbaijani, Bahasa (Indonesian), Bosnian, Bulgarian, Chinese (Traditional), Croatian, Czech, Danish, Dutch, Estonian, Finnish, French, Georgian, German, Greek, Hebrew, Hindi, Hungarian, Italian, Japanese, Kazakh, Korean, Kurdish, Latvian, Lithuanian, Malay, Norwegian, Polish, Portuguese, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish, Thai, Turkish, Ukrainian, Uzbek and Vietnamese. If your language is missing, you can help us translate. There are just 30 odd phrases that need to be translated. [Let us know](http://webengage.com/contact) if you are interested.
 
 = Demo =
 Take an online demo to get an idea of how the feedback tab, survey windows and notification messages will look on your website - [demo.webengage.com](http://demo.webengage.com/)
@@ -79,13 +87,13 @@ Email us on support {at} webengage dot com or [contact us](http://webengage.com/
 == Screenshots ==
 
 1. Feedback tab in action on a customer's website.
-2. Feedback thread submitted by a user.
-3. Feedback replies.
-4. Short survey in action on a customer's website.
-5. Creating a short survey for your website.
-6. Aggregate response for each survey.
-7. Demographic distribution and other stats per survey.
-8. WebEngage configuration screen inside your Wordpress admin panel.
+2. Short survey in action on a customer's website.
+3. Fancy callout notification in action
+4. Feedback inbox
+5. Feedback thread submitted by a user.
+6. Creating a notification using dashboard
+7. Survey response overview screenshot
+8. Creating a survey using dashboard
 
 
 == Installation ==
@@ -102,7 +110,7 @@ Email us on support {at} webengage dot com or [contact us](http://webengage.com/
 
 3. **What all information does WebEngage capture?** - Apart from the answers to questions in your forms (both feedback and survey) and a screengrab of the page on which the feedback was submitted on, we automatically capture a whole bunch of other information. E.g. Geo location (and IP) of the user submitting feedback, Date/time, Page URL on which the feedback was submitted, Browser, Operating Platform etc. You get to see all of these in the email notification as well as in your WebEngage dashboard.
 
-4. **Can I add custom fields to the feedback form?** - <strong>Yes</strong>. With [paid plans](http://webengage.com/pricing) (starting $15/month), you can add your own fields to the feedback form - checkboxes, radio buttons, input boxes, comment boxes, files, dropdowns etc. This can be done using a simple drag-n-drop form builder inside WebEngage dashboard. You don't need to write any code whatsoever.
+4. **Can I add custom fields to the feedback form?** - <strong>Yes</strong>. With [paid plans](http://webengage.com/pricing) (starting $49/month), you can add your own fields to the feedback form - checkboxes, radio buttons, input boxes, comment boxes, files, dropdowns etc. This can be done using a simple drag-n-drop form builder inside WebEngage dashboard. You don't need to write any code whatsoever.
 
 5. **Is WebEngage spam-free?** - <strong>Yes</strong>. Our technology makes sure that only humans can submit the feedback form on your website. And we do that without asking your users to read through an unreadable CAPTCHA image :). Our stuff just works!
 
@@ -114,6 +122,14 @@ Email us on support {at} webengage dot com or [contact us](http://webengage.com/
 For any other question(s), please email us on support {at} webengage dot com or [contact us](http://webengage.com/contact). We assure you of a quick revert.
 
 == Changelog ==
+= 2.0.4 =
+* Updated to latest (v6) Web SDK integration code.
+
+= 2.0.3 =
+* Updated with latest v5 of webengage integration code.
+* New screenshots and more languages support
+* Gallery link added
+
 = 2.0.2 =
 * Reduced dependency on iframes
 * New logo and notification text in the options page

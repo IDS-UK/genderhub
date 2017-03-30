@@ -1,37 +1,38 @@
-<?php
-/*
- * You can create your own template by placing a copy of this file on yourtheme/plugins/wp-embed-fb/
- * to access all fb data print_r($fb_data)
- */
-?>
-<div class="wpemfb-container" >
-	<div style="max-width: <?php echo $width ?>px;">
-		<div class="wpemfb-info">
-			<div class="wpemfb-pic">
-				<img src="http://graph.facebook.com/<?php echo $fb_data['from']['id'] ?>/picture" />
-			</div>
-			<div class="wpemfb-desc">
-				<h4 class="wpemfb-title" >
-					<a href="https://facebook.com/<?php echo $fb_data['from']['id'] ?>" target="_blank" rel="nofollow">
-						<?php echo $fb_data['from']['name'] ?>
+<div class="wef-classic aligncenter" style="max-width: <?php echo $width ?>px">
+	<div class="row">
+		<div class="col-3 text-center">
+			<a href="https://facebook.com/<?php /** @noinspection PhpUndefinedVariableInspection */
+			echo $fb_data['from']['id'] ?>" target="_blank" rel="nofollow">
+				<img src="https://graph.facebook.com/<?php echo $fb_data['from']['id'] ?>/picture" />
+			</a>
+		</div>
+		<div class="col-9 pl-none">
+			<a href="https://facebook.com/<?php echo $fb_data['from']['id'] ?>" target="_blank" rel="nofollow">
+				<span class="title"><?php echo $fb_data['from']['name'] ?></span>
+			</a>
+			<br>
+			<?php if(isset($fb_data['from']['category'])) : ?>
+				<?php echo $fb_data['from']['category'].'<br>'  ?>
+			<?php endif; ?>
+			<a href="https://www.facebook.com/<?php echo $fb_data['id'] ?>" target="_blank" rel="nofollow"><?php echo $fb_data['name'] ?></a>
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-12 text-center">
+			<div class="text-center album-thumbs">
+			<?php
+			if(isset($fb_data['photos']))
+				foreach ($fb_data['photos']['data'] as $pic) {
+					$data_title = isset($pic['name']) ? $pic['name'] :  '';
+					?>
+					<a href="<?php echo $pic['source'] ?>" <?php echo WP_Embed_FB_Plugin::get_option('lightbox_att') ?> <?php echo !empty($data_title) ? WP_Embed_FB_Plugin::lightbox_title($data_title) : '' ?> >
+						<img class="thumbnail" src="<?php echo $pic['picture'] ?>" />
 					</a>
-				</h4>
-				<?php if(isset($fb_data['from']['category'])) : ?>
-					<?php echo $fb_data['from']['category'].'<br>'  ?>
-				<?php endif; ?>
-				<a href="https://www.facebook.com/<?php echo $fb_data['id'] ?>" target="_blank" rel="nofollow"><?php echo $fb_data['name'] ?></a>
+					<?php
+				}
+			?>
 			</div>
 		</div>
-		<p style="text-align: center">
-		<?php
-		foreach ($fb_data['photos']['data'] as $pic) {
-			?>
-				<a class="wpemfb-link" href="<?php echo $pic['source'] ?>"  data-lightbox="roadtrip" data-title="<?php echo $pic['name'] ?>" >
-					<img class="wpemfb-thmb" src="<?php echo $pic['picture'] ?>" />
-				</a>			
-			<?php
-		}
-		?>
-		</p>
 	</div>
 </div>

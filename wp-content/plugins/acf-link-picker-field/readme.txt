@@ -3,7 +3,7 @@
 Contributors: BIOSTALL, caalami
 Tags: acf, advanced custom fields, link picker, link chooser, acf link picker
 Requires at least: 3.5
-Tested up to: WP 4.3
+Tested up to: 4.7
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -25,6 +25,8 @@ This ACF field type is compatible with:
 *	ACF 5
 *	ACF 4
 
+*ACF 4 support is deprecated, and new plugin features will generally not work with ACF 4.*
+
 == Installation ==
 
 1. Copy the `acf-link_picker` folder into your `wp-content/plugins` folder
@@ -38,6 +40,7 @@ When outputting the link selection on the front end, you will have three object 
 *	url - The URL of the page
 *	title - The title of the link, if entered
 *	target - Will be either a blank string or '_blank', depending on whether the user has ticked the box for the link to open in a new window/tab.
+* postid - Not available as part of wp_link, this is an ajax hack to attempt to look up the post ID of a selected link. This will return 0 if the post ID was not found.
 
 Code example:
 
@@ -53,9 +56,45 @@ Outputs:
   string(10) "Link Title"
   ["target"]=>
   string(6) "_blank"
+  ["postid"]=>
+  int 2231
 }`
 
 == Changelog ==
+
+= 1.2.8 =
+* Some additional compatibility checks for ACF 4 (disable post ID lookups to suppress JS errors)
+
+= 1.2.7 =
+* Enqueue wysiwyg assets if needed (thanks, [dmarkowicz](https://github.com/dmarkowicz))
+
+= 1.2.6 =
+* Bugfix: revert setting empty values
+
+= 1.2.5 =
+* Multiple fixes from [Jontis00](https://github.com/Jontis00), including:
+  * Set a default (empty) value for the field
+  * Refactor the post ID lookup
+  * Add sv_SE translations
+
+= 1.2.3 =
+* Make the link class a little more distinctive -- thanks, [dmarkowicz](https://github.com/dmarkowicz)
+
+= 1.2.2 =
+* New handlers for the updated link picker with WP 4.5.
+
+= 1.2.1 =
+* Attempt to add a post ID ($link["postid"]) to the field data
+
+= 1.2 =
+* Automatically update the link title when clicking on a link.  This functionality differs from the WYSIWYG link picker (which assumes highlighted text) but should be consistent with expected behavior of an ACF field.
+
+= 1.1.2 =
+* Add NL translation support from [vjanssens](https://github.com/vjanssens)
+
+= 1.1.1 =
+* Add PT translation support from [alvarogois](https://github.com/alvarogois)
+* Bump compatibility information
 
 = 1.1 =
 * Bump version, preserve _blank target if set from [philmprice](https://github.com/philmprice)

@@ -108,6 +108,11 @@
 							<?php printf(__('Data in <span>&lt;<span class="root_element">%s</span>&gt;</span> elements will be imported to <span>%s</span>'), PMXI_Plugin::$session->source['root_element'], $custom_type->labels->name); ?>
 						</h3>
 						<?php endif; ?>
+						
+						<h3 class="wp_all_import_warning">
+							<?php _e('This doesn\'t look right, try manually selecting a different root element on the left.'); ?>
+						</h3>
+						
 					</div>
 				</td>
 			</tr>
@@ -198,7 +203,7 @@
 	<hr>
 
 	<p class="wpallimport-submit-buttons" style="text-align:center;">
-		<a href="<?php echo $this->baseUrl ?>" class="back rad3"><?php _e('Back to Step 1','wp_all_import_plugin');?></a>
+		<a href="<?php echo add_query_arg('action', 'index', $this->baseUrl); ?>" class="back rad3"><?php _e('Back to Step 1','wp_all_import_plugin');?></a>
 		&nbsp;
 		<input type="hidden" name="is_submitted" value="1" />
 		<?php wp_nonce_field('choose-elements', '_wpnonce_choose-elements') ?>

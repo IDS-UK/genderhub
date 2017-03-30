@@ -600,7 +600,7 @@ class GenderHub_2017 {
 
 	public static function gh_get_carousel($pt, $t, $ex, $show_filter) {
 
-        $post_types     = $pt ?: array('blogs_opinions','events','other_training','news_stories');
+        $post_types     = ($pt == NULL ? array('blogs_opinions','events','other_training','news_stories') : $pt);
 		$exclude        = $ex ?: NULL;
         $topics         = $t ?: NULL;
 

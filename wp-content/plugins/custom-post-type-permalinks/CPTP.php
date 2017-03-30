@@ -7,37 +7,61 @@
  *
  * @package Custom_Post_Type_Permalinks
  * @since 0.9.4
- *
  * */
-
-
 class CPTP {
-
 
 	private static $_instance;
 
+	/** @var  CPTP_Module[] */
+	public $modules;
+
 	private function __construct() {
 		$this->load_modules();
-		$this->init();
 	}
 
 	/**
-	 * load_modules
 	 *
 	 * Load CPTP_Modules.
-	 * @since 0.9.5
 	 *
+	 * @since 0.9.5
 	 */
 	private function load_modules() {
-		new CPTP_Module_Setting();
-		new CPTP_Module_Rewrite();
-		new CPTP_Module_Admin();
-		new CPTP_Module_Option();
-		new CPTP_Module_Permalink();
-		new CPTP_Module_GetArchives();
-		new CPTP_Module_FlushRules();
-		do_action( 'CPTP_load_modules' );
+		$this->set_module( 'setting', new CPTP_Module_Setting() );
+		$this->set_module( 'rewrite', new CPTP_Module_Rewrite() );
+		$this->set_module( 'admin', new CPTP_Module_Admin() );
+		$this->set_module( 'option', new CPTP_Module_Option() );
+		$this->set_module( 'permalink', new CPTP_Module_Permalink() );
+		$this->set_module( 'get_archives', new CPTP_Module_GetArchives() );
+		$this->set_module( 'flush_rules', new CPTP_Module_FlushRules() );
 
+		do_action( 'CPTP_load_modules', $this );
+
+	}
+
+	/**
+	 * initialize modules.
+	 *
+	 * @since 2.0.0
+	 */
+	private function init_modules() {
+		foreach ( $this->modules as $module ) {
+			$module->init();
+		}
+
+		do_action( 'CPTP_registered_modules', $this );
+	}
+
+	/**
+	 * set module.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param $name
+	 * @param CPTP_Module $module
+	 */
+	public function set_module( $name, CPTP_Module $module ) {
+
+		$this->modules[ $name ] = apply_filters( "CPTP_set_{$name}_module", $module );
 	}
 
 	/**
@@ -46,14 +70,15 @@ class CPTP {
 	 * Fire Module::add_hook
 	 *
 	 * @since 0.9.5
-	 *
 	 */
-	private function init() {
+	public function init() {
+		$this->init_modules();
 		do_action( 'CPTP_init' );
 	}
 
 	/**
 	 * Singleton
+	 *
 	 * @static
 	 */
 	public static function get_instance() {
@@ -66,5 +91,34 @@ class CPTP {
 	}
 
 
+	/**
+	 *
+	 * Activation Hooks
+	 * This function will browse initialized modules and execute their activation_hook methods.
+	 * It will also set the uninstall_hook to the cptp_uninstall function which behaves the same way as this one.
+	 *
+	 * @since 2.0.0
+	 */
+	public function activate() {
+		foreach ( $this->modules as $module ) {
+			$module->activation_hook();
+		}
 
+		register_uninstall_hook( CPTP_PLUGIN_FILE, array( __CLASS__, 'uninstall' ) );
+	}
+
+	/**
+	 *
+	 * Uninstall Hooks
+	 * This function will browse initialized modules and execute their uninstall_hook methods.
+	 *
+	 * @since 2.0.0
+	 */
+	public static function uninstall() {
+		$cptp = CPTP::get_instance();
+
+		foreach ( $cptp->modules as $module ) {
+			$module->uninstall_hook();
+		}
+	}
 }

@@ -1,29 +1,32 @@
-<?php
-/*
- * You can create your own template by placing a copy of this file on yourtheme/plugins/wp-embed-fb/
- * to access all fb data print_r($fb_data)
- */
- $height = $width * $prop;
-?>
-<div class="wpemfb-container" style="max-width: <?php echo $width ?>px">
-	<div class="wpemfb-row">
-			<div class="wpemfb-col-3 wpemfb-text-center">
-				<a href="http://www.facebook.com/<?php echo $fb_data['id'] ?>" target="_blank" rel="nofollow">
-					<img src="http://graph.facebook.com/<?php echo $fb_data['id'] ?>/picture" />
-				</a>		
+<div class="wef-default" style="max-width: <?php echo $width ?>px">
+	<div class="row">
+		<div class="col-3 text-center">
+			<a href="https://www.facebook.com/<?php /** @noinspection PhpUndefinedVariableInspection */
+			echo $fb_data['id'] ?>" target="_blank" rel="nofollow">
+				<img src="https://graph.facebook.com/<?php echo $fb_data['id'] ?>/picture" />
+			</a>
+		</div>
+		<div class="col-9 pl-none">
+			<a href="https://www.facebook.com/<?php echo $fb_data['id'] ?>" target="_blank" rel="nofollow">
+				<span class="title"><?php echo $fb_data['name'] ?></span>
+			</a>
+			<br>
+			<div>
+				<?php
+				$opt = WP_Embed_FB_Plugin::get_option('show_like');
+				if($opt === 'true') :
+					echo WEF_Social_Plugins::get('like',array('href'=>'https://www.facebook.com/'.$fb_data['id'],'share'=>'true','layout'=>'button_count','show-faces'=> 'false'));
+				else :
+					printf( __( '%d people like this.', 'wp-embed-facebook' ), $fb_data['likes'] );
+				endif;
+				?>
 			</div>
-			<div class="wpemfb-col-9 wpemfb-pl-none">
-				<a class="wpemfb-title" href="http://www.facebook.com/<?php echo $fb_data['id'] ?>" target="_blank" rel="nofollow">
-					<?php echo $fb_data['name'] ?>
-				</a>
+			<?php if(isset($fb_data["website"])) : ?>
 				<br>
-				<div><?php WP_Embed_FB::like_btn($fb_data['id'],$fb_data['likes']) ?></div>
-				<?php if(isset($fb_data["website"])) : ?>
-					<br>
-						<a href="http://<?php echo WP_Embed_FB::getwebsite($fb_data["website"]) ?>" title="<?php _e('Web Site', 'wp-embed-facebook')  ?>" target="_blank">
-							<?php _e('Web Site','wp-embed-facebook') ?>
-						</a>
-				<?php endif; ?>
-			</div>
-	</div>	
+				<a href="<?php echo WP_Embed_FB::getwebsite($fb_data["website"]) ?>" title="<?php _e('Web Site', 'wp-embed-facebook')  ?>" target="_blank">
+					<?php _e('Web Site','wp-embed-facebook') ?>
+				</a>
+			<?php endif; ?>
+		</div>
+	</div>
 </div>
