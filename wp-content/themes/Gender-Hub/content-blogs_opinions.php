@@ -72,21 +72,20 @@
 	?>
 	<div class="entry-summary entry-content group">
 
-		<div class="intro_blurb group">
-			<div class="news_photo">
-				<?php if ( has_post_thumbnail() && ! post_password_required() && ! is_attachment() ) : ?>
-					<div class="news_photo-inner">
-						<?php print the_post_thumbnail('blog_featured'); 
-						echo '<div class="news_photo-text">'.get_post(get_post_thumbnail_id())->post_excerpt.'</div>'; ?>
-					</div>
-				<?php endif; ?>	
-			</div>	
+		<?php if ( has_post_thumbnail()) : ?>
+            <div class="archive-image wp-caption">
+				<?php the_post_thumbnail('blog_featured'); ?>
+                <p class="wp-caption-text"><?php the_post_thumbnail_caption(); ?></p>
+				<?php if(!empty($image_credit_text)) : ?>
+                    <p class="photo-credit"><b>Photo:</b> <?php echo !empty($image_credit_url) ? '<a href="'.$image_credit_url.'" target="_blank">'.$image_credit_text.'</a>' : $image_credit_text; ?></p>
+				<?php endif; ?>
+            </div>
 
-			<div class="intro_blurb_header">
-				<?php printf(__(get_field('blog_intro_blurb') ? get_field('blog_intro_blurb') : '')); ?>
-			</div><!--intro_blurb_header-->
+		<?php endif; ?>
 
-		</div><!--intro_blurb-->
+        <div class="archive-text">
+			<?php printf(__(get_field('blog_intro_blurb') ? get_field('blog_intro_blurb') : '')); ?>
+        </div>
 
 		<p><a class="button" href="<?php the_permalink(); ?>">Read more</a></p>
 

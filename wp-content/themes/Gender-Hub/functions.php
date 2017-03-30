@@ -18,6 +18,11 @@ class GenderHub_2017 {
 	    add_action( 'do_meta_boxes', array($this, 'gh_reposition_metaboxes') );
 	    add_action( 'edit_form_after_title', array($this, 'gh_after_title_metaboxes') );
 
+	    add_action ( 'after_wp_tiny_mce', array($this, 'gh_disable_open_new_window') );
+
+        add_action('init', array($this, 'gh_relabel_categories'));
+
+
 	    add_filter( 'image_size_names_choose', array($this, 'custom_image_sizes_choose') );
 	    add_filter( 'body_class', array($this, 'gh_body_classes') );
 	    add_filter( 'login_errors', create_function('$a', "return null;") );
@@ -527,6 +532,28 @@ class GenderHub_2017 {
 				return $array;
 			}
 		}
+	}
+
+	function gh_disable_open_new_window() {
+		?>
+        <script type="text/javascript">
+            jQuery(document).ready(function ($) {
+                $('input#link-target-checkbox').prop('checked', false);
+                $('#wp-link .link-target').css('visibility', 'hidden');
+            });
+        </script>
+		<?php
+	}
+
+	function gh_relabel_categories() {
+		global $wp_taxonomies;
+
+		$cat = $wp_taxonomies['category'];
+		$cat->label = 'Themes';
+		$cat->labels->singular_name = 'Theme';
+		$cat->labels->name = $cat->label;
+		$cat->labels->menu_name = $cat->label;
+		//…
 	}
 
 	public static function gh_get_slider_posts($type) {

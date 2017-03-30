@@ -86,56 +86,21 @@ endif;
 	<?php if ( is_home() || is_archive() || is_search() ) : // Only display Excerpts for Home / Archive / Search ?>
 		
 	<div class="entry-summary group">
-	
-		<div class="news_photo">
-				<?php if ( has_post_thumbnail() && ! post_password_required() && ! is_attachment() ) : ?>
-					<a href="<?php echo $source; ?>">
-					<?php the_post_thumbnail('custom-thumb'); 
-					echo '<p class="wp-caption-text">'.get_post(get_post_thumbnail_id())->post_excerpt.'</p>'; ?>
-					</a>
+
+		<?php if ( has_post_thumbnail()) : ?>
+            <div class="archive-image wp-caption">
+				<?php the_post_thumbnail('blog_featured'); ?>
+                <p class="wp-caption-text"><?php the_post_thumbnail_caption(); ?></p>
+				<?php if(!empty($image_credit_text)) : ?>
+                    <p class="photo-credit"><b>Photo:</b> <?php echo !empty($image_credit_url) ? '<a href="'.$image_credit_url.'" target="_blank">'.$image_credit_text.'</a>' : $image_credit_text; ?></p>
 				<?php endif; ?>
-		</div>
-			
-			
-			
-	<!--<div class="news_photo">
-	<?php 
-		$image = get_field('blog_image');
-		if( !empty($image) ): 
-			// vars
-			$url = $image['url'];
-			$title = $image['title'];
-			$alt = $image['alt'];
-			$caption = $image['caption'];
-			// thumbnail
-			$size = 'medium';
-			$thumb = $image['sizes'][ $size ];
-			$width = $image['sizes'][ $size . '-width' ];
-			$height = $image['sizes'][ $size . '-height' ];
-		
-			if( $caption ): ?>
-				<div class="wp-caption">
-			<?php endif; ?>
+            </div>
 
-			<a href="<?php echo $url; ?>" title="<?php echo $title; ?>">
-				<img src="<?php echo $thumb; ?>" alt="<?php echo $alt; ?>" width="<?php echo $width; ?>" height="<?php echo $height; ?>" />
-			</a>
-
-			<?php if( $caption ): ?>
-				<p class="wp-caption-text"><?php echo $caption; ?></p>
-			</div>
 		<?php endif; ?>
 
-	<?php endif; ?>
-
-	</div>-->
-		
-		
-	<?php 
-		//the_excerpt(); 
-		$x = get_post(get_the_ID(), OBJECT, 'display');
-		print wpautop($x->post_content);
-	?>
+        <div class="archive-text">
+			<?php the_content(); ?>
+        </div>
 			
 	<p><?php 
 		$source = get_field('source');

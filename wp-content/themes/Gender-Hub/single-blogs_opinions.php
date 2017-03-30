@@ -1,9 +1,6 @@
 <?php get_header(); ?>
 
 
-
-
-
 <div class="section group main_content">
 
 <div class="col span_3_of_4 archive_content padding10">
@@ -34,8 +31,6 @@
 		
 
 </div><!--/col span_3_of_4 padding10-->
-
-
 
 
 <div class="col span_1_of_4 sidebar padding10">

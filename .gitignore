@@ -52,6 +52,7 @@ Temporary Items
 #/wp-content/uploads
 sitemap.*
 wp-config.php
+/.idea
 *.sql
 
 # Hidden files
