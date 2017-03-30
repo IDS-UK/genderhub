@@ -49,7 +49,7 @@ Temporary Items
 /wp-content/themes/twenty*
 /wp-content/plugins/ids*
 /wp-content/upgrade
-#/wp-content/uploads
+/wp-content/uploads
 sitemap.*
 wp-config.php
 /.idea
