@@ -47,6 +47,7 @@ Temporary Items
 .apdisk
 
 /wp-content/themes/twenty*
+/wp-content/themes/Gender-Hub/inc/cache
 /wp-content/plugins/ids*
 /wp-content/upgrade
 /wp-content/uploads
