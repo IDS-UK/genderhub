@@ -121,7 +121,7 @@ else : ?>
 			<header class="entry-header">
 
 				<h1>
-					<span><?php echo ucwords($post->post_type); ?></span>
+					<span><a href="be-inspired/interviews/"><?php echo ucwords($post->post_type); ?></a></span>
 				</h1>
 
 				<?php the_title('<h2>', '</h2>'); ?>

@@ -37,7 +37,7 @@ get_header();
 
                     <h3>What's inspiring us</h3>
 
-                    <?php echo GenderHub_2017::gh_get_carousel(array('blogs_opinions','events','other_training','news_stories', 'interviews'), $topics=null, $exclude=null, true); ?>
+                    <?php echo GenderHub_2017::gh_get_carousel($post_types=null, $topics=null, $exclude=null, true); ?>
 
                 </div>
 

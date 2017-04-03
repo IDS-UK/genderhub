@@ -647,7 +647,7 @@ class GenderHub_2017 {
 
 	public static function gh_get_carousel($pt, $t, $ex, $show_filter) {
 
-        $post_types     = ($pt == NULL ? array('blogs_opinions','events','other_training','news_stories') : $pt);
+        $post_types     = ($pt == NULL ? array('blogs_opinions','events','other_training','news_stories', 'interviews') : $pt);
 		$exclude        = $ex ?: NULL;
         $topics         = $t ?: NULL;
 
@@ -681,7 +681,7 @@ class GenderHub_2017 {
 
 		if($show_filter) :
 		$html .= '<aside id="filter">';
-		$html .= 'Filter: <a rel="news_stories" data-filter=".news_stories" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-bell.png" /> News</a><a rel="other_training" data-filter=".other_training" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-training.png" /> Training</a><a rel="events" data-filter=".events" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-event.png" /> Event</a><a rel="blogs_opinions" data-filter=".blogs_opinions" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-blog.png" /> Blog</a><a rel="blogs_opinions" data-filter=".interviews" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-blog.png" /> Interview</a>';
+		$html .= 'Filter: <a rel="news_stories" data-filter=".news_stories" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-bell.png" /> News</a><a rel="other_training" data-filter=".other_training" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-training.png" /> Training</a><a rel="events" data-filter=".events" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-event.png" /> Event</a><a rel="blogs_opinions" data-filter=".blogs_opinions" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-blog.png" /> Blog</a><a rel="blogs_opinions" data-filter=".interviews" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-interview.png" /> Interview</a>';
 		$html .= '</aside>';
 		endif;
 
@@ -713,6 +713,9 @@ class GenderHub_2017 {
 
             elseif ($s->post_type == 'news_stories'):
                 $html .= '<img src="'.get_stylesheet_directory_uri().'/img/icon-bell.png" /><span> News</span>';
+
+            elseif ($s->post_type == 'interviews'):
+                $html .= '<img src="'.get_stylesheet_directory_uri().'/img/icon-interview.png" /><span> Interview</span>';
 
             endif;
 
@@ -780,6 +783,43 @@ class GenderHub_2017 {
 }
 
 new GenderHub_2017;
+
+class Slikkr_Custom_Menu_Walker extends Walker_Nav_Menu {
+
+	function start_el(&$output, $item, $depth=0, $args=array(), $id=0) {
+		global $wp_query;
+		$indent = ( $depth ) ? str_repeat( "\t", $depth ) : '';
+
+		$slug = basename($item->url);
+		$class_names = $value = '';
+
+		$classes = empty( $item->classes ) ? array() : (array) $item->classes;
+
+		$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item ) );
+		$class_names = ' class="' . esc_attr( $class_names ) . ' '.$slug.'"';
+
+		$item_output = $args->before;
+
+		$attributes = ! empty( $item->attr_title ) ? ' title="' . esc_attr( $item->attr_title ) .'"' : '';
+		$attributes .= ! empty( $item->target ) ? ' target="' . esc_attr( $item->target ) .'"' : '';
+		$attributes .= ! empty( $item->xfn ) ? ' rel="' . esc_attr( $item->xfn ) .'"' : '';
+		$attributes .= ! empty( $item->url ) ? ' href="' . esc_attr( $item->url ) .'" itemprop="name"' : '';
+
+		$output .= $indent . '<li id="primary-menu-item-' . $item->ID . '"' . $value . $class_names . ' itemprop="url">';
+
+		$item_output .= $depth != 0 ? '<a'. $attributes .'>' : null;
+		$item_output .= $depth != 0 ? '<span>' : '<span class="nolink">';
+
+		$item_output .= $args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;
+
+		$item_output .= '</span>';
+		$item_output .= $depth != 0 ? '</a>' : null;
+
+		$item_output .= $args->after;
+
+		$output .= apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
+	}
+}
 
 // Generic functiona and theme options
 function get_words($sentence, $count = 30) {

@@ -65,7 +65,7 @@ $social_media_links = method_exists('GH_Site_Settings', 'gh_social_media_links')
     <div class="inner paddingleftright">
         <?php
         if ( has_nav_menu( 'primary' ) ) :
-	        wp_nav_menu( array( 'theme_location' => 'primary' ) );
+	        wp_nav_menu( array( 'theme_location' => 'primary', 'walker' => new Slikkr_Custom_Menu_Walker() ) );
         else :
 	        wp_nav_menu( array('menu' => 'Main Sections Menu'));
         endif;
