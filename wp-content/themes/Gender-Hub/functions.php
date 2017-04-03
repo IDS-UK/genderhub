@@ -20,7 +20,7 @@ class GenderHub_2017 {
 
 	    add_action ( 'after_wp_tiny_mce', array($this, 'gh_disable_open_new_window') );
 
-        add_action('init', array($this, 'gh_relabel_categories'));
+        add_action('wp_loaded', array($this, 'gh_relabel_items'));
 
 
 	    add_filter( 'image_size_names_choose', array($this, 'custom_image_sizes_choose') );
@@ -545,7 +545,8 @@ class GenderHub_2017 {
 		<?php
 	}
 
-	function gh_relabel_categories() {
+	function gh_relabel_items() {
+
 		global $wp_taxonomies;
 
 		$cat = $wp_taxonomies['category'];
@@ -553,7 +554,26 @@ class GenderHub_2017 {
 		$cat->labels->singular_name = 'Theme';
 		$cat->labels->name = $cat->label;
 		$cat->labels->menu_name = $cat->label;
-		//…
+
+		$ptype = get_post_type_object( 'ids_documents' );
+		if ( ! $ptype )
+			return FALSE;
+
+		$ptype->labels->name               = 'Documents';
+		$ptype->labels->singular_name      = 'Document';
+		$ptype->labels->add_new            = 'Add document';
+		$ptype->labels->add_new_item       = 'Add new document';
+		$ptype->labels->all_items          = 'All documents';
+		$ptype->labels->edit_item          = 'Edit document';
+		$ptype->labels->name_admin_bar     = 'Document';
+		$ptype->labels->menu_name          = 'Document';
+		$ptype->labels->new_item           = 'New document';
+		$ptype->labels->not_found          = 'No documents found';
+		$ptype->labels->not_found_in_trash = 'No documents found in trash';
+		$ptype->labels->search_items       = 'Search documents';
+		$ptype->labels->view_item          = 'View document';
+
+		return TRUE;
 	}
 
 	public static function gh_get_slider_posts($type) {

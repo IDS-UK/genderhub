@@ -90,7 +90,6 @@ class GH_Custom_Post_Types {
 	function init() {
 
 		$post_types = array(
-			'blocks',
 			'blogs_opinions',
 			'collections',
 			'contact_point',
@@ -127,6 +126,8 @@ class GH_Custom_Post_Types {
 			register_taxonomy( $taxonomy, $t['post_types'], $t['args']);
 
 		}
+
+		unregister_post_type( 'blocks' ); // todo only needs to run once. This line to be removed in future update
 
 	}
 
