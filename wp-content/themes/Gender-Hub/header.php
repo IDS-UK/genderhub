@@ -48,7 +48,7 @@ $social_media_links = method_exists('GH_Site_Settings', 'gh_social_media_links')
         <span class="strapline"><?php echo $strapline;?></span>
         <?php echo $social_media_links; ?>
         <a id="searchicon"><img class="header-search" src="<?php echo get_stylesheet_directory_uri(); ?>/img/icon-search.png" alt="search icon" width="18" height="18"></a>
-        <form action="/" id="searchform" method="get" ><input type="text" name="s" id="s" placeholder="Search"><input type="hidden" name="search_loc" value="all" /></form>
+        <form action="/" id="searchform" method="get" ><input type="text" name="s" id="s" placeholder="Search"><input type="hidden" name="search_loc" value="all" /><input type="submit" value="Go" /></form>
 
         <a class="menuicon">
             <div class="hamburger">

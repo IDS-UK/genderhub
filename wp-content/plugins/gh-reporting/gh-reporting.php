@@ -71,7 +71,7 @@ function gh_reports_page() {
 	$month      = $_GET['month']?:null;
 	$types      = $_GET['types']?:null;
 
-	$options = get_option( 'gh_custom_general_settings' );
+	$options = get_option( 'gh_custom_misc_settings' );
 
 	$reports_narrative = '';
 	if( isset( $options['gh_reports_narrative'] ) ) {

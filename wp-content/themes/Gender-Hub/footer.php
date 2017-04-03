@@ -52,9 +52,7 @@ $social_media_links = method_exists('GH_Site_Settings', 'gh_social_media_links')
 
 </footer>
 
-<?php
-
-if(is_front_page()) { ?>
+<?php if( is_front_page() ) { ?>
 
     <script type="text/javascript">
 
@@ -79,14 +77,86 @@ if(is_front_page()) { ?>
 
 <?php } ?>
 
+<?php if( is_singular('events') ) {
+    $location = get_field_object('location');
+    if ($location['value']['address'] != '') {
+    $map = $location['value']['address'];
+    } else {
+    $map = $location['value']['lat'].', '.$location['value']['lng'];
+    }?>
+    <script async src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAkR6XcrYpo0z91H5mJQeNiVxIb8poV56Q&callback=initMap" type="text/javascript"></script>
+
+    <script>
+    function initMap() {
+        var loc = {lat: <?php echo $location['value']['lat']; ?>, lng: <?php echo $location['value']['lng']; ?>};
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 16,
+            center: loc
+        });
+        var marker = new google.maps.Marker({
+            position: loc,
+            map: map
+        });
+    }
+    </script>
+
+
+<?php } ?>
+
+<?php if( is_singular('ids_documents') || is_post_type_archive('ids_documents') || is_search() ) { ?>
+
+    <script type="text/javascript">
+
+        jQuery( "form.searchandfilter li.sf-level-0").children('ul').before('<div class="expand-arrow"></div>');
+
+        var listparent = document.getElementsByClassName("expand-arrow");
+        var i;
+
+        for (i = 0; i < listparent.length; i++) {
+            listparent[i].onclick = function() {
+                jQuery(this).parent().toggleClass("active");
+
+            }
+        }
+
+    </script>
+
+<?php } ?>
+
+<?php if( is_search()) { ?>
+
+	<script type="text/javascript">
+
+    function $_GET(param) {
+        var vars = {};
+        window.location.href.replace( location.hash, '' ).replace(
+            /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+            function( m, key, value ) { // callback
+	            vars[key] = value !== undefined ? value : '';
+            }
+        );
+
+        if ( param ) {
+	        return vars[param] ? vars[param] : null;
+        }
+        return vars;
+    }
+    if ($_GET("s") != null) {
+	    // Do anything...
+	    var searchphrase = $_GET('s').replace(/\+/g, ' ');
+        jQuery('.sf-field-search .sf-input-text').val(searchphrase);
+    }
+
+</script>
+
+<?php } ?>
+
 <script type="text/javascript">
 jQuery( "nav li a" ).not( "nav li li a" ).each(function( index ) {
     jQuery( this ).attr('href','#');
 });
 
-jQuery('#searchicon').click(function(){
-    jQuery('header.site [id=searchform]').toggleClass('active');
-});
+
 
 jQuery('.menuicon').click(function(){
     jQuery('nav').toggleClass('active');
@@ -124,39 +194,8 @@ jQuery( "nav" ).not( "nav.mobnav" ).hover(function(){
     jQuery('nav').toggleClass('active');
 });
 </script>
-<script type="text/javascript">
 
-    jQuery( "form.searchandfilter li.sf-level-0").children('ul').before('<div class="expand-arrow"></div>');
 
-    var listparent = document.getElementsByClassName("expand-arrow");
-    var i;
-
-    for (i = 0; i < listparent.length; i++) {
-        listparent[i].onclick = function() {
-            jQuery(this).parent().toggleClass("active");
-
-        }
-    }
-</script>
-<script type="text/javascript">
-    function $_GET(param) {
-        var vars = {};
-        window.location.href.replace( location.hash, '' ).replace(
-            /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
-            function( m, key, value ) { // callback
-                vars[key] = value !== undefined ? value : '';
-            }
-        );
-
-        if ( param ) {
-            return vars[param] ? vars[param] : null;
-        }
-        return vars;
-    }
-
-    var searchphrase = $_GET('s').replace(/\+/g, ' ');
-    jQuery('.sf-field-search .sf-input-text').val(searchphrase);
-</script>
 
 <?php
 wp_footer();?>

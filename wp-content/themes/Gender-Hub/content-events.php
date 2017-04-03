@@ -82,20 +82,11 @@ endif;
 	<?php endif; ?>
 
 	<?php if(get_field('location')) { ?>
-                <div id="event-map"><?php 
-                $location = get_field_object('location');
-                if ($location['value']['address'] != '') {
-                    $map = $location['value']['address']; 
-                } else {
-                    $map = $location['value']['lat'].', '.$location['value']['lng'];
-                }?><!--- Google API Key: key1 - AIzaSyDiD5g2YzXKDbU8rs7ijW6lnfM4WKfYbCs --->
-            <div class="acf-map">
-                <div class="marker" data-lat="<?php echo $location['value']['lat']; ?>" data-lng="<?php echo $location['value']['lng']; ?>"><?php echo $location['value']['address']; ?></div>
-       	     </div>      
-		 <!---<iframe class="event-location" width="300" height="200" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
-                        src="https://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=<?php echo $map; ?>&t=m&z=10&iwloc=A&output=embed&iwloc=near">
-                </iframe>--->
-                </div>
+
+        <div id="event-map">
+            <div id="map"></div>
+            <div class="marker" data-lat="<?php echo $location['value']['lat']; ?>" data-lng="<?php echo $location['value']['lng']; ?>"><?php echo $location['value']['address']; ?></div>
+        </div>
 	<?php } ?>
 
 		<?php the_content( __( 'Continue reading <span class="meta-nav"></span>', 'twentythirteen' ) ); ?>

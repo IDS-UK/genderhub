@@ -21,12 +21,10 @@
 
 	<p><?php _e( 'Sorry, but nothing matched your search terms. If you selected more than one option in the library search sidebar, this will only pull up results that match BOTH terms. 
 	<br /><br />Try searching just one of them or please try again with different keywords.', 'genderhub' ); ?><br /><br /></p>
-	<?php get_search_form(); ?>
 
 	<?php else : ?>
 
 	<p><?php _e( 'It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help.', 'genderhub' ); ?></p>
-	<?php get_search_form(); ?>
 
 	<?php endif; ?>
 </div><!-- .page-content -->

@@ -167,11 +167,13 @@ header.site .home-icon {margin: 7px 0 2px -37px;}
 header.site .social_link {width: 18px; height: 18px; margin-top: 6px; margin-left: 1em; }
 header.site #searchicon {float: right; margin-top: 11px; margin-left: 10px;}
 
-header.site #searchform { float:right; width:0px; display:inline-block; webkit-transition: width 0.8s;-moz-transition: width 0.8s; transition: width 0.8s; overflow: hidden;}
-header.site #searchform input {width: 92%;padding: 3px;margin-top: 9px;margin-right: 10px;}
+header.site #searchform { white-space: nowrap; width:0; float: right; webkit-transition: all 0.8s;-moz-transition: all 0.8s; transition: all 0.8s; overflow: hidden;}
+header.site #searchform input[type="text"] {width: 150px;padding: 3px;margin: 9px 0 0 0;}
+header.site #searchform input[type="submit"] {padding: 3px;margin: 9px 0 0 10px;}
 header.site #searchform input:focus {outline: none;}
 
-header #searchform.active, aside #searchform { display:block; width:150px; }
+header #searchform.active { width: 210px; }
+header #searchform.active input[type="submit"] { display: inline-block; }
 
 aside #searchform input {padding: 3px;margin-top: 13px;}
 aside #searchform {padding: 10px;}
@@ -1400,21 +1402,17 @@ margin-right:0
 
 
 #event-map {
-        width: 50%;
+	width: 50%;
 	min-width: 200px;
-        margin: 5px 0px 10px 10px;
-        float: right;
-        border: #ccc solid 2px;
-        padding: 2px;
+	margin: 5px 0px 10px 10px;
+	float: right;
+	border: #ccc solid 2px;
+	padding: 2px;
 }
-.acf-map {
+#map {
 	width: 100%;
 	height: 400px;
 	min-width: 200px;
-}
-/* fixes potential theme css conflict */
-.acf-map img {
-   max-width: inherit !important;
 }
 
 xh1.archive-title { display: table; }

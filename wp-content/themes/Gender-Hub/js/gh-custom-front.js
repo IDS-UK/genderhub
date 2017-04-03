@@ -5,6 +5,12 @@
 
     $(document).ready(function () {
 
+
+        $('#searchicon').click(function(){
+            $('header.site [id=searchform]').toggleClass('active');
+        });
+
+
 	var largestHeight = 0;
 	$("#featured_content h6").each(function() {
 		largestHeight = ( $(this).height() > largestHeight ? $(this).height() : largestHeight );
@@ -12,7 +18,7 @@
 	$("#featured_content h6").each(function() {
 		$(this).height(largestHeight);
 	});
-	    
+
 	$('.captioned-image').each(function() {
 		$(this).addClass('processed');
 		$(this).hover(

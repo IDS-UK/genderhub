@@ -661,7 +661,7 @@ class GenderHub_2017 {
 
 		if($show_filter) :
 		$html .= '<aside id="filter">';
-		$html .= 'Filter: <a rel="news_stories" data-filter=".news_stories" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-bell.png" /> News</a><a rel="other_training" data-filter=".other_training" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-training.png" /> Training</a><a rel="events" data-filter=".events" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-event.png" /> Event</a><a rel="blogs_opinions" data-filter=".blogs_opinions" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-blog.png" /> Blog</a>';
+		$html .= 'Filter: <a rel="news_stories" data-filter=".news_stories" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-bell.png" /> News</a><a rel="other_training" data-filter=".other_training" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-training.png" /> Training</a><a rel="events" data-filter=".events" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-event.png" /> Event</a><a rel="blogs_opinions" data-filter=".blogs_opinions" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-blog.png" /> Blog</a><a rel="blogs_opinions" data-filter=".interviews" class="btn-filter"><img src="'.get_stylesheet_directory_uri().'/img/icon-blog.png" /> Interview</a>';
 		$html .= '</aside>';
 		endif;
 
