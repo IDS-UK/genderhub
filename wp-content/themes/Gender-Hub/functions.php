@@ -67,6 +67,7 @@ class GenderHub_2017 {
 		add_image_size( 'collection', 300, 200, true);
 		add_image_size( 'featured-content', 297, 150, true);
 		add_image_size( 'blog_featured', 500, 300 );
+		add_image_size( 'archive-listings', 225);
 
 		register_nav_menu( 'primary', __( 'Primary Menu', 'genderhub' ) );
 		register_nav_menu( 'secondary', __( 'Footer Menu', 'genderhub' ) );
@@ -557,23 +558,21 @@ class GenderHub_2017 {
 		$cat->labels->name = $cat->label;
 		$cat->labels->menu_name = $cat->label;
 
-		$ptype = get_post_type_object( 'ids_documents' );
-		if ( ! $ptype )
-			return FALSE;
+		$docptype = get_post_type_object( 'ids_documents' );
 
-		$ptype->labels->name               = 'Resources';
-		$ptype->labels->singular_name      = 'Document';
-		$ptype->labels->add_new            = 'Add document';
-		$ptype->labels->add_new_item       = 'Add new document';
-		$ptype->labels->all_items          = 'All documents';
-		$ptype->labels->edit_item          = 'Edit document';
-		$ptype->labels->name_admin_bar     = 'Document';
-		$ptype->labels->menu_name          = 'Documents';
-		$ptype->labels->new_item           = 'New document';
-		$ptype->labels->not_found          = 'No documents found';
-		$ptype->labels->not_found_in_trash = 'No documents found in trash';
-		$ptype->labels->search_items       = 'Search documents';
-		$ptype->labels->view_item          = 'View document';
+		$docptype->labels->name               = 'Resources';
+		$docptype->labels->singular_name      = 'Document';
+		$docptype->labels->add_new            = 'Add document';
+		$docptype->labels->add_new_item       = 'Add new document';
+		$docptype->labels->all_items          = 'All documents';
+		$docptype->labels->edit_item          = 'Edit document';
+		$docptype->labels->name_admin_bar     = 'Document';
+		$docptype->labels->menu_name          = 'Documents';
+		$docptype->labels->new_item           = 'New document';
+		$docptype->labels->not_found          = 'No documents found';
+		$docptype->labels->not_found_in_trash = 'No documents found in trash';
+		$docptype->labels->search_items       = 'Search documents';
+		$docptype->labels->view_item          = 'View document';
 
 		return TRUE;
 	}

@@ -7,7 +7,7 @@
 <div class="section group main_content">
 
 <div class="col span_3_of_4 archive_content padding10">
-<h1 class="maintitle"><span><a href="/build-capacity/other-training/">Other Training</a></span></h1>
+<h1 class="maintitle"><span><a href="/build-capacity/other-training/">Training opportunities</a></span></h1>
 
 
 

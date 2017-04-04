@@ -74,40 +74,50 @@ if ($terms_as_text != ''): echo '<span>Content type(s): </span><strong>'.$terms_
 </header>
 	
 	<?php if ( is_home() || is_archive() || is_search() ) : // Only display Excerpts for Home / Archive / Search ?>
-	
 
-	
 	<div class="entry-summary">
-	
-		<?php if ( has_post_thumbnail() && ! post_password_required() && ! is_attachment() ) : ?>
-		<!--<?php the_post_thumbnail('custom-thumb'); ?>-->
-		
+
+		<?php if ( has_post_thumbnail()) : ?>
+
+            <div class="archive-image wp-caption">
+				<?php has_post_thumbnail('archive-listings') ? the_post_thumbnail('archive-listings') : the_post_thumbnail('blog_featured'); ?>
+                <p class="wp-caption-text"><?php the_post_thumbnail_caption(); ?></p>
+				<?php if(!empty($image_credit_text)) : ?>
+                    <p class="photo-credit"><b>Photo:</b> <?php echo !empty($image_credit_url) ? '<a href="'.$image_credit_url.'" target="_blank">'.$image_credit_text.'</a>' : $image_credit_text; ?></p>
+				<?php endif; ?>
+            </div>
+
 		<?php endif; ?>
 
-		
-				<?php the_excerpt(); ?>
-			
+        <div class="archive-text">
+	        <?php the_excerpt(); ?>
+        </div>
+
 		<p><a class="button" href="<?php the_permalink(); ?>">Read more</a></p>
 
 	</div><!-- .entry-summary -->
-	
-	
-	
-	
-	
+
 	<?php else : ?>
 	
 	
 	
 	
-	<div class="entry-content">
-	
-	<?php if ( has_post_thumbnail() && ! post_password_required() && ! is_attachment() ) : ?>
-		<div class="entry-featured-image">
-			<?php the_post_thumbnail('full'); ?>
-		</div>
+	<div class="entry-content group">
+
+		<?php if ( has_post_thumbnail()) : ?>
+            <div class="featured-image wp-caption">
+                <div class="featured-image-container">
+					<?php the_post_thumbnail('blog_featured'); ?>
+					<?php if(!empty($image_credit_text)) : ?>
+                        <p class="photo-credit"><b>Photo:</b> <?php echo !empty($image_credit_url) ? '<a href="'.$image_credit_url.'" target="_blank">'.$image_credit_text.'</a>' : $image_credit_text; ?></p>
+					<?php endif; ?>
+                </div>
+                <p class="wp-caption-text"><?php the_post_thumbnail_caption(); ?></p>
+            </div>
+
 		<?php endif; ?>
-				<?php the_content( __( 'Continue reading <span class="meta-nav"></span>', 'twentythirteen' ) ); ?>
+
+        <?php the_content( ); ?>
 		
 		
 		<h6><?php 

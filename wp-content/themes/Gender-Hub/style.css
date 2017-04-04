@@ -458,13 +458,18 @@ article.type-blogs_opinions h6 {background-color:#e66601;}
 .post-type-archive .entry-summary, .opinions .entry-summary {margin-bottom: 1em;}
 .post-type-archive .archive-image, .opinions .archive-image {width: 33%; float: right;}
 .post-type-archive .archive-image.wp-caption, .opinions .archive-image.wp-caption {background-color: #eee; padding: 0; margin: 0 0 0 1em;}
+.post-type-archive .archive-image.wp-caption img, .opinions .archive-image.wp-caption img {display: block; width: 100%; height: auto}
 .post-type-archive .archive-image.wp-caption p.wp-caption-text, .opinions .archive-image.wp-caption p.wp-caption-text {margin: 0; padding: 10px; text-align: left; font-style: italic; font-size: 13px;}
 .post-type-archive .archive-image.wp-caption p.photo-credit, .opinions .archive-image.wp-caption p.photo-credit {margin: 0; padding: 0 10px 10px; text-align: left; font-style: italic; font-size: 13px;}
 .post-type-archive #main .archive-image.wp-caption p.photo-credit a, .opinions #main .archive-image.wp-caption p.photo-credit a {color: #555; text-decoration: none;}
 .post-type-archive #main .archive-image.wp-caption p.photo-credit a:hover, .opinions #main .archive-image.wp-caption p.photo-credit a:hover {text-decoration: underline;}
 .post-type-archive .archive-text, .opinions .archive-text {margin-top: 1em;}
 
-.single .featured-image.wp-caption {padding: 0; margin: 0 0 1em;}
+.single .entry-content { margin-top: 1em; }
+.single .entry-content .featured-image { float: right; margin: 0 0 2em 2em;}
+
+
+.single .featured-image.wp-caption {padding: 0; margin: 0 0 1em 1em;}
 .single .featured-image.wp-caption p.wp-caption-text {margin: 0; padding: 10px; text-align: left; font-style: italic; font-size: 13px;}
 .single .featured-image.wp-caption .featured-image-container {position: relative;}
 .single .featured-image.wp-caption .featured-image-container img {display: block;}

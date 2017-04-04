@@ -14,7 +14,7 @@ get_header(); ?>
 
 		<header class="archive-header">
 
-			<h1 class="archive-title"><span>Other training</span></h1>
+			<h1 class="archive-title"><span>Training opportunities</span></h1>
 
 		</header><!-- .archive-header -->
 
