@@ -24,7 +24,7 @@
 		 
     </div><!--/col span_3_of_4 padding10-->
 
-    <div class="col span_1_of_4 sidebar padding10">
+    <div class="col span_1_of_4 sidebar padding10 blockheaders orange">
 
         <?php if ( function_exists( 'dynamic_sidebar' ) ) dynamic_sidebar( "alerts-sidebar" ); ?>
 

@@ -574,7 +574,7 @@ class GenderHub_2017 {
 		$docptype->labels->search_items       = 'Search documents';
 		$docptype->labels->view_item          = 'View document';
 
-		return TRUE;
+		return true;
 	}
 
 	public static function gh_get_slider_posts($type) {

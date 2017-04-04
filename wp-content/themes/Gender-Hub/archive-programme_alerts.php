@@ -33,7 +33,7 @@ get_header(); ?>
 
                                 <ul>
 
-                                    <li class="rssNav"><a title="RSS Feed" href="<?php echo current_page_url(); ?>/feed"><span>RSS Feed</span></a></li>
+                                    <li class="rssNav"><a title="RSS Feed" href="<?php echo current_page_url(); ?>feed"><span>RSS Feed</span></a></li>
                                 </ul>
 
                             </div>
@@ -41,13 +41,13 @@ get_header(); ?>
                             <?php
 
                             if ( is_day() ) :
-                                printf( __( 'Daily Archives: %s', 'twentythirteen' ), get_the_date() );
+                                printf( __( 'Daily Archives: %s', 'genderhub' ), get_the_date() );
                             elseif ( is_month() ) :
-                                printf( __( 'Monthly Archives: %s', 'twentythirteen' ), get_the_date( _x( 'F Y', 'monthly archives date format', 'twentythirteen' ) ) );
+                                printf( __( 'Monthly Archives: %s', 'genderhub' ), get_the_date( _x( 'F Y', 'monthly archives date format', 'genderhub' ) ) );
                             elseif ( is_year() ) :
-                                printf( __( 'Yearly Archives: %s', 'twentythirteen' ), get_the_date( _x( 'Y', 'yearly archives date format', 'twentythirteen' ) ) );
+                                printf( __( 'Yearly Archives: %s', 'genderhub' ), get_the_date( _x( 'Y', 'yearly archives date format', 'genderhub' ) ) );
                             else :
-                                _e( 'Programme alerts', 'twentythirteen' );
+                                _e( 'Programme activities', 'genderhub' );
                             endif; ?>
 
                         </span></h1>
