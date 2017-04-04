@@ -22,9 +22,7 @@ foreach ($terms as $term){
     $img = vt_resize($img['id'], '', 140, 110, true);
     $attribution .= '<img class="attribution-image" src="'.$img['url'].'" />';
     $attribution .= '</a></div>';
-}
-
-?>
+} ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
@@ -36,8 +34,6 @@ foreach ($terms as $term){
                 <?php the_post_thumbnail(); ?>
             </div>
         <?php endif; ?>
-
-        <!-- Main single page -->
 		
         <?php if ( is_single() ) : ?>
 		
@@ -55,20 +51,19 @@ foreach ($terms as $term){
         <?php endif; // is_single() ?>
 
         <h6>
-            <span class="floatright"><img src="/wp-content/uploads/2015/05/document-icon.png" /></span>
+            <span class="floatright"><img src="<?php echo get_stylesheet_directory_uri(); ?>/img/icon-document.png" /></span>
 
             <?php if (ids_get_field('publisher') != '') { echo '<span>Publisher: </span><strong>'.ids_get_field('publisher').'</strong>'; } ?>
             <?php if (ids_get_field('publication_year') != '') { echo '<!--span>Published in: </span--><strong>'.ids_get_field('publication_year').'</strong>'; } ?>
             <br />
             <?php if ($authors = ids_get_field('authors')) { echo '<span>Author: </span><strong>'.str_ireplace("false", "", $authors).'</strong>'; } ?>
-            <?php if ($terms_as_text = strip_tags( get_the_term_list( $wp_query->post->ID, 'resource_type', '', ' , ' ) )) { echo '<span>Resource type(s): </span><strong>'.str_ireplace(';',', ',$terms_as_text).'</strong>'; } ?>
+            <br />
+	        <?php if ($terms_as_text = strip_tags( get_the_term_list( $wp_query->post->ID, 'resource_type', '', ' , ' ) )) { echo '<span>Resource type(s): </span><strong>'.str_ireplace(';',', ',$terms_as_text).'</strong>'; } ?>
         </h6>
 	
-    </header><!-- .entry-header -->
-
-    <!-- Main IDS resources list page -->
+    </header>
 						
-    <?php if ( is_home() || is_archive() || is_search() ) : // Only display Excerpts for Home / Archive / Search ?>
+    <?php if ( is_home() || is_archive() || is_search() ) : ?>
 			
         <div class="entry-summary">
 
@@ -87,7 +82,7 @@ foreach ($terms as $term){
 		
             <p><a class="button" href="<?php the_permalink(); ?>">Read more</a></p>
 
-        </div><!-- .entry-summary -->
+        </div>
 		
     <?php else : ?>
 		
@@ -117,96 +112,35 @@ foreach ($terms as $term){
 
                 <?php endif; ?>
 
-            </div><!--span_1_of_4-->
-			
-            <!-- DISPLAY THE IDS FIELD META -->
+            </div>
+
             <?php if ( is_single() ) : ?>
 
                 <div class="ids-fields">
-      
-                    <h3>Document details</h3>
 
                     <?php ids_field('urls', '<div class="list-of-buttons">', '</div>', array('link', 'Read document')); ?>
-             
+
+                    <p><strong>Themes:</strong>
+
                     <?php
-                    /* Get the collections this is part of */
-                    $topics = wp_get_post_terms(get_the_ID(), 'topics', array('fields' => 'all','orderby' => 't.term_id'));
-                    foreach($topics as $topic) {
-                        $topic_list[] = $topic->term_id;
-                    }
-                    //print 'xxx'.print_r($topic_list,true);
-        
-                    $posts_array = get_posts(
 
-                        array( 'showposts' => -1,
-                               'post_type' => 'collections',
-                               'tax_query' => array(
-                                   array(
-                                       'taxonomy' => 'topics',
-                                       'field' => 'term_id',
-                                       'terms' => $topic_list,
-                                   )
-                               )
-                        )
-                    );
+                    $sep = '';
+                    $sfid = $_SERVER['SERVER_NAME'] == 'genderhub.org' ? '279' : '1903'; // id of the Search and Filter Pro form, depending on whether we're on live or dev (respectively)
 
-                    //print 'xxx'.print_r($posts_array,true);
-
-                    if (count($posts_array) > 0) {
-                        print '<div class="document-collections-wrapper">';
-                        print '<h3>'.'<span>Collections</span>'.'</h3>';
-                        print '<p>'.'Find more like this in our collections'.'</p><ul>';
-                        foreach ($posts_array as $collection) {
-                            //print get_field('date', $collection->ID);
-                            $collection_date = new DateTime(get_field('date', $collection->ID));
-                            //print 'xxx'.print_r($collection,true);
-                            print '<li>';
-                            print '<a href="'.$collection->guid.'">'.$collection->post_title.' ('.$collection_date->format('F Y').')</a><br/>'.  get_the_excerpt($collection->ID);
-                            print '</li>';
-                        }
-                        print '</ul>';
-                        print '</div>';
-                    }
-                    ?>
-                    <ul>
-                        <?php ids_field('publisher', '<li class="ids-field">' . __('<strong>Publisher:</strong> '), '</li>'); ?>
-                        <?php ids_field('authors', '<li class="ids-field">' . __('<strong>Author:</strong> '), '</li>'); ?>
-                        <?php ids_field('publication_year', '<li class="ids-field">' . __('<strong>Publication year:</strong> '), '</li>'); ?>
-                        <?php ids_field('date_updated', '<li class="ids-field">' . __('<strong>Updated on:</strong> '), '</li>', 'date'); ?>
-                        <!-- categories list with no link -->
-                        <li class="ids-field"><strong>Themes:</strong> <?php
-
-                            $sep = '';
-                            $sfid = $_SERVER['SERVER_NAME'] == 'genderhub.org' ? '279' : '1903'; // id of the Search and Filter Pro form, depending on whether we're on live or dev (respectively)
-
-                            foreach((get_the_category()) as $category) {
-                                echo $sep . '<a href="/?unonce=34668a7887&sfid='.$sfid.'&taxo%5B0%5D%5Bname%5D=category&taxo%5B0%5D%5Bopt%5D=&taxo%5B0%5D%5Bterm%5D='.$category->slug.'&taxo%5B1%5D%5Bname%5D=bridge_countries&taxo%5B1%5D%5Bopt%5D=&taxo%5B1%5D%5Bterm%5D=uwpqsftaxoall&skeyword=">'.$category->cat_name.'</a>'; $sep = ', ';
-                            } ?>
-                        </li>
-                        <li>
-                            <strong>Resource Type(s): </strong><?php
-                            $terms_as_text = strip_tags( get_the_term_list( $wp_query->post->ID, 'resource_type', '', ', ' ) );
-                            if(!empty($terms_as_text)) {
-                                echo $terms_as_text;
-                            } else if(empty($terms_as_text)) {
-                                echo 'Not Known';
-                            } ?>
-                        </li>
-                    </ul>
-
+                    foreach((get_the_category()) as $category) {
+                        echo $sep . '<a href="/?unonce=34668a7887&sfid='.$sfid.'&taxo%5B0%5D%5Bname%5D=category&taxo%5B0%5D%5Bopt%5D=&taxo%5B0%5D%5Bterm%5D='.$category->slug.'&taxo%5B1%5D%5Bname%5D=bridge_countries&taxo%5B1%5D%5Bopt%5D=&taxo%5B1%5D%5Bterm%5D=uwpqsftaxoall&skeyword=">'.$category->cat_name.'</a>'; $sep = ', ';
+                    } ?>
+                    </p>
                 </div>
       
                 <?php echo do_shortcode('[ssbp]'); ?>
       
-            <?php endif; // is_single() ?>
+            <?php endif; ?>
 
-            <?php wp_link_pages( array( 'before' => '<div class="page-links"><span class="page-links-title">' . __( 'Pages:', 'twentythirteen' ) . '</span>', 'after' => '</div>', 'link_before' => '<span>', 'link_after' => '</span>' ) ); ?>
+            <?php wp_link_pages( array( 'before' => '<div class="page-links"><span class="page-links-title">' . __( 'Pages:', 'genderhub' ) . '</span>', 'after' => '</div>', 'link_before' => '<span>', 'link_after' => '</span>' ) ); ?>
 
-        </div><!-- .entry-content -->
+        </div>
 
     <?php endif; ?>
-	
-    <!--footer class="entry-meta">
-	</footer--><!-- .entry-meta -->
 
-</article><!-- #post -->
+</article>

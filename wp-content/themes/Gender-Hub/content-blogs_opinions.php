@@ -119,7 +119,7 @@
 		
 	  <?php echo do_shortcode('[ssbp]'); ?>
 		
-	<?php wp_link_pages( array( 'before' => '<div class="page-links"><span class="page-links-title">' . __( 'Pages:', 'twentythirteen' ) . '</span>', 'after' => '</div>', 'link_before' => '<span>', 'link_after' => '</span>' ) ); ?>
+	<?php wp_link_pages( array( 'before' => '<div class="page-links"><span class="page-links-title">' . __( 'Pages:', 'genderhub' ) . '</span>', 'after' => '</div>', 'link_before' => '<span>', 'link_after' => '</span>' ) ); ?>
 	
 
 	</div><!-- .entry-content -->
@@ -136,7 +136,7 @@
 		
 		<?php if ( comments_open() && ! is_single() ) : ?>
 			<div class="comments-link">
-				<?php comments_popup_link( '<span class="leave-reply">' . __( 'Leave a comment', 'twentythirteen' ) . '</span>', __( 'One comment so far', 'twentythirteen' ), __( 'View all % comments', 'twentythirteen' ) ); ?>
+				<?php comments_popup_link( '<span class="leave-reply">' . __( 'Leave a comment', 'genderhub' ) . '</span>', __( 'One comment so far', 'genderhub' ), __( 'View all % comments', 'genderhub' ) ); ?>
 			</div><!-- .comments-link -->
 		<?php endif; // comments_open() ?>
 

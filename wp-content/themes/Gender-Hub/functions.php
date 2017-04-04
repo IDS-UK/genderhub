@@ -7,6 +7,7 @@ class GenderHub_2017 {
 	    include('inc/gh-page-meta.php');
 	    include('inc/gh-social-media-posts.php');
 
+	    add_action( 'init', 'gh_editor_capabilities' );
 	    add_action( 'after_setup_theme', array($this, 'setup') );
 	    add_action( 'wp_enqueue_scripts', array($this, 'gh_loadscripts') );
 	    add_action( 'wp_footer', array($this, 'gh_footer_loadscripts') );
@@ -18,10 +19,9 @@ class GenderHub_2017 {
 	    add_action( 'do_meta_boxes', array($this, 'gh_reposition_metaboxes') );
 	    add_action( 'edit_form_after_title', array($this, 'gh_after_title_metaboxes') );
 
-	    add_action ( 'after_wp_tiny_mce', array($this, 'gh_disable_open_new_window') );
+	    add_action ('after_wp_tiny_mce', array($this, 'gh_disable_open_new_window') );
 
-        add_action('wp_loaded', array($this, 'gh_relabel_items'));
-
+        add_action( 'wp_loaded', array($this, 'gh_relabel_items') );
 
 	    add_filter( 'image_size_names_choose', array($this, 'custom_image_sizes_choose') );
 	    add_filter( 'body_class', array($this, 'gh_body_classes') );
@@ -49,6 +49,12 @@ class GenderHub_2017 {
 	    add_shortcode( 'recent-posts', array($this, 'gh_recent_posts_shortcode') );
 
     }
+
+	function gh_editor_capabilities() {
+
+		$role = get_role( 'editor' );
+		$role->remove_cap( 'manage_categories' );
+	}
 
 	function setup() {
 
