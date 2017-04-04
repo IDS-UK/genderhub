@@ -69,9 +69,7 @@ else : ?>
 			<div class="entry-featured-image">
 
 				<?php if ( has_post_thumbnail() && ! post_password_required() && ! is_attachment() ) : ?>
-					<a class="captioned-image"><?php the_post_thumbnail('blog_featured'); ?>
-					<?php if ($interviewee_bio) : echo '<div class="image-text image-caption">'.wpautop($interviewee_bio).'</div>'; endif; ?>
-					</a>
+					<?php the_post_thumbnail('blog_featured'); ?>
 				<?php endif; ?>
 
 			</div>
@@ -118,17 +116,21 @@ else : ?>
 
 		<div class="col col2_3">
 
+            <h1 class="main-title">
+                <span><a href="/be-inspired/interviews/"><?php echo ucwords($post->post_type); ?></a></span>
+            </h1>
+
 			<header class="entry-header">
 
-				<h1>
-					<span><a href="be-inspired/interviews/"><?php echo ucwords($post->post_type); ?></a></span>
-				</h1>
+                <?php the_title('<h1 class="entry-title">', '</h1>'); ?>
 
-				<?php the_title('<h2>', '</h2>'); ?>
-
-				<p><strong><?php the_date(); ?></strong></p>
+				<h6>Interview with <strong><?php echo $interviewee_name; ?> </strong> Published on: <strong><?php the_date(); ?></strong></h6>
 
 			</header>
+
+            <div class="intro-blurb-meta">
+                <?php echo wpautop($interviewee_bio); ?>
+            </div>
 
 			<div>
 

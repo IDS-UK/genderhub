@@ -559,14 +559,14 @@ class GenderHub_2017 {
 		if ( ! $ptype )
 			return FALSE;
 
-		$ptype->labels->name               = 'Documents';
+		$ptype->labels->name               = 'Resources';
 		$ptype->labels->singular_name      = 'Document';
 		$ptype->labels->add_new            = 'Add document';
 		$ptype->labels->add_new_item       = 'Add new document';
 		$ptype->labels->all_items          = 'All documents';
 		$ptype->labels->edit_item          = 'Edit document';
 		$ptype->labels->name_admin_bar     = 'Document';
-		$ptype->labels->menu_name          = 'Document';
+		$ptype->labels->menu_name          = 'Documents';
 		$ptype->labels->new_item           = 'New document';
 		$ptype->labels->not_found          = 'No documents found';
 		$ptype->labels->not_found_in_trash = 'No documents found in trash';
@@ -751,6 +751,8 @@ class GenderHub_2017 {
 
             if ($s->post_type == 'events') :
                 $html .= '<strong>Event Date:</strong> '.date('jS M',strtotime(substr($c['start_date'][0],0,4).'-'.substr($c['start_date'][0],4,2).'-'.substr($c['start_date'][0],6,2))).' to the '.date('jS M',strtotime(substr($c['end_date'][0],0,4).'-'.substr($c['end_date'][0],4,2).'-'.substr($c['end_date'][0],6,2)));
+            elseif ($s->post_type == 'interviews') :
+                $html .= date('jS M Y',strtotime($c['_interview_date'][0]));
             else :
                 $html .= '<strong>'.$c['author'][0].'</strong> '. date('jS M Y',strtotime(substr($c['date_published'][0],0,4).'-'.substr($c['date_published'][0],4,2).'-'.substr($c['date_published'][0],6,2)));
             endif;

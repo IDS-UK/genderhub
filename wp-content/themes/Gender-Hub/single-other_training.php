@@ -43,7 +43,7 @@
 
 
 
-<div class="col span_1_of_4 sidebar padding10">
+<div class="col span_1_of_4 sidebar padding10 blockheaders pink">
 
 
 
