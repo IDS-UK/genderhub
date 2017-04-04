@@ -93,11 +93,9 @@ foreach ($terms as $term){
 		
         <div class="entry-content">
 
-            <?php if ( has_post_thumbnail() && ! post_password_required() && ! is_attachment() ) : ?>
-                <div class="entry-featured-image">
-                    <?php the_post_thumbnail('medium'); ?>
+            <div class="featured-image">
+	                <?php ids_field('urls', '<img src="http://ims.ids.ac.uk/thumbnail/?url=', '" />'); ?>
                 </div>
-            <?php endif; ?>
 
             <?php if ($attribution) { ?>
                 <div class="attribution">
@@ -127,7 +125,7 @@ foreach ($terms as $term){
                 <div class="ids-fields">
       
                     <h3>Document details</h3>
-	                <?php ids_field('urls', '<img src="http://ims.ids.ac.uk/thumbnail/?url=', '" />'); ?>
+
                     <?php ids_field('urls', '<div class="list-of-buttons">', '</div>', array('link', 'Read document')); ?>
              
                     <?php

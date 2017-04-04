@@ -40,6 +40,8 @@ class GenderHub_2017 {
 
 	    add_filter( 'get_user_option_meta-box-order_programme_alerts', array($this, 'gh_programme_alerts_metabox_order') );
 
+	    add_filter('acf/fields/google_map/api', array($this, 'gh_google_map_api_key') );
+
 	    remove_action( 'wp_head','wp_generator' );
 
 	    add_editor_style( 'css/editor-style.css' );
@@ -765,6 +767,7 @@ class GenderHub_2017 {
             elseif ($s->post_type == 'blogs_opinions'): $html .= 'View blog post';
             elseif ($s->post_type == 'other_training'): $html .= 'Read article';
             elseif ($s->post_type == 'news_stories'): $html .= 'Read article';
+            elseif ($s->post_type == 'interviews'): $html .= 'Read interview';
             endif;
 
             $html .= '</a>';
@@ -781,6 +784,13 @@ class GenderHub_2017 {
 	    return $html;
 
     }
+
+	function gh_google_map_api_key( $api ){
+
+		$api['key'] = 'AIzaSyAkR6XcrYpo0z91H5mJQeNiVxIb8poV56Q';
+		return $api;
+
+	}
 
 }
 
@@ -974,6 +984,9 @@ function format_link($url, $title = '', $scheme = 'http://') {
 * @param bool $crop
 * @return array
 */
+/**
+ * referenced by content-ids_documents.php
+ */
 if(!function_exists('vt_resize')){
     function vt_resize($attach_id = null, $img_url = null, $width, $height, $crop = false){
     if($attach_id){

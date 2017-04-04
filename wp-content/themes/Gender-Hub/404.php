@@ -1,52 +1,28 @@
 <?php
 /**
  * The template for displaying 404 pages (Not Found)
- *
- * @package WordPress
- * @subpackage Twenty_Thirteen
- * @since Twenty Thirteen 1.0
  */
 
 get_header(); ?>
 
-
-
-
-
 <div class="section group main_content">
 
-<div class="col span_3_of_4 archive_content padding10">
+    <div class="col col1_3 sidebar blockheaders purple">
 
-<h1><?php _e( 'Oops, you seem to be lost', 'twentythirteen' ); ?></h1>
+        <?php if ( function_exists( 'dynamic_sidebar' ) ) dynamic_sidebar( 'search-sidebar' ); ?>
 
+    </div>
 
-<p><?php _e( 'It looks like nothing was found at this location. Please use the navigation above or maybe try a search to find your way.', 'twentythirteen' ); ?></p>
+    <div class="col col2_3 archive_content padding10">
 
-<p><?php _e( 'Alternatively, please <a href="<?php echo site_url(); ?>/connect-and-discuss/contact-us/">contact us here with any questions</a>.', 'twentythirteen' ); ?></p>
+        <h1><?php _e( 'Oops, you seem to be lost', 'genderhub' ); ?></h1>
 
-					<?php get_search_form(); ?>
+        <p><?php _e( 'It looks like nothing was found at this location. Please use the navigation above or maybe try a search to find your way.', 'genderhub' ); ?></p>
 
+        <p><?php _e( 'Alternatively, please <a href="'. site_url().'/connect-and-discuss/contact-us/">contact us here with any questions</a>.', 'genderhub' ); ?></p>
 
-
-
-</div><!--/col span_3_of_4-->
-
-
-
-
-<div class="col span_1_of_4 sidebar padding10">
-
-<?php get_sidebar(); ?> 
-
-</div><!--/col span_1_of_4-->
-
-
-	
-	
+    </div>
 
 </div><!--/section group-->
-
-
-
 
 <?php get_footer(); ?>

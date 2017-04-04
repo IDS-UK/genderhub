@@ -15,15 +15,15 @@ endif;
 		
 		<?php if ( is_single() ) : ?>
 		
-			<h1 class="entry-title"><span><?php the_title(); ?></span></h1>
+            <h1 class="entry-title"><span><?php the_title(); ?></span></h1>
 			
-		<?php else : ?>
+        <?php else : ?>
 		
 			<h1 class="entry-title">
 				<a href="<?php the_permalink(); ?>" rel="bookmark">
-                                <?php if ( is_search() ) :  ?><span class="search-content-type">EVENT: </span><?php endif; ?>
-                                    <?php the_title(); ?>
-                                </a>
+                    <?php if ( is_search() ) :  ?><span class="search-content-type">EVENT: </span><?php endif; ?>
+                    <?php the_title(); ?>
+                </a>
 			</h1>
 		
 		<?php endif; ?>
@@ -31,21 +31,15 @@ endif;
 		<?php if ( is_home() || is_archive()  || is_search() || is_single() ) : // Only display Excerpts for Home / Archive / Search / Single ?>
 
 			<h6>
-
-				 <?php	
+                <?php
 				$dates = ids_pretty_date(strtotime(get_field('start_date')), strtotime(get_field('end_date')));
 				 if ($dates) {
-					print '<span>Date(s): </span><strong>'.$dates.'</strong>';
-				}			
-				?>
+                     print '<span>Date(s): </span><strong>'.$dates.'</strong>';
+				} ?>
 		 
-				<?php
-				$terms_as_text = strip_tags( get_the_term_list( $wp_query->post->ID, 'content_type', '', ' , ' ) );
-				?>
+				<?php $terms_as_text = strip_tags( get_the_term_list( $wp_query->post->ID, 'content_type', '', ' , ' ) ); ?>
 		
-				<?php
-				echo '<span class="floatright"><img src="/wp-content/uploads/2015/05/event-icon.png" /></span>';
-				?>
+				<?php echo '<span class="floatright"><img src="/wp-content/uploads/2015/05/event-icon.png" /></span>'; ?>
 			</h6>
 
 <?php endif; ?>
@@ -55,14 +49,8 @@ endif;
 	<?php if ( is_home() || is_archive() || is_search() ) : // Only display Excerpts for Home / Archive / Search ?>
 		
 	<div class="entry-summary">
-	
-		<?php if ( has_post_thumbnail() && ! post_password_required() && ! is_attachment() ) : ?>
-		<!--<?php the_post_thumbnail('custom-thumb'); ?>-->
-		
-		<?php endif; ?>
 
-		
-				<?php the_excerpt(); ?>
+        <?php the_excerpt(); ?>
 			
 		<p><a class="button" href="<?php the_permalink(); ?>">Read more</a></p>
 
@@ -72,26 +60,25 @@ endif;
 	
 	<div class="entry-content">
 	
-	
-
-
-	<?php if ( has_post_thumbnail() && ! post_password_required() && ! is_attachment() ) : ?>
-		<div class="entry-featured-image">
+        <?php if ( has_post_thumbnail() && ! post_password_required() && ! is_attachment() ) : ?>
+		<div class="featured-image">
 			<?php the_post_thumbnail('full'); ?>
 		</div>
 	<?php endif; ?>
 
-	<?php if(get_field('location')) { ?>
+		<?php the_content( __( 'Continue reading <span class="meta-nav"></span>', 'genderhub' ) ); ?>
 
-        <div id="event-map">
-            <div id="map"></div>
-            <div class="marker" data-lat="<?php echo $location['value']['lat']; ?>" data-lng="<?php echo $location['value']['lng']; ?>"><?php echo $location['value']['address']; ?></div>
-        </div>
-	<?php } ?>
+		<?php
 
-		<?php the_content( __( 'Continue reading <span class="meta-nav"></span>', 'twentythirteen' ) ); ?>
-		
-		
+		$location = get_field('location');
+
+        if(!empty($location)) { ?>
+            <div id="event-map">
+                <div id="map"></div>
+                <div class="marker" data-lat="<?php echo $location['lat']; ?>" data-lng="<?php echo $location['lng']; ?>"><?php echo $location['address']; ?></div>
+            </div>
+		<?php } ?>
+
 		<?php $source = get_field('source');
 		if( !empty($source) ): ?>
 			<h6>
@@ -102,7 +89,7 @@ endif;
 		<?php $link = get_field('link');
 		if( !empty($link) ): ?>
 			<div class="event-link">
-				<a class="button" href="<?php echo $link['url']; ?>"><?php echo $link['title']; ?></a>
+				<a class="button" href="<?php echo $link['url']; ?>"><?php echo $link['title']?: 'Full details'; ?></a>
 			</div>
 		<?php endif; ?>	
 		<div class="col span_1_of_4">

@@ -3,6 +3,7 @@
 <div class="section group main_content">
 
     <div class="col span_3_of_4 archive_content padding10">
+        <h1 class="maintitle"><span><a href="/be-inspired/programme-alerts/">Programme Activities</a></span></h1>
 
         <?php /* The loop */ ?>
         <?php while ( have_posts() ) : the_post(); ?>

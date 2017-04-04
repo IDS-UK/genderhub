@@ -579,7 +579,9 @@ article.contact_point .archive-summary-container .archive-summary-details h2 {co
 .single-programme_alerts article{border-bottom:5px solid #e66601;}
 /*.single-programme_alerts article.entry-summary a {border-radius:5px;background-color:#e66601; padding:5px; color:#fff}*/
 .single-programme_alerts #main a.button {border-radius:5px;background-color:#e66601; padding:5px; color:#fff}
-.single-programme_alerts h1.entry-title {line-height: 28px;border-top: 5px solid #e66601;}
+.single-programme_alerts h1.maintitle {border-top:5px solid #e66601; display:block; width:100%; font-size:18px}
+.single-programme_alerts h1.maintitle span {color: #fff; background-color: #e66601; width: auto; padding: 6px; }
+.single-programme_alerts h1.entry-title {line-height: 28px;}
 .single-programme_alerts h1.entry-title span{font-size: 18px; padding:0px}
 .single-programme_alerts article.news_photo a {background:none}
 .single-programme_alerts article.news_photo {float:right; padding-left:15px; padding-bottom:15px; width: 30%; color:#666; font-size:14px; font-style:italic}
@@ -794,6 +796,10 @@ a.captioned-image.processed .image-caption { display: none; opacity: 0.85;}
 	padding: 10px;
 	margin-bottom: 10px;}
 
+
+.single.single-ids_documents .entry-content { margin-top: 1em; }
+.single.single-ids_documents .entry-content .featured-image { float: right; margin: 0 0 2em 2em;}
+
 /* collections */
 #documents {padding-bottom: 1em;border-bottom: 2px solid #53a669;}
 #documents + h3 {margin-top: 1em;}
@@ -889,6 +895,7 @@ a.captioned-image.processed .image-caption { display: none; opacity: 0.85;}
 .interviews .section-highlight { background-color: #e0e1e3; }
 
 .post-type-archive-news_stories .news_photo img,
+.entry-featured-image { margin-bottom: 1em; }
 .entry-featured-image img { object-fit: cover; display: block; width: 100%; }
 .post-type-archive-news_stories .news_photo img,
 .type-news_stories .entry-featured-image img { width: auto; }
@@ -1050,7 +1057,6 @@ font-weight:700;}
 	overflow:hidden;
 	color:#fff;
 	margin-bottom:20px;
-	border-top:5px solid #333333
 }
 #main #tp_widget_recent_tweets ul , #main #tp_widget_recent_tweets-2 ul { margin: 0; }
 
@@ -1434,17 +1440,20 @@ margin-right:0
 
 
 #event-map {
-	width: 50%;
+	width: 70%;
 	min-width: 200px;
-	margin: 5px 0px 10px 10px;
-	float: right;
-	border: #ccc solid 2px;
+	margin: 5px auto 10px;
 	padding: 2px;
+}
+#event-map .marker {
+	padding-top: .5em;
+	text-align:right;
 }
 #map {
 	width: 100%;
 	height: 400px;
 	min-width: 200px;
+	border: #ccc solid 2px;
 }
 
 xh1.archive-title { display: table; }

@@ -47,7 +47,7 @@ get_header(); ?>
 
                     <h1 class="archive-title">
 
-                        <span class="type">
+                        <span>
                             <?php
                             if ( is_day() ) :
                                 printf( __( 'Daily Archives: %s', 'genderhub' ), get_the_date() );
