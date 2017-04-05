@@ -18,6 +18,7 @@ class GenderHub_2017 {
 
 	    add_action( 'do_meta_boxes', array($this, 'gh_reposition_metaboxes') );
 	    add_action( 'edit_form_after_title', array($this, 'gh_after_title_metaboxes') );
+	    add_action( 'admin_menu', array($this, 'gh_tidy_meta_boxes') );
 
 	    add_action ('after_wp_tiny_mce', array($this, 'gh_disable_open_new_window') );
 
@@ -49,12 +50,6 @@ class GenderHub_2017 {
 	    add_shortcode( 'recent-posts', array($this, 'gh_recent_posts_shortcode') );
 
     }
-
-	function gh_editor_capabilities() {
-
-		$role = get_role( 'editor' );
-		$role->remove_cap( 'manage_categories' );
-	}
 
 	function setup() {
 
@@ -531,6 +526,28 @@ class GenderHub_2017 {
 
 		global $post, $wp_meta_boxes;
 		do_meta_boxes( get_current_screen(), 'after_title', $post );
+	}
+
+	function gh_tidy_meta_boxes() {
+
+	    // blogs_opinions
+        $boxes_to_remove_from_blogs_opinions = array( 'authordiv', 'postexcerpt', 'postcustom' );
+        foreach ($boxes_to_remove_from_blogs_opinions as $metabox) {
+	        remove_meta_box( $metabox, 'blogs_opinions', 'normal' );
+        }
+
+	    // interviews
+        $boxes_to_remove_from_interviews = array( 'postexcerpt' );
+        foreach ($boxes_to_remove_from_interviews as $metabox) {
+	        remove_meta_box( $metabox, 'interviews', 'normal' );
+        }
+
+	}
+
+	function gh_editor_capabilities() {
+
+		$role = get_role( 'editor' );
+		$role->remove_cap( 'manage_categories' );
 	}
 
 	public static function gh_array_shift($array, $k, $id) {
