@@ -9,9 +9,8 @@ class GenderHub_2017 {
 
 	    add_action( 'init', 'gh_editor_capabilities' );
 	    add_action( 'after_setup_theme', array($this, 'setup') );
-	    add_action( 'wp_enqueue_scripts', array($this, 'gh_loadscripts') );
-	    add_action( 'wp_footer', array($this, 'gh_footer_loadscripts') );
-	    add_action( 'admin_enqueue_scripts', array($this, 'gh_admin_loadscripts') );
+	    add_action( 'wp_enqueue_scripts', array($this, 'gh_scripts_front') );
+	    add_action( 'admin_enqueue_scripts', array($this, 'gh_scripts_admin') );
 	    add_action( 'widgets_init', array($this, 'gh_sidebars') );
 	    add_action( 'pre_get_posts', array($this, 'practical_tools_filter') );
 	    add_action( 'login_enqueue_scripts', array($this, 'gh_custom_login_logo') );
@@ -103,7 +102,7 @@ class GenderHub_2017 {
 
 	}
 
-	function gh_loadscripts() {
+	function gh_scripts_front() {
 
 		wp_register_script( 'gh-frontend-jquery', get_stylesheet_directory_uri() . '/js/gh-custom-front.js', array( 'jquery'), null, true);
 		wp_enqueue_script( 'gh-frontend-jquery');
@@ -123,16 +122,13 @@ class GenderHub_2017 {
         }
 	}
 
-	function gh_footer_loadscripts() {
-	}
-
-	function gh_admin_scripts($hook) {
+	function gh_scripts_admin($hook) {
 
 		wp_enqueue_media();
 
 		wp_enqueue_style( 'jquery-ui-css','http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/base/jquery-ui.css',false,"1.9.0",false);
 
-		wp_register_script( 'genderhub-admin-js', get_stylesheet_directory_uri() . '/js/genderhub-custom-admin.js', array('jquery'), null, true );
+		wp_register_script( 'genderhub-admin-js', get_stylesheet_directory_uri() . '/js/gh-custom-admin.js', array('jquery'), null, true );
 		wp_enqueue_script( 'genderhub-admin-js' );
 
 		$jquery_ui = array(
