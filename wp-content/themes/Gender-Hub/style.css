@@ -203,6 +203,11 @@ aside.widget .textwidget { color:#000; padding:0;}
 .sidebar.green .widget form.searchandfilter .sf-level-0.active div.expand-arrow { background-image : url('img/arrow-up-green.png'); }
 .sidebar.purple .widget form.searchandfilter .sf-level-0.active div.expand-arrow { background-image : url('img/arrow-up-purple.png'); }
 
+.sidebar.green .widget form.searchandfilter .sf-field-reset a { margin-left: 1em; color: #53a669; }
+.sidebar.purple .widget form.searchandfilter .sf-field-reset a { margin-left: 1em; color: #8f308e; }
+
+.sidebar .widget form.searchandfilter .sf-field-submit, .sidebar .widget form.searchandfilter .sf-field-reset { display: inline; }
+
 .sidebar .widget form.searchandfilter .sf-level-1 { border-bottom: none; padding: 7px 0 0 24px; }
 
 @media all and (min-width: 768px) {
@@ -975,7 +980,7 @@ font-family: 'Asap', Arial, Helvetica, sans-serif;}
 .ssbp-facebook:after {content:'Share on Facebook'; display:block; position: relative;
 font-family: 'Asap', Arial, Helvetica, sans-serif;
  }
- .ssbp-google {background-color:#db5442 !important; background-image:url(/wp-content/uploads/2015/05/google1.png) !important; background-repeat:no-repeat; background-position:5px 90px; background-size: 20px; }
+.ssbp-google {background-color:#db5442 !important; background-image:url(/wp-content/uploads/2015/05/google1.png) !important; background-repeat:no-repeat; background-position:5px 90px; background-size: 20px; }
 .ssbp-google img {display:none !important}
 .ssbp-google:after {content:'Share by Google+'; display:block; position: relative;
 font-family: 'Asap', Arial, Helvetica, sans-serif;
