@@ -34,19 +34,6 @@
                 <span class="floatright"><img src="/wp-content/uploads/2015/06/presentation-icon.png" /></span>
 
                 <?php
-                $author = get_field('author');
-                $idsauthor = ids_get_field('authors');
-                $blogauthor = get_field('blog_author');
-	
-                if  ($idsauthor) {
-                    echo '<span>Publisher: </span><strong>'.$idsauthor.'</strong> ';
-                } elseif  ($blogauthor) {
-                    echo '<span>Publisher: </span><strong>'.$blogauthor.'</strong> ';
-                } elseif  ($author) {
-                    echo '<span>Publisher: </span><strong>'.$author.'</strong> ';
-                } elseif(get_the_author() != '') {
-                    echo '<span>Publisher: </span><strong>'.get_the_author().'</strong> ';
-                }
 
                 if (($timestamp = strtotime(get_field('date_published'))) || ($timestamp = get_post_meta(get_the_ID(), 'wprss_item_date', TRUE))) {
                     $date_published = date('d/m/Y', $timestamp);

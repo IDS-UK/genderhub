@@ -773,6 +773,8 @@ class GenderHub_2017 {
                 $html .= '<strong>Event Date:</strong> '.date('jS M',strtotime(substr($c['start_date'][0],0,4).'-'.substr($c['start_date'][0],4,2).'-'.substr($c['start_date'][0],6,2))).' to the '.date('jS M',strtotime(substr($c['end_date'][0],0,4).'-'.substr($c['end_date'][0],4,2).'-'.substr($c['end_date'][0],6,2)));
             elseif ($s->post_type == 'interviews') :
                 $html .= date('jS M Y',strtotime($c['_interview_date'][0]));
+            elseif ($s->post_type == 'blogs_opinions') :
+                $html .= date('jS M Y',strtotime($c['blog_original_date'][0]));
             else :
                 $html .= '<strong>'.$c['author'][0].'</strong> '. date('jS M Y',strtotime(substr($c['date_published'][0],0,4).'-'.substr($c['date_published'][0],4,2).'-'.substr($c['date_published'][0],6,2)));
             endif;
