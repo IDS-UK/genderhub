@@ -5,7 +5,9 @@
 
     $(document).ready(function () {
 
-        $( ".pickadate" ).datepicker();
+        $( ".pickadate" ).datepicker({
+            dateFormat: "d MM yy"
+        });
 
     });
 
