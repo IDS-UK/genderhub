@@ -128,6 +128,7 @@ class GH_Custom_Post_Types {
 		}
 
 		unregister_post_type( 'blocks' ); // todo only needs to run once. This line to be removed in future update
+		//unregister_taxonomy( 'content_type' ); // todo as at April 09, 2017, this has not run yet and only needs to run once. Uncomment when ready to remove the taxonomy. This whole line can be removed after the change has been applied.
 
 	}
 
@@ -158,9 +159,7 @@ class GH_Custom_Post_Types {
 						<?php
 						$nf = $nf.$post_type.'-description,';
 					endif;
-				}
-
-				?>
+				} ?>
 
 				<input type="hidden" name="action" value="update" />
 				<input type="hidden" name="page_options" value="<?php echo $nf;?>" />
