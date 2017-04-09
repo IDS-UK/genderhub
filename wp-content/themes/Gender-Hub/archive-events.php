@@ -64,6 +64,8 @@ $wp_query = new WP_Query( $args );
 
 		<?php endwhile; ?>
 
+            <?php wp_reset_postdata(); ?>
+
 	<?php genderhub_pagination(); ?>
 
 	<?php else : ?>
