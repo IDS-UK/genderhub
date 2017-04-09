@@ -898,7 +898,6 @@ function get_words($sentence, $count = 30) {
   return $matches[0];
 }
 
-// current page url
 function current_page_url() {
   $pageURL = 'http';
   if( isset($_SERVER["HTTPS"]) ) {
