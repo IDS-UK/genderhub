@@ -1,9 +1,10 @@
 === BackWPup - WordPress Backup Plugin ===
-Contributors: inpsyde, danielhuesken, Bueltge, nullbyte
+Contributors: inpsyde, cocreation, danielhuesken, Bueltge, nullbyte
 Tags: Amazon, Amazon S3, back up, backup, chinese, cloud, cloud files, database, db backup, dropbox, dump, file, french, ftp, ftps, german, migrate, multisite, russian, schedule, sftp, storage, S3, time, upload, xml
 Requires at least: 3.9
-Tested up to: 4.7.3
-Stable tag: 3.3.7
+Tested up to: 4.8.2
+Requires PHP: 5.3
+Stable tag: 3.4.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -11,7 +12,7 @@ Schedule complete automatic backups of your WordPress installation. Decide which
 
 == Description ==
 
-The **backup plugin** **[BackWPup](http://backwpup.com/)** can be used to save your complete installation including /wp-content/ and push them to an external Backup Service, like **Dropbox**, **S3**, **FTP** and many more, see list below. With a single backup .zip file you are able to easily restore an installation. Please understand: this free version will not be supported as good as the [BackWPup Pro version](http://backwpup.com). With our premium version you get first class support and more features.
+The **backup plugin** **[BackWPup](https://backwpup.com/)** can be used to save your complete installation including /wp-content/ and push them to an external Backup Service, like **Dropbox**, **S3**, **FTP** and many more, see list below. With a single backup .zip file you are able to easily restore an installation. Please understand: this free version will not be supported as good as the [BackWPup Pro version](https://backwpup.com). With our premium version you get first class support and more features.
 
 
 * Database Backup  *(needs mysqli)*
@@ -32,10 +33,10 @@ The **backup plugin** **[BackWPup](http://backwpup.com/)** can be used to save y
 * PRO: Store backup to Google Drive *(needs PHP 5.3.3, curl)*
 * Send logs and backups by email
 * Multi-site support only as network admin
-* Pro version and support available - [BackWPup Pro](http://backwpup.com)
+* Pro version and support available - [BackWPup Pro](https://backwpup.com)
 
 = Requirements =
-* WordPress 3.9 and PHP 5.2.7 required!
+* WordPress 3.9 and PHP 5.3 required! (read more about [recommended php version and why you should switch to modern php](https://inpsyde.com/en/wordpress-recommended-php-version-update-php))
 * To use the Plugin with full functionality PHP 5.3.3 with mysqli, FTP,gz, bz2, ZipArchive and curl is needed.
 * Plugin functions that don't work because of your server settings, will not be displayed in admin area.
 
@@ -49,9 +50,9 @@ https://www.youtube.com/watch?v=pECMkLE27QQ&w=532&rel=0
 
 **Remember: The most expensive backup is the one you never did! And please test your backups!**
 
-Get the [BackWPup Pro](http://backwpup.com) Version with more features.
+Get the [BackWPup Pro](https://backwpup.com) Version with more features.
 
-**Made by [Inpsyde](http://inpsyde.com) &middot; We love WordPress**
+**Made by [Inpsyde](https://inpsyde.com) &middot; We love WordPress**
 
 == Frequently Asked Questions ==
 
@@ -100,7 +101,7 @@ Please set CHMOD 775 on the /wp-content/ directory and refresh the BackWPup dash
 
 
 = How do I restore a backup? =
-Up to now, there is no feature in BackWPup to restore a backup. But we are eagerly working on a restore functionality, which is in beta right now. If you like to participate to test the restore feature, please [write an email](mailto:info@inpsyde.com). Meanwhile you can follow [these instructions from the WordPress Codex](http://codex.wordpress.org/Restoring_Your_Database_From_Backup) or [this tutorial (also Codex)](http://codex.wordpress.org/WordPress_Backups) for more detailed information on cPanel, Plesk, vDeck and others.
+Up to now, there is no feature in BackWPup to restore a backup. But we are eagerly working on a restore functionality, which is in beta right now. If you like to participate to test the restore feature, please [write an email](mailto:betatest@backwpup.com). Meanwhile you can follow [these instructions from the BackWPup documentation](http://docs.backwpup.com/article/127-how-to-restore-a-wordpress-backup) or [this tutorial (from WordPress Codex)](http://codex.wordpress.org/WordPress_Backups) for more detailed information on cPanel, Plesk, vDeck and others.
 
 
 = When I edit a job the Files tab loads forever. =
@@ -157,6 +158,46 @@ Yes. You need to have writing access to the wp-config.php file (usually residing
 [You can find a detailed tutorial in the BackWPup documentation.](http://docs.backwpup.com/article/118-install-backwpup)
 
 == Changelog ==
+= Version 3.4.2 =
+* Fixed: Security issue to prevent backups from being seen by others.
+* Fixed: Only one admin notice shown at a time.
+* Improved: Better support for large XML files.
+* Fixed: Remove user roles on uninstall.
+* Fixed: S3 parse URL issue
+* Fixed: open_basedir warning from looking for mysqldump
+* Fixed: Dropbox sync fails because of case sensitivity
+* Fixed: Dropbox sync sometimes deletes synced files
+* Fixed: Dropbox fails when user uses proxy
+* Improved: German formal and chinese translation for PRO
+
+= Version 3.4.1 =
+* Check if file is dot to prevent open_basedir warning.
+* Only display Dropbox upload progress in debug mode.
+* Fix PHP notice when running job via WP CLI.
+* Fix the way Dropbox API wrapper handles errors.
+* Only encode DB values to hex when binary flag is set.
+* Fix handling of storing backups in root Dropbox dir.
+* Allow symbolic links to be excluded.
+* If archive name is not valid format, will still recognize and delete old files.
+* Allow user to copy debug info for support.
+* Do not display notices for pro users.
+* Add support form for pro users.
+* Add Rate Us admin notice.
+* Support empty folder name when syncing to Dropbox.
+* Allow folders under wp-content to be excluded.
+
+= Version 3.4.0 =
+* Changed: Dropped support for PHP 5.2.
+* Improved: Migrated to Dropbox API V2.
+* Changed: Removed Adminer link from backend.
+* Added: Backup file tracking so backups from other jobs aren't accidentally deleted.
+* Fixed: Call to get_users was previously incorrect.
+* Added: Ability to have backup file sent to multiple email addresses.
+* Added: Web.config is now included in list of special files to back up.
+* Fixed: error for some users when generating XML export.
+* Fixed: opendir permission denied warning on some versions of IIS.
+* Improved: accuracy of binary column export.
+
 = Version 3.3.7 =
 * Fixed: Services credentials lost after 3.3.6 update
 * Fixed: Removed all instances of PHP short echo tags and other minor PHP 5.2 compatibility issues

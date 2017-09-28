@@ -2,9 +2,9 @@
 Contributors: poxtron
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R8Q85GT3Q8Q26
 Tags: Facebook, facebook, Social Plugins, embed facebook, facebook video, facebook posts, facebook publication, facebook publications, facebook event, facebook events, facebook pages, facebook page, facebook profiles, facebook album, facebook albums, facebook photos, facebook photo, social,
-Requires at least: 3.8.1
-Tested up to: 4.7.2
-Stable tag: 2.1.10
+Requires at least: 4.6
+Tested up to: 4.8
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,6 +96,10 @@ You can overwrite the embed template with a custom one.
 1. Copy the contents of “wp-embed-facebook/templates/default/” to “your-theme/plugins/wp-embed-facebook/default”
 1. Change the template files to what you want. Inside each file you can access the `$fb_data` array that contains the information retrieved from facebook.
 
+= I moved from another Facebook comments/like plugin and my comments don't show =
+
+Go to advanced section on settings and tick the option "Use permalinks on social plugins urls" if it does not work please create a support ticket mentioning the old comments plugin.
+
 = How can I make my page load faster ? =
 
 Social plugins will load at its own time via JavaScript so you just have to wait on them, for custom embeds a cache plugin will greatly increase performance.
@@ -137,17 +141,50 @@ Buying the premium extensions helps to keep this project alive.
 
 == Changelog ==
 
+= 2.2.2 =
+* Added: Facebook SDK v2.10
+
+= 2.2.1 =
+* Fixed: Album thumbnails
+* Fixed: Default sdk locale
+* Fixed: Tiny MCE CSS not updating correctly
+
+= 2.2.0 =
+* Improved: fb.js no longer depends on jQuery
+* Improved: Templates CSS (completely rewritten)
+* Improved: Custom embed responsiveness
+* Improved: Album thumbnails look
+* Fixed: Adaptive embed script
+* Added: [embedfb] shortcode just in case [facebook] shortcode is being used by another plugin
+* Updated: Deprecate Facebook SDK version 2.3 force to 2.4
+
+= 2.1.14 =
+* Added: Compatibility for PHP 5.3 0..o
+
+= 2.1.13 =
+* Fixed: website page url @sabrina_b
+* Added: Shortcode widget
+* Updated: Facebook locales
+
+
+= 2.1.12 =
+* Added: shortcode widget
+* Added: api version 2.9
+* Added: filter wef_embedded_with
+* Added: advanced option to use permalinks on social plugins urls
+* Improved: updated wp_get_sites for get_sites
+
 = 2.1.10 =
-* Deprecated Facebook sdk 2.1 and 2.2 automatically updates to 2.3
-* Better admin navigation
+* Improved: Deprecated Facebook sdk 2.1 and 2.2 automatically updates to 2.3
+* Improved: admin navigation
 
 = 2.1.9 =
-* Fixed page likes count
-* Fix css not found no custom templates
+* Fixed: page likes count
+* Fixed: css not found no custom templates
 
 = 2.1.8 =
-* Removed download video link
-* Prevent wrong file load on theme templates @pierreg_
+* Fixed: Removed download video link
+* Fixed: Prevent wrong file load on theme templates @pierreg_
 
 = 2.1.7 =
 * Fixed: url understanding on page embeds when they have the format page-name-8798798
@@ -436,5 +473,5 @@ Buying the premium extensions helps to keep this project alive.
 
 == Upgrade Notice ==
 
-= 2.1.10 =
-Deprecated Facebook sdk 2.1 and 2.2 automatically updates to 2.3 and better admin navigation
+= 2.2.2 =
+Added Facebook SDK v2.10

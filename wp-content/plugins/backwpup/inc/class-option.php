@@ -27,6 +27,7 @@ final class BackWPup_Option {
 		add_site_option( 'backwpup_cfg_loglevel', 'normal_translated' );
 		add_site_option( 'backwpup_cfg_jobwaittimems', 0 );
 		add_site_option( 'backwpup_cfg_jobdooutput', 0 );
+		add_site_option( 'backwpup_cfg_windows', 0 );
 		//Logs
 		add_site_option( 'backwpup_cfg_maxlogs', 30 );
 		add_site_option( 'backwpup_cfg_gzlogs', 0 );
@@ -136,7 +137,13 @@ final class BackWPup_Option {
 		} elseif ( ! isset( $jobs_options[ $jobid ][ $option ] ) ) {
 			return self::defaults_job( $option );
 		} else {
-			return $jobs_options[ $jobid ][ $option ];
+			// Ensure archive name formatted properly
+			if ( $option == 'archivename' ) {
+				return self::normalize_archive_name( $jobs_options[ $jobid ][ $option ], $jobid );
+			}
+			else {
+				return $jobs_options[ $jobid ][ $option ];
+			}
 		}
 	}
 
@@ -168,7 +175,7 @@ final class BackWPup_Option {
 		$default['mailerroronly']         = true;
 		$default['backuptype']            = 'archive';
 		$default['archiveformat']         = '.zip';
-		$default['archivename']           = 'backwpup_' . BackWPup::get_plugin_data( 'hash' ) . '_%Y-%m-%d_%H-%i-%s';
+		$default['archivename']           = self::get_archive_name_prefix( self::next_job_id() ) . '%Y-%m-%d_%H-%i-%s';
 		//defaults vor destinations
 		foreach ( BackWPup::get_registered_destinations() as $dest_key => $dest ) {
 			if ( ! empty( $dest['class'] ) ) {
@@ -295,4 +302,73 @@ final class BackWPup_Option {
 
 		return $new_option_job_ids;
 	}
+
+	/**
+	 * Gets the next available job id.
+	 *
+	 * @return int
+	 */
+	public static function next_job_id() {
+		$ids = self::get_job_ids();
+		sort( $ids );
+		return end( $ids ) + 1;
+	}
+
+	/**
+	 * Normalizes the archive name.
+	 *
+	 * The archive name should include the hash to identify this site, and the job id to identify this job.
+	 *
+	 * This allows backup files belonging to this job to be tracked.
+	 *
+	 * @param string $archive_name
+	 * @param int    $jobid
+	 *
+	 * @return string The normalized archive name
+	 */
+	public static function normalize_archive_name( $archive_name, $jobid ) {
+		$hash = BackWPup::get_plugin_data( 'hash' );
+		$prefix = dechex( mt_rand( 0, 255 ) );
+		$suffix = dechex( mt_rand( 0, 255 ) );
+
+		// If name starts with 'backwpup', then we can try to parse
+		if ( substr( $archive_name, 0, 8 ) == 'backwpup' ) {
+			$parts = explode( '_', $archive_name );
+			
+			// Decode hash part
+			if ( strpos( $parts[1], $hash ) === false ) {
+				$parts[1] = base_convert($parts[1], 36, 16);
+			}
+			if ( strpos( $parts[1], $hash ) !== false ) {
+				$parts[1] = sprintf( '%s%s%s%02d', $prefix, $hash, $suffix, $jobid );
+				$parts[1] = base_convert( $parts[1], 16, 36 );
+			}
+			else {
+				// Hash not included, so insert
+				array_splice( $parts, 1, 0,
+					base_convert( sprintf( '%s%s%s%02d', $prefix, $hash, $suffix, $jobid ), 16, 36 ) );
+			}
+			return implode( '_', $parts );
+		}
+		else {
+			// But otherwise, just prepend required format
+			return 'backwpup_' .
+				base_convert( "{$prefix}{$hash}{$suffix}" . sprintf( '%02d', $jobid ), 16, 36 ) .
+				'_' . $archive_name;
+		}
+	}
+
+	/**
+	 * Get the prefix for an archive name.
+	 *
+	 * Format should be backwpup_[hash][jobid]_
+	 *
+	 * @return string
+	 */
+	public static function get_archive_name_prefix( $jobid ) {
+		return 'backwpup_' .
+			base_convert( dechex( mt_rand( 0, 255 ) ) . BackWPup::get_plugin_data( 'hash' ) .
+			dechex( mt_rand( 0, 255 ) ) . sprintf( '%02d', $jobid ), 16, 36 ) . '_';
+	}
+
 }

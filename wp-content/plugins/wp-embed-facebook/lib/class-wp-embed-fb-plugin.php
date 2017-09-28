@@ -6,12 +6,12 @@
  */
 class WP_Embed_FB_Plugin {
 	const option_name = 'wpemfb_options';
-	private static $path = null;
-	private static $url = null;
-	private static $options = null;
-	private static $defaults = null;
+	private static $path        = null;
+	private static $url         = null;
+	private static $options     = null;
+	private static $defaults    = null;
 	private static $lb_defaults = null;
-	private static $has_photon = null;
+	private static $has_photon  = null;
 	private static $wp_timezone = null;
 
 	/**
@@ -28,6 +28,9 @@ class WP_Embed_FB_Plugin {
 
 		//register all scripts and styles
 		add_action( 'wp_enqueue_scripts', __CLASS__ . '::wp_enqueue_scripts' );
+
+		add_action( 'widgets_init', __CLASS__ . '::widgets_init' );
+
 	}
 
 	static function install() {
@@ -42,8 +45,7 @@ class WP_Embed_FB_Plugin {
 	 */
 	static function uninstall() {
 		if ( is_multisite() ) {
-			//TODO deprecated for get_sites in WP v4.6
-			$sites = wp_get_sites();
+			$sites = get_sites();
 			foreach ( $sites as $site ) {
 				switch_to_blog( $site['blog_id'] );
 				delete_option( self::option_name );
@@ -102,15 +104,29 @@ class WP_Embed_FB_Plugin {
 			'force_app_token',
 			'video_download',
 			'sdk_version'
-		);
+	);
 	}
 
 	static function get_defaults() {
 		if ( self::$defaults === null ) {
-			$locale = get_locale();
-			if ( strpos( $locale, 'es_' ) !== false ) {
-				$locale = 'es_LA';
+			$locale         = get_locale();
+			$locale         = str_replace( array(
+				'es_MX',
+				'es_AR',
+				'es_CL',
+				'es_GT',
+				'es_PE',
+				'es_VE'
+			), 'es_LA', $locale );
+
+			$fb_locales = self::get_fb_locales();
+
+			if(isset($fb_locales[$locale])){
+				$sdk_lang = $locale;
+			} else {
+				$sdk_lang = 'en_US';
 			}
+
 			$vars           = WEF_Social_Plugins::get_defaults();
 			$social_options = array();
 			foreach ( $vars as $key => $value ) {
@@ -121,14 +137,14 @@ class WP_Embed_FB_Plugin {
 				}
 			}
 			self::$defaults = array(
-				                  'sdk_lang'                       => array_key_exists( $locale, self::get_fb_locales() ) ? $locale : 'en_US',
+				                  'sdk_lang'                       => $sdk_lang,
 				                  'max_width'                      => '450',
 				                  'max_photos'                     => '24',
 				                  'max_posts'                      => '0',
 				                  'app_id'                         => '',
 				                  'app_secret'                     => '',
 				                  'theme'                          => 'default',
-				                  'sdk_version'                    => 'v2.8',
+				                  'sdk_version'                    => 'v2.10',
 				                  'show_like'                      => 'true',
 				                  'fb_root'                        => 'true',
 				                  'show_follow'                    => 'true',
@@ -165,18 +181,20 @@ class WP_Embed_FB_Plugin {
 				                  'adaptive_fb_plugin'             => 'false',
 				                  'quote_plugin_active'            => 'false',
 				                  'quote_post_types'               => 'post,page',
-				                  'auto_embed_active'              => 'true',//
-//				                  'auto_embed_post_types'          => '',//TODO filter embed register handler per post_type
+				                  'auto_embed_active'              => 'true',
+				                  //
+				                  //				                  'auto_embed_post_types'          => '',//TODO filter embed register handler per post_type
 				                  'auto_comments_active'           => 'false',
 				                  'auto_comments_post_types'       => 'post',
 				                  'comments_count_active'          => 'true',
 				                  'comments_open_graph'            => 'true',
-//				                  'scrape_open_graph'              => 'true',
+				                  //				                  'scrape_open_graph'              => 'true',
 				                  'lightbox_att'                   => 'data-lightbox="roadtrip"',
 				                  'event_start_time_format'        => 'l, j F Y g:i a',
 				                  'single_post_time_format'        => 'l, j F Y g:s a',
 				                  'single_post_from_like'          => 'false',
-			                  ) + $social_options;
+				                  'permalink_on_social_plugins'    => 'false',
+		) + $social_options;
 		}
 
 		return apply_filters( 'wpemfb_defaults', self::$defaults );
@@ -220,11 +238,11 @@ class WP_Embed_FB_Plugin {
 			} elseif ( session_status() == PHP_SESSION_NONE ) {
 				session_start();
 			}
-			if( (float) substr(WP_Embed_FB_Plugin::get_option('sdk_version'),1) <= 2.2 ){
-			    $options = WP_Embed_FB_Plugin::get_option();
-			    $options['sdk_version'] = 'v2.3';
-			    WP_Embed_FB_Plugin::set_options($options);
-            }
+			if ( (float) substr( WP_Embed_FB_Plugin::get_option( 'sdk_version' ), 1 ) <= 2.3 ) {
+				$options                = WP_Embed_FB_Plugin::get_option();
+				$options['sdk_version'] = 'v2.4';
+				WP_Embed_FB_Plugin::set_options( $options );
+			}
 		}
 	}
 
@@ -244,15 +262,14 @@ class WP_Embed_FB_Plugin {
 		foreach ( array( 'default', 'classic' ) as $theme ) {
 			$on_theme  = get_stylesheet_directory() . "/plugins/wp-embed-facebook/$theme/$theme.css";
 			$true_path = self::url() . "templates/$theme/$theme.css";
-			if(file_exists( $on_theme )){
+			if ( file_exists( $on_theme ) ) {
 				$true_path = get_stylesheet_directory_uri() . "/plugins/wp-embed-facebook/$theme/$theme.css";
 			}
 
-			wp_register_style( 'wpemfb-' . $theme, $true_path, array(), false );
+			wp_register_style( 'wpemfb-' . $theme, $true_path, array(), '1.1' );
 		}
-		wp_register_style( 'wpemfb-lightbox', self::url() . 'lib/lightbox2/css/lightbox.css', array(), false );
-		wp_register_script( 'wpemfb-lightbox', self::url() . 'lib/lightbox2/js/lightbox.min.js', array( 'jquery' )
-		);
+		wp_register_style( 'wpemfb-lightbox', self::url() . 'lib/lightbox2/css/lightbox.css', array(  ), '1.0' );
+		wp_register_script( 'wpemfb-lightbox', self::url() . 'lib/lightbox2/js/lightbox.min.js', array( 'jquery' ), '1.0' );
 		$lb_defaults       = self::get_lb_defaults();
 		$options           = self::get_option();
 		$translation_array = array();
@@ -265,9 +282,9 @@ class WP_Embed_FB_Plugin {
 			//TODO use something like wp_add_inline_script('wpemfb-lightbox','new Lightbox(WEF_LB)') for LightBox options
 			wp_localize_script( 'wpemfb-lightbox', 'WEF_LB', $translation_array );
 		}
-		wp_register_script( 'wpemfb', self::url() . 'lib/js/wpembedfb.min.js', array( 'jquery' ) );
+		wp_register_script( 'wpemfb', self::url() . 'lib/js/wpembedfb.min.js', array( 'jquery' ), '1.0',true );
 
-		wp_register_script( 'wpemfb-fbjs', self::url() . 'lib/js/fb.min.js', array( 'jquery' ) );
+		wp_register_script( 'wpemfb-fbjs', self::url() . 'lib/js/fb.min.js', array( ), '1.1' );
 		$translation_array = array(
 			'local'   => $options['sdk_lang'],
 			'version' => $options['sdk_version'],
@@ -402,12 +419,10 @@ class WP_Embed_FB_Plugin {
 
 	static function get_fb_locales() {
 		return array(
+
 			'af_ZA' => 'Afrikaans',
-			'ak_GH' => 'Akan',
-			'am_ET' => 'Amharic',
 			'ar_AR' => 'Arabic',
-			'as_IN' => 'Assamese',
-			'ay_BO' => 'Aymara',
+			'ar_IN' => 'Assamese',
 			'az_AZ' => 'Azerbaijani',
 			'be_BY' => 'Belarusian',
 			'bg_BG' => 'Bulgarian',
@@ -416,7 +431,6 @@ class WP_Embed_FB_Plugin {
 			'bs_BA' => 'Bosnian',
 			'ca_ES' => 'Catalan',
 			'cb_IQ' => 'Sorani Kurdish',
-			'ck_US' => 'Cherokee',
 			'co_FR' => 'Corsican',
 			'cs_CZ' => 'Czech',
 			'cx_PH' => 'Cebuano',
@@ -425,21 +439,13 @@ class WP_Embed_FB_Plugin {
 			'de_DE' => 'German',
 			'el_GR' => 'Greek',
 			'en_GB' => 'English (UK)',
-			'en_IN' => 'English (India)',
-			'en_PI' => 'English (Pirate)',
 			'en_UD' => 'English (Upside Down)',
 			'en_US' => 'English (US)',
-			'eo_EO' => 'Esperanto',
-			'es_CL' => 'Spanish (Chile)',
-			'es_CO' => 'Spanish (Colombia)',
 			'es_ES' => 'Spanish (Spain)',
 			'es_LA' => 'Spanish',
-			'es_MX' => 'Spanish (Mexico)',
-			'es_VE' => 'Spanish (Venezuela)',
 			'et_EE' => 'Estonian',
 			'eu_ES' => 'Basque',
 			'fa_IR' => 'Persian',
-			'fb_LT' => 'Leet Speak',
 			'ff_NG' => 'Fulah',
 			'fi_FI' => 'Finnish',
 			'fo_FO' => 'Faroese',
@@ -450,7 +456,6 @@ class WP_Embed_FB_Plugin {
 			'gl_ES' => 'Galician',
 			'gn_PY' => 'Guarani',
 			'gu_IN' => 'Gujarati',
-			'gx_GR' => 'Classical Greek',
 			'ha_NG' => 'Hausa',
 			'he_IL' => 'Hebrew',
 			'hi_IN' => 'Hindi',
@@ -458,7 +463,6 @@ class WP_Embed_FB_Plugin {
 			'hu_HU' => 'Hungarian',
 			'hy_AM' => 'Armenian',
 			'id_ID' => 'Indonesian',
-			'ig_NG' => 'Igbo',
 			'is_IS' => 'Icelandic',
 			'it_IT' => 'Italian',
 			'ja_JP' => 'Japanese',
@@ -470,11 +474,6 @@ class WP_Embed_FB_Plugin {
 			'kn_IN' => 'Kannada',
 			'ko_KR' => 'Korean',
 			'ku_TR' => 'Kurdish (Kurmanji)',
-			'la_VA' => 'Latin',
-			'lg_UG' => 'Ganda',
-			'li_NL' => 'Limburgish',
-			'ln_CD' => 'Lingala',
-			'lo_LA' => 'Lao',
 			'lt_LT' => 'Lithuanian',
 			'lv_LV' => 'Latvian',
 			'mg_MG' => 'Malagasy',
@@ -486,60 +485,45 @@ class WP_Embed_FB_Plugin {
 			'mt_MT' => 'Maltese',
 			'my_MM' => 'Burmese',
 			'nb_NO' => 'Norwegian (bokmal)',
-			'nd_ZW' => 'Ndebele',
 			'ne_NP' => 'Nepali',
 			'nl_BE' => 'Dutch (België)',
 			'nl_NL' => 'Dutch',
 			'nn_NO' => 'Norwegian (nynorsk)',
-			'ny_MW' => 'Chewa',
 			'or_IN' => 'Oriya',
 			'pa_IN' => 'Punjabi',
 			'pl_PL' => 'Polish',
 			'ps_AF' => 'Pashto',
 			'pt_BR' => 'Portuguese (Brazil)',
 			'pt_PT' => 'Portuguese (Portugal)',
-			'qu_PE' => 'Quechua',
-			'rm_CH' => 'Romansh',
+			'qz_MM' => 'Burmese',
 			'ro_RO' => 'Romanian',
 			'ru_RU' => 'Russian',
 			'rw_RW' => 'Kinyarwanda',
-			'sa_IN' => 'Sanskrit',
 			'sc_IT' => 'Sardinian',
-			'se_NO' => 'Northern Sámi',
 			'si_LK' => 'Sinhala',
 			'sk_SK' => 'Slovak',
 			'sl_SI' => 'Slovenian',
-			'sn_ZW' => 'Shona',
 			'so_SO' => 'Somali',
 			'sq_AL' => 'Albanian',
 			'sr_RS' => 'Serbian',
 			'sv_SE' => 'Swedish',
 			'sw_KE' => 'Swahili',
-			'sy_SY' => 'Syriac',
 			'sz_PL' => 'Silesian',
 			'ta_IN' => 'Tamil',
 			'te_IN' => 'Telugu',
 			'tg_TJ' => 'Tajik',
 			'th_TH' => 'Thai',
-			'tk_TM' => 'Turkmen',
 			'tl_PH' => 'Filipino',
-			'tl_ST' => 'Klingon',
 			'tr_TR' => 'Turkish',
-			'tt_RU' => 'Tatar',
 			'tz_MA' => 'Tamazight',
 			'uk_UA' => 'Ukrainian',
 			'ur_PK' => 'Urdu',
 			'uz_UZ' => 'Uzbek',
 			'vi_VN' => 'Vietnamese',
-			'wo_SN' => 'Wolof',
-			'xh_ZA' => 'Xhosa',
-			'yi_DE' => 'Yiddish',
-			'yo_NG' => 'Yoruba',
 			'zh_CN' => 'Simplified Chinese (China)',
 			'zh_HK' => 'Traditional Chinese (Hong Kong)',
 			'zh_TW' => 'Traditional Chinese (Taiwan)',
-			'zu_ZA' => 'Zulu',
-			'zz_TR' => 'Zazaki',
+
 		);
 	}
 
@@ -564,6 +548,10 @@ class WP_Embed_FB_Plugin {
 		$array = explode( ',', $string );
 
 		return array_map( 'trim', $array );
+	}
+
+	static function widgets_init() {
+		register_widget( 'WEF_Widget' );
 	}
 
 	static function lightbox_title( $title ) {

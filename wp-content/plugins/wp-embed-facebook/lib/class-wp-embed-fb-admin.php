@@ -144,9 +144,33 @@ class WP_Embed_FB_Admin extends WP_Embed_FB_Plugin {
 	 * Add template editor style to the embeds.
 	 */
 	static function admin_init() {
-		add_editor_style( self::url() . '/templates/default/default.css' );
-		add_editor_style( self::url() . '/templates/classic/classic.css' );
+		//add_editor_style( self::url() . 'templates/default/default.css' );
+		//add_editor_style( self::url() . 'templates/classic/classic.css' );
+        //This way I only have to change the version instead of all
+        add_filter('mce_css',__CLASS__.'::mce_css');
 	}
+
+	static function mce_css($css){
+
+	    $list = array();
+
+		$list[] = add_query_arg(
+			'version',
+			'2.2.1',
+			WP_Embed_FB_Plugin::url() . 'templates/classic/classic.css'
+		);
+		$list[] = add_query_arg(
+			'version',
+			'2.2.1',
+			WP_Embed_FB_Plugin::url() . 'templates/default/default.css'
+		);
+
+		if(!empty($css)){
+		    $css .= ',';
+        }
+
+		return $css . implode( ',', $list );
+    }
 
 	/**
 	 * Render form sections
@@ -596,11 +620,12 @@ class WP_Embed_FB_Admin extends WP_Embed_FB_Plugin {
 					<?php do_action( 'wpemfb_options' ); ?>
 
 					<section id="advanced" class="sections">
-						<p>Beware altering this options without the proper knowledge could make the world disappear.</p>
+						<p><?php _e('Beware altering this options without the proper knowledge could make the world disappear.','wp-embed-facebook') ?></p>
 						<?php
 						self::section( true );
 						self::field( 'string', '', '<h3>' . __( 'Enqueue styles and scripts', 'wp-embed-facebook' ) . '</h3>' );
 						self::field( 'checkbox', 'enq_when_needed', __( 'Only when there is an embed present', 'wp-embed-facebook' ) );
+						self::field( 'checkbox', 'permalink_on_social_plugins', __( 'Use permalinks on social plugins urls', 'wp-embed-facebook' ) );
 						self::field( 'checkbox', 'enq_fbjs', __( 'Facebook SDK', 'wp-embed-facebook' ) );
 						self::field( 'checkbox', 'enqueue_style', __( 'Template Styles', 'wp-embed-facebook' ) );
 						self::field( 'checkbox', 'enq_wpemfb', __( 'Adaptive social plugins script', 'wp-embed-facebook' ) );
@@ -620,6 +645,8 @@ class WP_Embed_FB_Admin extends WP_Embed_FB_Plugin {
 							'v2.6' => '2.6',
 							'v2.7' => '2.7',
 							'v2.8' => '2.8',
+							'v2.9' => '2.9',
+							'v2.10' => '2.10',
 						);
 						self::field( 'select', 'sdk_version', 'Facebook SDK Version', $versions );
 

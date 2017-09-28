@@ -20,6 +20,7 @@ class  WEF_Magic_Embeds extends WP_Embed_FB_Plugin {
 
 		/** @see WP_Embed_FB::shortcode */
 		add_shortcode( 'facebook', 'WP_Embed_FB::shortcode' );
+		add_shortcode( 'embedfb', 'WP_Embed_FB::shortcode' );
 
 		/** @see WEF_Social_Plugins::shortcode */
 		add_shortcode( 'fb_plugin', 'WEF_Social_Plugins::shortcode' );
@@ -31,7 +32,6 @@ class  WEF_Magic_Embeds extends WP_Embed_FB_Plugin {
 		/** @see WEF_Social_Plugins::shortcode */
 		add_filter( 'wef_sp_defaults', __CLASS__ . '::wef_sp_defaults', 10, 2 );
 		add_filter( 'wef_sp_shortcode_filter', __CLASS__ . '::wef_sp_shortcode_filter',10,4 );
-		add_action( 'wef_sp_shortcode_action', __CLASS__ . '::wef_sp_shortcode_action' );
 		//wef_sp_embed
 	}
 
@@ -67,7 +67,7 @@ class  WEF_Magic_Embeds extends WP_Embed_FB_Plugin {
 		$options  = self::get_option();
 		foreach ( $defaults as $key => $value ) {
 			if ( in_array( $key, self::$link_types ) ) {
-				$defaults[ $key ] = home_url( '/?p=' . get_queried_object_id() );
+				$defaults[ $key ] = self::get_true_url();
 			} else {
 				$defaults[ $key ] = $options["{$type}_$key"];
 			}
@@ -76,15 +76,38 @@ class  WEF_Magic_Embeds extends WP_Embed_FB_Plugin {
 		return $defaults;
 	}
 
+	static function get_true_url(){
+		global $wp;
+		if(is_home())
+			return home_url();
+
+		if(in_the_loop()){
+			global $post;
+			if(WP_Embed_FB_Plugin::get_option('permalink_on_social_plugins') === 'true'){
+				return get_permalink($post->ID);
+			} else {
+				$query = '/?p=' .$post->ID;
+			}
+		} else {
+			if(WP_Embed_FB_Plugin::get_option('permalink_on_social_plugins') === 'true'){
+				$query = $wp->request;
+			} else {
+				$query = '/?' .$wp->query_string;
+			}
+		}
+
+		return home_url($query);
+	}
+
 	static function wef_sp_shortcode_filter($ret,$type,$atts,$defaults) {
 		if ( isset( $defaults[ $type ]['width'] ) && $type != 'comments' && $type != 'page' ) {
 			$default_width = $defaults[ $type ]['width'];
 			if ( isset( $atts['adaptive'] ) ) {
 				if ( $atts['adaptive'] == 'true' ) {
-					$ret .= self::add_adaptive( $default_width, $atts );
+					$ret = self::add_adaptive( $default_width, $atts ).$ret;
 				}
 			} elseif ( self::get_option( 'adaptive_fb_plugin' ) == 'true' ) {
-				$ret .= self::add_adaptive( $default_width, $atts );
+				$ret = self::add_adaptive( $default_width, $atts ).$ret;
 			}
 		}
 		if ( isset( $atts['debug'] ) ) {
@@ -115,11 +138,7 @@ class  WEF_Magic_Embeds extends WP_Embed_FB_Plugin {
 		}
 		return $ret;
 	}
-	static function wef_sp_shortcode_action() {
-		if ( ( self::get_option( 'enq_when_needed' ) == 'true' ) && ( self::get_option( 'enq_fbjs' ) == 'true' ) ) {
-			wp_enqueue_script( 'wpemfb-fbjs' );
-		}
-	}
+
 
 	private static function add_adaptive( $default_width, $atts ) {
 		$width = isset( $atts['width'] ) ? $atts['width'] : $default_width;
