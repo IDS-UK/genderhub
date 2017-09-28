@@ -15,6 +15,10 @@
 
 jQuery(document).ready( function($) {
 
+    /* If there is a form on the page, move any transition message over it */
+    $('.wpcf7').css({'position': 'relative'}).find('input').attr("disabled", "disabled");
+    $('.transition-message').css({'position':'absolute', 'z-index': '1', 'top': '100px', 'left': '30%'}).prependTo($('.wpcf7'));
+    $('.wpcf7').parents().find('article > p, article > h2').css({'opacity':'0.5'});
     $('#twitter-widget-0').width('100% !important');
 
     // current page host

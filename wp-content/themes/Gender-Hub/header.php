@@ -28,7 +28,7 @@ $social_media_links = method_exists('GH_Site_Settings', 'gh_social_media_links')
 <!--<![endif]-->
 <head>
     <meta charset="<?php bloginfo( 'charset' ); ?>" />
-    <title><?php wp_title( '|', true, 'right' ); ?></title>
+    <title>ARCHIVE: <?php wp_title( '|', true, 'right' ); ?></title>
 	<?php wp_head(); ?>
     <link rel="profile" href="http://gmpg.org/xfn/11" />
     <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
@@ -46,7 +46,8 @@ $social_media_links = method_exists('GH_Site_Settings', 'gh_social_media_links')
         <a href="<?php echo home_url(); ?>"><img src="<?php echo get_stylesheet_directory_uri(); ?>/img/icon-home.png" class="home-icon" /></a>
         <a href="<?php echo home_url(); ?>" class="site-logo"><?php echo $logo; ?></a>
         <span class="strapline"><?php echo $strapline;?></span>
-        <?php echo $social_media_links; ?>
+        <span class="transition-header"><span class="transition-header-inner">Archived site<br/><a href="http://www.genderhub.org/be-inspired/blogs-opinion/gender-hub-transition-changes-from-october-2017/">read more</a></span></span>
+	  <?php //echo $social_media_links; ?>
         <a id="searchicon"><img class="header-search" src="<?php echo get_stylesheet_directory_uri(); ?>/img/icon-search.png" alt="search icon" width="18" height="18"></a>
         <form action="/" id="searchform" method="get" ><input type="text" name="s" id="s" placeholder="Search"><input type="hidden" name="search_loc" value="all" /><input type="submit" value="Go" /></form>
 

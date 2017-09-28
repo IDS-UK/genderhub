@@ -48,6 +48,8 @@ if ( post_password_required() )
 		</nav><!-- .comment-navigation -->
 		<?php endif; // Check for comment navigation ?>
 
+		<?php print '<div class="transition-message-1">Sorry, commenting is no longer open on the <em>GenderHub</em> website. <a href="http://www.genderhub.org/be-inspired/blogs-opinion/gender-hub-transition-changes-from-october-2017/">more...</a></div>'; ?>
+
 		<?php if ( ! comments_open() && get_comments_number() ) : ?>
 		<p class="no-comments"><?php _e( 'Comments are closed.' , 'twentythirteen' ); ?></p>
 		<?php endif; ?>
@@ -55,46 +57,17 @@ if ( post_password_required() )
 	<?php endif; // have_comments() ?>
 
 	<?php #comment_form(); ?>
-<?php $comment_args = array( 'title_reply'=>'Comment on this',
 
-'fields' => apply_filters( 'comment_form_default_fields', array(
+<?php 
 
-'author' => '<p class="comment-form-author">' . '' . ( $req ? '' : '' ) .
-
-        '<input id="author" name="author" placeholder="Name *" type="text" value="' . esc_attr( $commenter['comment_author'] ) . '" size="30"' . $aria_req . ' /></p>',   
-
-    'email'  => '<p class="comment-form-email">' .
-
-             
-
-               
-
-                '<input id="email" name="email" placeholder="Email *" type="text" value="' . esc_attr(  $commenter['comment_author_email'] ) . '" size="30"' . $aria_req . ' />'.'</p>',
-
-    'url'    => '<p class="comment-form-email">' .
-
-             
-
-               
-
-                '<input id="url" name="url" placeholder="Website" type="text" value="' . esc_attr(  $commenter['comment_author_url'] ) . '" size="30"' . $aria_req . ' />'.'</p>'  ) ),
-	
-	
-	
-	
-	
-
-    'comment_field' => '<p>' .
-
-            
-
-                '<textarea id="comment" name="comment" cols="45" rows="8" aria-required="true" placeholder="Comment"></textarea>' .
-
-                '</p>',
-
-    'comment_notes_after' => '',
-
+$comment_args = array( 'title_reply'=>'Comment on this',
+	'fields' => apply_filters( 'comment_form_default_fields', array(
+	'author' => '<p class="comment-form-author">' . '' . ( $req ? '' : '' ) . '<input id="author" name="author" placeholder="Name *" type="text" value="' . esc_attr( $commenter['comment_author'] ) . '" size="30"' . $aria_req . ' /></p>',   
+	'email'  => '<p class="comment-form-email">' .  '<input id="email" name="email" placeholder="Email *" type="text" value="' . esc_attr(  $commenter['comment_author_email'] ) . '" size="30"' . $aria_req . ' />'.'</p>',
+	'url'    => '<p class="comment-form-email">' . '<input id="url" name="url" placeholder="Website" type="text" value="' . esc_attr(  $commenter['comment_author_url'] ) . '" size="30"' . $aria_req . ' />'.'</p>'  ) ),
+	'comment_field' => '<p>' . '<textarea id="comment" name="comment" cols="45" rows="8" aria-required="true" placeholder="Comment"></textarea>' . '</p>',
+	'comment_notes_after' => '',
 );
-
-comment_form($comment_args); ?>
+//comment_form($comment_args); 
+?>
 </div><!-- #comments -->

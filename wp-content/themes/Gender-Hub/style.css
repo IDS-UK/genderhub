@@ -162,6 +162,17 @@ header.site .home-icon {margin: 7px 0 2px -37px;}
 .strapline { margin-left: 23px;display: inline-block;}
 .strapline p{font-size:14px; font-weight:bold; margin:0; color:#fff; vertical-align: top; display: block; line-height: 16px;}
 
+/* Archiving CSS */
+.transition-header { display: block;background-color: #ff3; text-align:unset; padding: 6px; border-radius: 2px; position: fixed; top: 100px; left: calc(50% - 100px); border: 2px solid #422f5d; }
+.transition-header-inner { display: block; font-size:18px; font-weight:bold; padding: 2px 30px 2px 32px; text-transform: uppercase; margin:0; color:#422f5d; vertical-align: top; line-height: 16px; background-image: url('img/warning-icon-24-50x50.png'); background-repeat: no-repeat; background-position: 2px 2px;background-size: 26px 26px;}
+.transition-header-inner a { text-transform: none; font-weight: normal; }
+
+.transition-message, .transition-message-1  { padding: 10px 10px 10px 60px; margin: 10px auto; border: 2px solid #422f5d; background-image: url('img/warning-icon-24-50x50.png'); background-repeat: no-repeat; background-position: 5px 5px; max-width: 40%; background-color: #ff3; border-radius: 2px; }
+.transition-message a, .transition-message-1 a { text-decoration: none !important; }
+.wpcf7 form { opacity: 0.5; background-color: #f3f3f3; padding: 10px; cursor: not-allowed;}
+
+
+
 .social_link { float: right; background-color: #fff; padding: 5px;  -webkit-border-radius: 5px;  -moz-border-radius: 5px;  border-radius: 5px; }
 .social_link img {width: 100%; height: auto; display: block;}
 header.site .social_link {width: 18px; height: 18px; margin-top: 6px; margin-left: 1em; }
@@ -1019,7 +1030,7 @@ font-family: 'Asap', Arial, Helvetica, sans-serif;
 #commentform input, #commentform textarea {padding:2px; width:98%; margin-top:5px; font-size:16px; color:#666}
 #commentform .form-submit input {width:auto; padding:10px; border-radius:5px; background-color:#53a669; color:#fff; font-size:16px; cursor:pointer; border:none}
 article #commentformp {margin-top:3px}
-
+#comments a.comment-reply-link { display: none; }
 
 /* Footer */
 footer {background-color:#422f5d; padding-bottom:60px; padding-top:20px;}
@@ -1477,3 +1488,4 @@ xh1.archive-title span { display: table-cell; }
 
 .category-description {display: inline-block; padding: 6px; }
 #main .category-description p {margin: 0; font-size: 16px;}
+

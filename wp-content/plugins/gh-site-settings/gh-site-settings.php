@@ -380,7 +380,7 @@ class GH_Site_Settings {
 
 		$options = get_option( 'gh_custom_footer_settings' );
 
-		$html = !empty( $options['gh_fundedby_logo'] ) ? '<h5>Funded by</h5><image src="'.$options['gh_fundedby_logo'].'" />' : NULL;
+		$html = !empty( $options['gh_fundedby_logo'] ) ? '<h5>2014-17: Funded by</h5><image src="'.$options['gh_fundedby_logo'].'" />' : NULL;
 
 		return $html;
 
@@ -390,7 +390,7 @@ class GH_Site_Settings {
 
 		$options = get_option( 'gh_custom_footer_settings' );
 
-		$html = !empty( $options['gh_deliveredby_logo'] ) ? '<h5>Delivered by</h5><image src="'.$options['gh_deliveredby_logo'].'" />' : NULL;
+		$html = !empty( $options['gh_deliveredby_logo'] ) ? '<h5>2014-17: Delivered by</h5><image src="'.$options['gh_deliveredby_logo'].'" />' : NULL;
 
 		return $html;
 
@@ -399,6 +399,8 @@ class GH_Site_Settings {
 	public static function gh_social_media_links($html = null) {
 
 		$options = get_option( 'gh_custom_main_settings' );
+
+		return '<span style="color:#fff">Email us at <a href="mailto:info@genderhub.org">info@genderhub.org</a></span>';
 
 		$twitter_icon = '<img src="'.get_stylesheet_directory_uri().'/img/icon-twitter.png'.'" />';
 		$facebook_icon = '<img src="'.get_stylesheet_directory_uri().'/img/icon-facebook.png'.'" />';

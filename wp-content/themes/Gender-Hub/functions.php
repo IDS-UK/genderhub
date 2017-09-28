@@ -7,9 +7,7 @@ class GenderHub_2017 {
 	    include('inc/gh-page-meta.php');
 	    include('inc/gh-social-media-posts.php');
 
-	    add_action( 'init', array($this, 'gh_editor_capabilities') );
-	    add_action( 'init', array($this, 'custom_rewrite_basic') );
-	    add_action( 'wp_head', array($this, 'canonical_for_comments') );
+	    add_action( 'init', 'gh_editor_capabilities' );
 	    add_action( 'after_setup_theme', array($this, 'setup') );
 	    add_action( 'wp_enqueue_scripts', array($this, 'gh_scripts_front') );
 	    add_action( 'admin_enqueue_scripts', array($this, 'gh_scripts_admin') );
@@ -20,13 +18,11 @@ class GenderHub_2017 {
 	    add_action( 'do_meta_boxes', array($this, 'gh_reposition_metaboxes') );
 	    add_action( 'edit_form_after_title', array($this, 'gh_after_title_metaboxes') );
 	    add_action( 'admin_menu', array($this, 'gh_tidy_meta_boxes') );
-	    add_action( 'add_meta_boxes', array($this, 'genderhub_custom_meta') );
 
 	    add_action ('after_wp_tiny_mce', array($this, 'gh_disable_open_new_window') );
 
         add_action( 'wp_loaded', array($this, 'gh_relabel_items') );
 
-	    add_filter( 'wp_image_editors', array($this, 'change_graphic_lib') );
 	    add_filter( 'image_size_names_choose', array($this, 'custom_image_sizes_choose') );
 	    add_filter( 'body_class', array($this, 'gh_body_classes') );
 	    add_filter( 'login_errors', create_function('$a', "return null;") );
@@ -358,10 +354,6 @@ class GenderHub_2017 {
 		));
 	}
 
-	function change_graphic_lib($array) {
-		return array( 'WP_Image_Editor_GD', 'WP_Image_Editor_Imagick' );
-	}
-
 	function practical_tools_filter($query) {
 		if (!is_admin() && is_post_type_archive('practical_tools')) {
 			$tax_query = array(
@@ -504,23 +496,6 @@ class GenderHub_2017 {
 		return $terms;
 	}
 
-	function genderhub_custom_meta() {
-		add_meta_box(
-            'genderhub_meta',
-            __( 'Current Active Categories', 'genderhub' ),
-            array($this, 'genderhub_meta_callback'),
-            'ids_documents',
-            'side',
-            'high'  );
-	}
-
-	function genderhub_meta_callback( $post ) {
-		echo $sep = '';
-		foreach((get_the_category()) as $category) {
-			echo $sep . $category->cat_name; $sep = ', ';
-		};
-	}
-
 	function gh_reposition_metaboxes() {
 
 		remove_meta_box( 'postexcerpt', 'programme_alerts', 'normal' );
@@ -569,20 +544,6 @@ class GenderHub_2017 {
 
 		$role = get_role( 'editor' );
 		$role->remove_cap( 'manage_categories' );
-	}
-
-	function custom_rewrite_basic() {
-		add_rewrite_rule('^csw60/?', 'index.php?page_id=30914', 'top');
-	}
-
-	function canonical_for_comments() {
-		global $cpage, $post;
-		if ( $cpage > 1 ) :
-			echo "n";
-			echo "<link rel='canonical' href='";
-			echo get_permalink( $post->ID );
-			echo "' />n";
-		endif;
 	}
 
 	public static function gh_array_shift($array, $k, $id) {
@@ -892,12 +853,13 @@ class Slikkr_Custom_Menu_Walker extends Walker_Nav_Menu {
 	}
 }
 
-// Generic functions and theme options
+// Generic functiona and theme options
 function get_words($sentence, $count = 30) {
   preg_match("/(?:\w+(?:\W+|$)){0,$count}/", $sentence, $matches);
   return $matches[0];
 }
 
+// current page url
 function current_page_url() {
   $pageURL = 'http';
   if( isset($_SERVER["HTTPS"]) ) {
@@ -912,6 +874,9 @@ function current_page_url() {
   return $pageURL;
 }
 
+
+// Numbered Pagination
+// used on search results - checked feb 2017
 if ( !function_exists( 'genderhub_pagination' ) ) {
   function genderhub_pagination() {  
     $prev_arrow = is_rtl() ? '' : '&larr;';
@@ -939,6 +904,77 @@ $format = '&paged=%#%';
       ) );
     }
   }
+}
+
+// canonical urls for comments to avoid duplicate content
+
+function canonical_for_comments() {
+  global $cpage, $post;
+  if ( $cpage > 1 ) :
+	  echo "n";
+	  echo "<link rel='canonical' href='";
+	  echo get_permalink( $post->ID );
+	  echo "' />n";
+  endif;
+}
+add_action( 'wp_head', 'canonical_for_comments' );
+
+
+
+
+function custom_rewrite_basic() {
+  add_rewrite_rule('^csw60/?', 'index.php?page_id=30914', 'top');
+}
+add_action('init', 'custom_rewrite_basic');
+
+
+function process_found_posts($posts) {
+  $post_types = get_query_var('post_type');
+  if (!is_admin() && is_archive() && (is_array($post_types) && in_array('practical_tools', $post_types)) ) {
+    $dummy_post = new WP_Post((object)array('ID'=> 0,'post_title'   => 'Bla blah'));
+    $dummy_post->post_type = 'practical_tools';
+    $dummy_post->filter = 'raw';
+    array_unshift($posts, $dummy_post);
+  }
+  return $posts;  
+}
+add_filter('the_posts', 'process_found_posts');
+
+
+
+
+/**
+ * slkr - this really belongs in ids documents post type
+ */
+function genderhub_custom_meta() {
+    add_meta_box( 'genderhub_meta', __( 'Current Active Categories', 'genderhub' ), 'genderhub_meta_callback', 'ids_documents', 'side', 'high'  );
+}
+add_action( 'add_meta_boxes', 'genderhub_custom_meta' );
+
+/**
+ * Outputs the content of the meta box
+ */
+function genderhub_meta_callback( $post ) {
+    echo $sep = '';
+foreach((get_the_category()) as $category) {
+echo $sep . $category->cat_name; $sep = ', ';
+};  
+}
+
+
+
+
+/// place RSS Aggregator Images to Custom Field ///
+add_filter( 'wprss_ftp_featured_image_meta', 'save_url_custom_field' );
+function save_url_custom_field() {
+   return 'publisher_logo'; // Replace with name of desired meta key
+}
+/// This error appears in the plugin’s Error Log when an image was not imported due to WordPress’ security check for the image’s extension. Some sites will deliver images without extensions in the URL, but will still send the correct MIME type. The filter below will allow the plugin to bypass this security check, and import images correctly: ///
+add_filter( 'wprss_ftp_override_upload_security', '__return_true' );
+
+add_filter( 'wp_image_editors', 'change_graphic_lib' );
+function change_graphic_lib($array) {
+    return array( 'WP_Image_Editor_GD', 'WP_Image_Editor_Imagick' );
 }
 
 function format_link($url, $title = '', $scheme = 'http://') {
@@ -1146,6 +1182,8 @@ function ids_pretty_date( $start, $end = NULL, $fmt = NULL ) {
     return $complete_date;
 }
 
+
+
 // POSSIBLY CAN DELETE EVERYTHING UNDER HERE
 
 function twentytwelve_wp_title( $title, $sep ) {
@@ -1181,24 +1219,3 @@ function enable_custom_fields_per_default( $hidden ) {
 	return $hidden;
 }
 add_filter( 'default_hidden_meta_boxes', 'enable_custom_fields_per_default', 20, 1 );
-
-/// place RSS Aggregator Images to Custom Field ///
-add_filter( 'wprss_ftp_featured_image_meta', 'save_url_custom_field' );
-function save_url_custom_field() {
-	return 'publisher_logo'; // Replace with name of desired meta key
-}
-
-/// This error appears in the plugin’s Error Log when an image was not imported due to WordPress’ security check for the image’s extension. Some sites will deliver images without extensions in the URL, but will still send the correct MIME type. The filter below will allow the plugin to bypass this security check, and import images correctly: ///
-add_filter( 'wprss_ftp_override_upload_security', '__return_true' );
-
-function process_found_posts($posts) {
-	$post_types = get_query_var('post_type');
-	if (!is_admin() && is_archive() && (is_array($post_types) && in_array('practical_tools', $post_types)) ) {
-		$dummy_post = new WP_Post((object)array('ID'=> 0,'post_title'   => 'Bla blah'));
-		$dummy_post->post_type = 'practical_tools';
-		$dummy_post->filter = 'raw';
-		array_unshift($posts, $dummy_post);
-	}
-	return $posts;
-}
-add_filter('the_posts', 'process_found_posts');
